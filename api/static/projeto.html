@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Gerenciamento de Projetos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 2em;
+    }
+
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: none;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      font-weight: 600;
+    }
+
+    .btn {
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .table {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .table th {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: #667eea !important;
+    }
+
+    .btn-logout {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+    
+    .status-pendente {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    .status-andamento {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    .status-concluido {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container">
+      <a class="navbar-brand" href="dashboard.html">
+        <i class="bi bi-kanban"></i> Sistema de Projetos
+      </a>
+      <div class="d-flex align-items-center">
+        <span class="navbar-text me-3" id="userWelcome"></span>
+        <a href="usuario.html" class="btn btn-outline-primary me-2">
+          <i class="bi bi-people"></i> Usuários
+        </a>
+        <a href="projeto.html" class="btn btn-outline-success me-2">
+          <i class="bi bi-folder"></i> Projetos
+        </a>
+        <a href="tarefa.html" class="btn btn-outline-warning me-2">
+          <i class="bi bi-check-square"></i> Tarefas
+        </a>
+        <button class="btn btn-logout" id="btnLogout">
+          <i class="bi bi-box-arrow-right"></i> Sair
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="mb-4 text-dark">
+      <i class="bi bi-folder"></i> Gerenciamento de Projetos
+    </h1>
+
+    <!-- ======================== FORMULÁRIO DE CADASTRO ======================== -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-plus-circle"></i> Cadastro de Projeto
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-2">
+            <input type="number" id="txtId" class="form-control mb-3" disabled placeholder="ID (automático)" />
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="txtNome" class="form-control mb-3" placeholder="Nome do Projeto" />
+          </div>
+          <div class="col-md-4">
+            <select id="selStatus" class="form-select mb-3">
+              <option value="">Selecione o status</option>
+              <option value="pendente">Pendente</option>
+              <option value="andamento">Em Andamento</option>
+              <option value="concluido">Concluído</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <select id="selUsuario" class="form-select mb-3">
+              <option value="">Responsável pelo projeto</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <textarea id="txtDescricao" class="form-control" rows="3" placeholder="Descrição do Projeto"></textarea>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <label for="txtDataInicio" class="form-label">Data de Início</label>
+            <input type="date" id="txtDataInicio" class="form-control mb-3" />
+          </div>
+          <div class="col-md-6">
+            <label for="txtDataFim" class="form-label">Data de Término</label>
+            <input type="date" id="txtDataFim" class="form-control mb-3" />
+          </div>
+        </div>
+
+        <div class="mb-3 d-flex gap-2" id="divBotoes"></div>
+      </div>
+
+      <div id="divResposta" class="alert m-3" style="display: none;"></div>
+    </div>
+
+    <!-- ======================== TABELA DE PROJETOS ======================== -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <i class="bi bi-list-ul"></i> Lista de Projetos
+        <button class="btn btn-sm btn-outline-light float-end" onclick="listAll()">
+          <i class="bi bi-arrow-clockwise"></i> Atualizar
+        </button>
+      </div>
+      <div class="card-body">
+        <div id="divTabela">
+          <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando projetos...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="modalConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalConfirmLabel">
+            <i class="bi bi-exclamation-triangle text-warning"></i> Confirmação
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+            <i class="bi bi-trash"></i> Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import ApiService from './ApiService.js';
+
+    // ======================== AUTENTICAÇÃO ========================
+    let userData = localStorage.getItem("userData");
+    if (userData) {
+      userData = JSON.parse(userData);
+      
+      // Configurar saudação do usuário
+      const userInfo = userData.usuario || userData.data?.usuario || userData.data?.user?.usuario;
+      if (userInfo) {
+        const userName = userInfo.nome || userInfo.name || 'Usuário';
+        document.getElementById('userWelcome').textContent = `Olá, ${userName}`;
+      }
+    } else {
+      window.location.href = "login.html";
+    }
+
+    const token = localStorage.getItem("token") || userData.token || userData.data?.token;
+    
+    const api = new ApiService(token, "http://localhost:5000");
+
+    let API_DATA;
+    let usuarios = [];
+
+    // ======================== ELEMENTOS HTML ========================
+    const txtId = document.getElementById("txtId");
+    const txtNome = document.getElementById("txtNome");
+    const txtDescricao = document.getElementById("txtDescricao");
+    const selStatus = document.getElementById("selStatus");
+    const selUsuario = document.getElementById("selUsuario");
+    const txtDataInicio = document.getElementById("txtDataInicio");
+    const txtDataFim = document.getElementById("txtDataFim");
+    const divBotoes = document.getElementById("divBotoes");
+    const divResposta = document.getElementById("divResposta");
+    const btnLogout = document.getElementById("btnLogout");
+
+    // ======================== FUNÇÃO AUXILIAR PARA CRIAR BOTÕES ========================
+    function createButton(text, className, icon = null) {
+      const btn = document.createElement("button");
+      btn.innerHTML = icon ? `<i class="bi ${icon}"></i> ${text}` : text;
+      btn.className = `btn ${className} flex-fill`;
+      return btn;
+    }
+
+    // ======================== BOTÕES CRUD ========================
+    const btnCriar = createButton("Criar", "btn-success", "bi-plus-circle");
+    btnCriar.onclick = async () => {
+      if (txtNome.value.trim() === "") {
+        showMessage("Nome é obrigatório", "warning");
+        txtNome.focus();
+        return;
+      }
+
+      if (!selStatus.value) {
+        showMessage("Status é obrigatório", "warning");
+        selStatus.focus();
+        return;
+      }
+
+      // ✅ CORREÇÃO: Formata as datas para o formato correto (yyyy-MM-dd)
+      const dataInicio = txtDataInicio.value ? formatDateForInput(txtDataInicio.value) : null;
+      const dataFim = txtDataFim.value ? formatDateForInput(txtDataFim.value) : null;
+
+      const objetoCriar = {
+        "projeto": {
+          "nome": txtNome.value.trim(),
+          "descricao": txtDescricao.value.trim(),
+          "status": selStatus.value,
+          "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null,
+          "data_inicio": dataInicio,
+          "data_fim": dataFim
+        }
+      };
+
+      try {
+        const resposta = await api.post("/api/projeto/", objetoCriar);
+        
+        // ✅ CORREÇÃO: Verificação completa da resposta
+        if (resposta && resposta.success === false) {
+          showMessage(resposta.error?.message || "Erro ao criar projeto", "danger");
+          return;
+        }
+        
+        if (resposta && resposta.success) {
+          showMessage("Projeto criado com sucesso!", "success");
+          listAll();
+          limparFormulario();
+        } else {
+          showMessage("Erro ao criar projeto: resposta inválida", "danger");
+        }
+      } catch (error) {
+        showMessage("Erro ao criar projeto: " + error.message, "danger");
+      }
+    };
+    divBotoes.appendChild(btnCriar);
+
+    const btnAtualizar = createButton("Atualizar", "btn-warning", "bi-arrow-clockwise");
+    btnAtualizar.onclick = async () => {
+      const id = txtId.value.trim();
+      if (!id) {
+        showMessage("Selecione um projeto para atualizar", "warning");
+        return;
+      }
+
+      if (txtNome.value.trim() === "") {
+        showMessage("Nome é obrigatório", "warning");
+        txtNome.focus();
+        return;
+      }
+
+      if (!selStatus.value) {
+        showMessage("Status é obrigatório", "warning");
+        selStatus.focus();
+        return;
+      }
+
+      // ✅ CORREÇÃO: Formata as datas para o formato correto (yyyy-MM-dd)
+      const dataInicio = txtDataInicio.value ? formatDateForInput(txtDataInicio.value) : null;
+      const dataFim = txtDataFim.value ? formatDateForInput(txtDataFim.value) : null;
+
+      const objetoAtualizar = {
+        "projeto": {
+          "nome": txtNome.value.trim(),
+          "descricao": txtDescricao.value.trim(),
+          "status": selStatus.value,
+          "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null,
+          "data_inicio": dataInicio,
+          "data_fim": dataFim
+        }
+      };
+
+      try {
+        // ✅ CORREÇÃO: Usa put com URL correta (sem barra extra)
+        const resposta = await api.put("/api/projeto", id, objetoAtualizar);
+        
+        // ✅ CORREÇÃO: Verificação completa da resposta
+        if (resposta && resposta.success === false) {
+          showMessage(resposta.error?.message || "Erro ao atualizar projeto", "danger");
+          return;
+        }
+        
+        if (resposta && resposta.success) {
+          showMessage("Projeto atualizado com sucesso!", "success");
+          listAll();
+          limparFormulario();
+        } else {
+          showMessage("Erro ao atualizar projeto: resposta inválida", "danger");
+        }
+      } catch (error) {
+        showMessage("Erro ao atualizar projeto: " + error.message, "danger");
+      }
+    };
+    divBotoes.appendChild(btnAtualizar);
+
+    const btnExcluir = createButton("Excluir", "btn-danger", "bi-trash");
+    btnExcluir.onclick = function () {
+      const id = txtId.value.trim();
+      if (!id) {
+        showMessage("Selecione um projeto para excluir", "warning");
+        return;
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById('modalConfirm'));
+      modal.show();
+
+      const btnConfirmDelete = document.getElementById("btnConfirmDelete");
+      btnConfirmDelete.replaceWith(btnConfirmDelete.cloneNode(true));
+      const newBtnConfirm = document.getElementById("btnConfirmDelete");
+
+      newBtnConfirm.onclick = async function () {
+        try {
+          // ✅ CORREÇÃO: Usa delete com URL correta (sem barra extra)
+          const resposta = await api.delete("/api/projeto", id);
+          
+          // ✅ CORREÇÃO: Verificação completa da resposta
+          if (resposta && resposta.success === false) {
+            showMessage(resposta.error?.message || "Erro ao excluir projeto", "danger");
+            return;
+          }
+          
+          if (resposta && resposta.success) {
+            showMessage(`Projeto ID ${id} excluído com sucesso.`, "success");
+            listAll();
+            limparFormulario();
+          } else {
+            showMessage("Erro ao excluir projeto: resposta inválida", "danger");
+          }
+        } catch (error) {
+          showMessage(`Erro ao excluir projeto: ${error.message}`, "danger");
+        } finally {
+          modal.hide();
+        }
+      };
+    };
+    divBotoes.appendChild(btnExcluir);
+
+    const btnLimpar = createButton("Limpar", "btn-info", "bi-eraser");
+    btnLimpar.onclick = limparFormulario;
+    divBotoes.appendChild(btnLimpar);
+
+    // ======================== FUNÇÕES DE SUPORTE ========================
+    function showMessage(message, type) {
+      divResposta.textContent = message;
+      divResposta.className = `alert alert-${type} m-3`;
+      divResposta.style.display = 'block';
+
+      if (type === 'success') {
+        setTimeout(() => {
+          divResposta.style.display = 'none';
+        }, 3000);
+      }
+    }
+    
+    // ✅ CORREÇÃO: Função para formatar data para o formato yyyy-MM-dd
+    function formatDateForInput(dateString) {
+      if (!dateString) return null;
+      
+      // Se já está no formato yyyy-MM-dd, retorna como está
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return dateString;
+      }
+      
+      // Se está no formato yyyy-MM-ddTHH:mm:ss, extrai apenas a parte da data
+      if (dateString.includes('T')) {
+        return dateString.split('T')[0];
+      }
+      
+      // Tenta converter de outros formatos
+      try {
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+          return date.toISOString().split('T')[0];
+        }
+      } catch (e) {
+        console.error('Erro ao formatar data:', e);
+      }
+      
+      return dateString;
+    }
+    
+    // ✅ CORREÇÃO: Função para converter data do backend para input date
+    function formatDateFromBackend(dateString) {
+      if (!dateString) return '';
+      
+      // Se já está no formato yyyy-MM-dd, retorna como está
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return dateString;
+      }
+      
+      // Se está no formato yyyy-MM-ddTHH:mm:ss, extrai apenas a parte da data
+      if (dateString.includes('T')) {
+        return dateString.split('T')[0];
+      }
+      
+      // Tenta converter de outros formatos
+      try {
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+          return date.toISOString().split('T')[0];
+        }
+      } catch (e) {
+        console.error('Erro ao converter data do backend:', e);
+      }
+      
+      return dateString;
+    }
+
+    async function carregarUsuarios() {
+      try {
+        const resposta = await api.get("/api/usuario/");
+        
+        // ✅ CORREÇÃO: Verificação de erro na resposta
+        if (resposta && resposta.success === false) {
+          console.error("Erro ao carregar usuários:", resposta.error?.message);
+          return;
+        }
+        
+        usuarios = [];
+        
+        if (resposta && Array.isArray(resposta)) {
+          usuarios = resposta;
+        } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+          usuarios = resposta.data;
+        } else if (resposta && resposta.success && Array.isArray(resposta.data?.usuarios)) {
+          usuarios = resposta.data.usuarios;
+        } else if (resposta && resposta.usuarios && Array.isArray(resposta.usuarios)) {
+          usuarios = resposta.usuarios;
+        }
+        
+        selUsuario.innerHTML = '<option value="">Responsável pelo projeto</option>';
+        usuarios.forEach(usuario => {
+          const option = document.createElement("option");
+          option.value = usuario.id;
+          option.textContent = usuario.nome;
+          selUsuario.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar usuários:", error);
+      }
+    }
+
+    async function listAll() {
+      try {
+        const resposta = await api.get("/api/projeto/");
+        
+        // ✅ CORREÇÃO: Verificação de erro na resposta
+        if (resposta && resposta.success === false) {
+          showMessage("Erro ao carregar projetos: " + (resposta.error?.message || "Erro desconhecido"), "danger");
+          return;
+        }
+        
+        renderTable(resposta);
+      } catch (error) {
+        showMessage("Erro ao carregar projetos: " + error.message, "danger");
+      }
+    }
+
+    function limparFormulario() {
+      txtId.value = "";
+      txtNome.value = "";
+      txtDescricao.value = "";
+      selStatus.value = "";
+      selUsuario.value = "";
+      txtDataInicio.value = "";
+      txtDataFim.value = "";
+      divResposta.style.display = "none";
+    }
+
+    function renderTable(dados) {
+      const divTabela = document.getElementById("divTabela");
+      divTabela.innerHTML = "";
+
+      let projetos = [];
+
+      // ✅ CORREÇÃO: Tratamento melhorado da estrutura de resposta
+      if (dados && dados.success && dados.data && Array.isArray(dados.data.projetos)) {
+        projetos = dados.data.projetos;
+      } else if (dados && Array.isArray(dados)) {
+        projetos = dados;
+      } else if (dados && dados.data && Array.isArray(dados.data)) {
+        projetos = dados.data;
+      } else if (dados && dados.success && Array.isArray(dados.data)) {
+        projetos = dados.data;
+      } else if (dados && dados.projetos && Array.isArray(dados.projetos)) {
+        projetos = dados.projetos;
+      }
+
+      if (!projetos || projetos.length === 0) {
+        divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhum Projeto encontrado!</div>';
+        return;
+      }
+
+      const table = document.createElement("table");
+      table.className = "table table-bordered table-striped table-hover";
+
+      const thead = document.createElement("thead");
+      thead.className = "table-light";
+      const trHead = document.createElement("tr");
+
+      ["ID", "Nome", "Status", "Responsável", "Data Início", "Data Fim", "Ações"].forEach(text => {
+        const th = document.createElement("th");
+        th.textContent = text;
+        trHead.appendChild(th);
+      });
+
+      thead.appendChild(trHead);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      projetos.forEach(projeto => {
+        const tr = document.createElement("tr");
+
+        // ID
+        const tdId = document.createElement("td");
+        tdId.textContent = projeto.id;
+        tr.appendChild(tdId);
+
+        // Nome
+        const tdNome = document.createElement("td");
+        tdNome.textContent = projeto.nome;
+        tr.appendChild(tdNome);
+
+        // Status
+        const tdStatus = document.createElement("td");
+        const statusClass = `status-${projeto.status}`;
+        tdStatus.className = statusClass;
+        tdStatus.textContent = formatarStatus(projeto.status);
+        tr.appendChild(tdStatus);
+
+        // Responsável
+        const tdResponsavel = document.createElement("td");
+        if (projeto.usuario_id) {
+          const usuario = usuarios.find(u => u.id === projeto.usuario_id);
+          tdResponsavel.textContent = usuario ? usuario.nome : 'N/A';
+        } else {
+          tdResponsavel.textContent = 'Não atribuído';
+        }
+        tr.appendChild(tdResponsavel);
+
+        // Data Início
+        const tdDataInicio = document.createElement("td");
+        tdDataInicio.textContent = projeto.data_inicio ? 
+          new Date(projeto.data_inicio).toLocaleDateString('pt-BR') : 'N/A';
+        tr.appendChild(tdDataInicio);
+
+        // Data Fim
+        const tdDataFim = document.createElement("td");
+        tdDataFim.textContent = projeto.data_fim ? 
+          new Date(projeto.data_fim).toLocaleDateString('pt-BR') : 'N/A';
+        tr.appendChild(tdDataFim);
+
+        // Ações
+        const tdAcoes = document.createElement("td");
+        const divBotoes = document.createElement("div");
+        divBotoes.className = "d-flex gap-2";
+
+        const btnSel = createButton("Selecionar", "btn-info btn-sm", "bi-pencil");
+        btnSel.onclick = () => {
+          txtId.value = projeto.id;
+          txtNome.value = projeto.nome;
+          txtDescricao.value = projeto.descricao || "";
+          selStatus.value = projeto.status;
+          selUsuario.value = projeto.usuario_id || "";
+          
+          // ✅ CORREÇÃO: Formata as datas para o input type="date"
+          txtDataInicio.value = formatDateFromBackend(projeto.data_inicio);
+          txtDataFim.value = formatDateFromBackend(projeto.data_fim);
+          
+          showMessage("Projeto selecionado para edição", "info");
+        };
+        divBotoes.appendChild(btnSel);
+
+        tdAcoes.appendChild(divBotoes);
+        tr.appendChild(tdAcoes);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      divTabela.appendChild(table);
+    }
+    
+    function formatarStatus(status) {
+      const statusMap = {
+        'pendente': 'Pendente',
+        'andamento': 'Em Andamento',
+        'concluido': 'Concluído'
+      };
+      return statusMap[status] || status;
+    }
+
+    // Logout
+    btnLogout.addEventListener('click', function() {
+      if (confirm('Tem certeza que deseja sair?')) {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Carregar dados ao iniciar
+    carregarUsuarios();
+    listAll();
+
+    console.log("🚀 Página de projetos carregada!");
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

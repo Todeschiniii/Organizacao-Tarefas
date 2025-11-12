@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Login - Sistema de Projetos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2em;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 2em;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 0.5em;
+        }
+
+        .logo p {
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .demo-accounts {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1em;
+            margin-top: 1.5em;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .demo-accounts h6 {
+            color: #495057;
+            margin-bottom: 0.5em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .demo-accounts ul {
+            margin-bottom: 0;
+            padding-left: 1em;
+        }
+
+        .demo-accounts li {
+            margin-bottom: 0.25em;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .demo-accounts li:hover {
+            color: #667eea;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            padding-left: 8px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 0.8em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .user-item {
+            transition: all 0.2s ease;
+        }
+
+        .user-item:hover {
+            transform: translateX(5px);
+        }
+
+        .user-email {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .user-info {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>📊 Sistema de Projetos</h1>
+            <p>Faça login para continuar</p>
+        </div>
+
+        <!-- Formulário de Login -->
+        <div class="mb-3">
+            <label for="txtEmail" class="form-label">Email</label>
+            <input type="email" id="txtEmail" class="form-control" placeholder="seu@email.com" />
+        </div>
+
+        <div class="mb-3">
+            <label for="txtSenha" class="form-label">Senha</label>
+            <input type="password" id="txtSenha" class="form-control" placeholder="Sua senha" />
+        </div>
+
+        <!-- Botão de Login -->
+        <div class="mb-3">
+            <button id="btnLogin" class="btn btn-login w-100">Entrar</button>
+        </div>
+
+        <!-- Mensagens de resposta -->
+        <div id="divResposta" class="alert" style="display: none;"></div>
+
+        <!-- Contas disponíveis (carregadas dinamicamente) -->
+        <div class="demo-accounts">
+            <h6>
+                <span>📋 Usuários do Sistema:</span>
+                <button id="btnRefreshUsers" class="refresh-btn" title="Atualizar lista">
+                    ↻ Atualizar
+                </button>
+            </h6>
+            <div id="usersList">
+                <div class="text-center">
+                    <span class="loading-spinner"></span>
+                    Carregando usuários...
+                </div>
+            </div>
+            <small class="text-muted">Clique em um usuário para preencher automaticamente.</small>
+        </div>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                Sistema de Gerenciamento de Projetos v1.0
+            </small>
+        </div>
+    </div>
+
+    <script type="module">
+        import ApiService from './ApiService.js';
+
+        // Referências para elementos do DOM
+        const txtEmail = document.getElementById("txtEmail");
+        const txtSenha = document.getElementById("txtSenha");
+        const btnLogin = document.getElementById("btnLogin");
+        const btnRefreshUsers = document.getElementById("btnRefreshUsers");
+        const divResposta = document.getElementById("divResposta");
+        const usersList = document.getElementById("usersList");
+
+        // Verificar se já está logado
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+            window.location.href = "dashboard.html";
+        }
+
+        // ApiService instance (sem token para buscar usuários)
+        const api = new ApiService(null, "http://localhost:5000");
+
+        /**
+         * Exibe mensagem na tela
+         * @param {string} message - Mensagem a ser exibida
+         * @param {string} type - Tipo da mensagem (success, danger, warning, info)
+         */
+        function showMessage(message, type) {
+            divResposta.textContent = message;
+            divResposta.className = `alert alert-${type}`;
+            divResposta.style.display = 'block';
+            
+            // Auto-esconder mensagens de sucesso após 3 segundos
+            if (type === 'success') {
+                setTimeout(() => {
+                    divResposta.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        /**
+         * Valida os campos do formulário
+         * @returns {boolean} True se válido, False se inválido
+         */
+        function validarFormulario() {
+            if (txtEmail.value.trim() === "") {
+                showMessage("Email é obrigatório", "warning");
+                txtEmail.focus();
+                return false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(txtEmail.value)) {
+                showMessage("Formato de email inválido", "warning");
+                txtEmail.focus();
+                return false;
+            }
+
+            if (txtSenha.value.trim() === "") {
+                showMessage("Senha é obrigatória", "warning");
+                txtSenha.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Realiza o login do usuário
+         */
+        async function realizarLogin() {
+            // Validar formulário
+            if (!validarFormulario()) {
+                return;
+            }
+
+            // Mostrar loading no botão
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Entrando...';
+
+            try {
+                const dadosLogin = {
+                    "usuario": {
+                        "email": txtEmail.value.trim(),
+                        "senha": txtSenha.value.trim()
+                    }
+                };
+
+                console.log("🔐 Enviando requisição de login...", dadosLogin);
+
+                const resposta = await api.post("/api/usuario/login", dadosLogin);
+                console.log("📨 Resposta da API:", resposta);
+
+                if (resposta && resposta.success) {
+                    showMessage("Login realizado com sucesso! Redirecionando...", "success");
+                    
+                    // Salvar dados do usuário no localStorage
+                    localStorage.setItem("userData", JSON.stringify(resposta.data));
+                    if (resposta.data.token) {
+                        localStorage.setItem("token", resposta.data.token);
+                    }
+                    
+                    // Redirecionar após breve delay
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html";
+                    }, 1000);
+                    
+                } else {
+                    showMessage(resposta?.error?.message || "Erro ao fazer login", "danger");
+                }
+
+            } catch (error) {
+                console.error("❌ Erro no login:", error);
+                showMessage("Erro de conexão. Verifique se o servidor Flask está rodando.", "danger");
+            } finally {
+                // Restaurar botão
+                btnLogin.disabled = false;
+                btnLogin.textContent = "Entrar";
+            }
+        }
+
+        /**
+         * Carrega a lista de usuários do banco de dados
+         */
+        async function carregarUsuarios() {
+            try {
+                usersList.innerHTML = '<div class="text-center"><span class="loading-spinner"></span> Carregando usuários...</div>';
+                
+                console.log("📋 Buscando lista de usuários...");
+                
+                const resposta = await api.get("/api/usuario/");
+                console.log("👥 Resposta completa da API:", resposta);
+
+                let usuarios = [];
+
+                // ✅ CORREÇÃO MELHORADA: Lida com diferentes estruturas de resposta
+                if (resposta && Array.isArray(resposta)) {
+                    usuarios = resposta;
+                } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+                    usuarios = resposta.data;
+                } else if (resposta && resposta.success && Array.isArray(resposta.data?.usuarios)) {
+                    usuarios = resposta.data.usuarios;
+                } else if (resposta && resposta.usuarios && Array.isArray(resposta.usuarios)) {
+                    usuarios = resposta.usuarios;
+                } else if (resposta && resposta.error) {
+                    // Se houver erro (como 401), tenta buscar sem autenticação
+                    console.warn("Erro ao carregar usuários:", resposta.error);
+                    await carregarUsuariosFallback();
+                    return;
+                } else {
+                    console.warn("⚠️ Estrutura de resposta inesperada:", resposta);
+                    await carregarUsuariosFallback();
+                    return;
+                }
+
+                if (usuarios.length === 0) {
+                    usersList.innerHTML = `
+                        <div class="alert alert-warning">
+                            <strong>Nenhum usuário encontrado</strong><br>
+                            <small>Cadastre um usuário primeiro através da API</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Criar lista de usuários
+                exibirUsuarios(usuarios);
+
+                console.log(`✅ ${usuarios.length} usuários carregados com sucesso`);
+
+            } catch (error) {
+                console.error('❌ Erro ao carregar usuários:', error);
+                await carregarUsuariosFallback();
+            }
+        }
+
+        /**
+         * Método fallback para carregar usuários caso o endpoint principal falhe
+         */
+        async function carregarUsuariosFallback() {
+            try {
+                // Tenta um endpoint alternativo ou método diferente
+                const resposta = await api.get("/api/usuario/todos");
+                if (resposta && Array.isArray(resposta)) {
+                    exibirUsuarios(resposta);
+                    return;
+                }
+            } catch (fallbackError) {
+                console.log('Tentativa fallback também falhou:', fallbackError);
+            }
+
+            usersList.innerHTML = `
+                <div class="alert alert-info">
+                    <small>Digite manualmente seu email e senha cadastrados.</small>
+                </div>
+            `;
+        }
+
+        /**
+         * Exibe a lista de usuários na interface
+         */
+        function exibirUsuarios(usuarios) {
+            const ul = document.createElement('ul');
+            ul.className = 'list-unstyled';
+            
+            usuarios.forEach(usuario => {
+                const li = document.createElement('li');
+                li.className = 'user-item';
+                
+                // Formatar informações do usuário
+                const nome = usuario.nome || 'Nome não informado';
+                const email = usuario.email || 'Email não informado';
+                const id = usuario.id || 'N/A';
+                const dataCriacao = formatarData(usuario.data_criacao);
+                
+                li.innerHTML = `
+                    <div>
+                        <span class="user-email">${email}</span>
+                        <br>
+                        <span class="user-info">
+                            <strong>${nome}</strong> • ID: ${id} • Cadastro: ${dataCriacao}
+                        </span>
+                    </div>
+                `;
+                
+                li.title = `Clique para usar: ${email}`;
+                
+                li.addEventListener('click', () => {
+                    txtEmail.value = email;
+                    txtSenha.value = '123456'; // Senha padrão para demonstração
+                    showMessage(`Usuário ${nome} selecionado! Senha padrão preenchida. Clique em Entrar.`, 'info');
+                    txtSenha.focus();
+                    txtSenha.select(); // Seleciona a senha para facilitar alteração
+                });
+
+                ul.appendChild(li);
+            });
+
+            usersList.innerHTML = '';
+            usersList.appendChild(ul);
+        }
+
+        /**
+         * Formata data para exibição
+         */
+        function formatarData(dataString) {
+            if (!dataString) return 'Data desconhecida';
+            
+            try {
+                const data = new Date(dataString);
+                return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return 'Data inválida';
+            }
+        }
+
+        // Event Listeners
+        btnLogin.addEventListener("click", realizarLogin);
+        btnRefreshUsers.addEventListener("click", carregarUsuarios);
+
+        // Permitir login com Enter
+        txtSenha.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                realizarLogin();
+            }
+        });
+
+        // Focar no campo de email ao carregar a página
+        txtEmail.focus();
+
+        // Carregar usuários automaticamente ao abrir a página
+        carregarUsuarios();
+
+        console.log("🚀 Página de login carregada!");
+    </script>
+</body>
+</html>

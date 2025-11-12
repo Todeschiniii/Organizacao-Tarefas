@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Projetos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: none;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-card.users { border-left: 4px solid var(--primary-color); }
+        .stats-card.projects { border-left: 4px solid var(--success-color); }
+        .stats-card.tasks { border-left: 4px solid var(--warning-color); }
+        .stats-card.completed { border-left: 4px solid var(--info-color); }
+
+        .stats-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-card p {
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+        }
+
+        .recent-activity {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-left: 3px solid var(--primary-color);
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .activity-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .quick-actions .btn {
+            margin: 0.25rem;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-kanban"></i> Sistema de Projetos
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text me-3" id="userWelcome"></span>
+                <button class="btn btn-logout" id="btnLogout">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="sidebar">
+                    <h5 class="mb-3"><i class="bi bi-menu-button"></i> Menu</h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="dashboard.html">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="usuario.html">
+                            <i class="bi bi-people"></i> Usuários
+                        </a>
+                        <a class="nav-link" href="projeto.html">
+                            <i class="bi bi-folder"></i> Projetos
+                        </a>
+                        <a class="nav-link" href="tarefa.html">
+                            <i class="bi bi-check-square"></i> Tarefas
+                        </a>
+                    </nav>
+
+                    <div class="quick-actions mt-4">
+                        <h6 class="mb-3"><i class="bi bi-lightning"></i> Ações Rápidas</h6>
+                        <div class="d-grid gap-2">
+                            <a href="projeto.html" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-plus-circle"></i> Novo Projeto
+                            </a>
+                            <a href="tarefa.html" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-plus-circle"></i> Nova Tarefa
+                            </a>
+                            <a href="usuario.html" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-person-plus"></i> Novo Usuário
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="col-lg-9">
+                <!-- Welcome Card -->
+                <div class="welcome-card mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 id="welcomeMessage">Bem-vindo de volta!</h2>
+                            <p class="mb-0" id="welcomeSubtitle">Aqui está um resumo das suas atividades recentes.</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <i class="bi bi-graph-up-arrow" style="font-size: 3rem; opacity: 0.8;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card users">
+                            <div class="icon text-primary">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <h3 id="usersCount">0</h3>
+                            <p>Usuários</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card projects">
+                            <div class="icon text-success">
+                                <i class="bi bi-folder"></i>
+                            </div>
+                            <h3 id="projectsCount">0</h3>
+                            <p>Projetos</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card tasks">
+                            <div class="icon text-warning">
+                                <i class="bi bi-check-square"></i>
+                            </div>
+                            <h3 id="tasksCount">0</h3>
+                            <p>Tarefas</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card completed">
+                            <div class="icon text-info">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <h3 id="completedCount">0</h3>
+                            <p>Concluídas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="recent-activity">
+                            <h5 class="mb-4">
+                                <i class="bi bi-clock-history"></i> Atividade Recente
+                            </h5>
+                            <div id="recentActivity">
+                                <div class="activity-item">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Bem-vindo ao Sistema</strong>
+                                        <small class="text-muted">Agora</small>
+                                    </div>
+                                    <p class="mb-0">Você acessou o dashboard do sistema de gerenciamento de projetos.</p>
+                                </div>
+                                <!-- As atividades serão carregadas via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import ApiService from './ApiService.js';
+
+        // Elementos do DOM
+        const userWelcome = document.getElementById('userWelcome');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const welcomeSubtitle = document.getElementById('welcomeSubtitle');
+        const btnLogout = document.getElementById('btnLogout');
+        
+        // Elementos de estatísticas
+        const usersCount = document.getElementById('usersCount');
+        const projectsCount = document.getElementById('projectsCount');
+        const tasksCount = document.getElementById('tasksCount');
+        const completedCount = document.getElementById('completedCount');
+        const recentActivity = document.getElementById('recentActivity');
+
+        // Verificar autenticação
+        let userData = localStorage.getItem("userData");
+
+        if (!userData) {
+            window.location.href = "login.html";
+        } else {
+            userData = JSON.parse(userData);
+            initializeDashboard();
+        }
+
+        async function initializeDashboard() {
+            // ✅ CORREÇÃO: Estrutura correta dos dados do usuário
+            const userInfo = userData.usuario || userData.data?.usuario || userData.data?.user?.usuario;
+            
+            if (!userInfo) {
+                console.error('Estrutura de dados do usuário inválida:', userData);
+                showError('Erro ao carregar dados do usuário');
+                return;
+            }
+
+            const userName = userInfo.nome || userInfo.name || 'Usuário';
+            const userEmail = userInfo.email || '';
+            
+            userWelcome.textContent = `Olá, ${userName}`;
+            welcomeMessage.textContent = `Bem-vindo(a), ${userName}!`;
+            welcomeSubtitle.textContent = `Gerencie seus projetos e tarefas de forma eficiente.`;
+
+            // ✅ CORREÇÃO: ApiService com URL base explícita
+            const token = localStorage.getItem("token") || userData.token || userData.data?.token;
+            if (!token) {
+                console.error('Token não encontrado');
+                window.location.href = "login.html";
+                return;
+            }
+
+            const api = new ApiService(token, "http://localhost:5000");
+
+            try {
+                // Carregar estatísticas
+                await loadStatistics(api);
+                
+                // Carregar atividade recente
+                await loadRecentActivity(api);
+                
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+                showError('Erro ao carregar dados do dashboard');
+            }
+        }
+
+        async function loadStatistics(api) {
+            try {
+                console.log('📊 Carregando estatísticas...');
+
+                // ✅ CORREÇÃO: /api/usuario/ (formato singular)
+                const usuariosRes = await api.get("/api/usuario/");
+                console.log('Resposta usuários:', usuariosRes);
+                
+                if (usuariosRes && Array.isArray(usuariosRes)) {
+                    usersCount.textContent = usuariosRes.length;
+                } else if (usuariosRes && usuariosRes.data && Array.isArray(usuariosRes.data)) {
+                    usersCount.textContent = usuariosRes.data.length;
+                } else if (usuariosRes && usuariosRes.success && Array.isArray(usuariosRes.data?.usuarios)) {
+                    usersCount.textContent = usuariosRes.data.usuarios.length;
+                } else {
+                    usersCount.textContent = '0';
+                    console.warn('Estrutura de resposta de usuários inesperada:', usuariosRes);
+                }
+
+                // ✅ CORREÇÃO: /api/projeto/ (formato singular)
+                const projetosRes = await api.get("/api/projeto/");
+                console.log('Resposta projetos:', projetosRes);
+                
+                if (projetosRes && Array.isArray(projetosRes)) {
+                    projectsCount.textContent = projetosRes.length;
+                } else if (projetosRes && projetosRes.data && Array.isArray(projetosRes.data)) {
+                    projectsCount.textContent = projetosRes.data.length;
+                } else if (projetosRes && projetosRes.success && Array.isArray(projetosRes.data?.projetos)) {
+                    projectsCount.textContent = projetosRes.data.projetos.length;
+                } else {
+                    projectsCount.textContent = '0';
+                    console.warn('Estrutura de resposta de projetos inesperada:', projetosRes);
+                }
+
+                // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
+                const tarefasRes = await api.get("/api/tarefa/");
+                console.log('Resposta tarefas:', tarefasRes);
+                
+                let todasTarefas = [];
+                
+                if (tarefasRes && Array.isArray(tarefasRes)) {
+                    todasTarefas = tarefasRes;
+                } else if (tarefasRes && tarefasRes.data && Array.isArray(tarefasRes.data)) {
+                    todasTarefas = tarefasRes.data;
+                } else if (tarefasRes && tarefasRes.success && Array.isArray(tarefasRes.data?.tarefas)) {
+                    todasTarefas = tarefasRes.data.tarefas;
+                } else {
+                    console.warn('Estrutura de resposta de tarefas inesperada:', tarefasRes);
+                }
+
+                tasksCount.textContent = todasTarefas.length;
+                
+                // Contar tarefas concluídas
+                const concluidas = todasTarefas.filter(t => t.concluida === true || t.concluida === 1 || t.status === 'concluido').length;
+                completedCount.textContent = concluidas;
+
+                console.log('✅ Estatísticas carregadas com sucesso');
+
+            } catch (error) {
+                console.error('❌ Erro ao carregar estatísticas:', error);
+                // Manter valores zero em caso de erro
+                usersCount.textContent = '0';
+                projectsCount.textContent = '0';
+                tasksCount.textContent = '0';
+                completedCount.textContent = '0';
+            }
+        }
+
+        async function loadRecentActivity(api) {
+            try {
+                console.log('🕐 Carregando atividade recente...');
+
+                // ✅ CORREÇÃO: /api/projeto/ (formato singular)
+                const projetosRes = await api.get("/api/projeto/");
+                
+                let projetos = [];
+                
+                if (projetosRes && Array.isArray(projetosRes)) {
+                    projetos = projetosRes;
+                } else if (projetosRes && projetosRes.data && Array.isArray(projetosRes.data)) {
+                    projetos = projetosRes.data;
+                } else if (projetosRes && projetosRes.success && Array.isArray(projetosRes.data?.projetos)) {
+                    projetos = projetosRes.data.projetos;
+                }
+
+                if (projetos.length > 0) {
+                    const projetosRecentes = projetos
+                        .sort((a, b) => new Date(b.data_criacao || b.created_at) - new Date(a.data_criacao || a.created_at))
+                        .slice(0, 3);
+
+                    recentActivity.innerHTML = '';
+
+                    projetosRecentes.forEach(projeto => {
+                        const activityItem = document.createElement('div');
+                        activityItem.className = 'activity-item';
+                        activityItem.innerHTML = `
+                            <div class="d-flex justify-content-between">
+                                <strong>Novo Projeto: ${projeto.nome || 'Sem nome'}</strong>
+                                <small class="text-muted">${formatDate(projeto.data_criacao || projeto.created_at)}</small>
+                            </div>
+                            <p class="mb-0">${projeto.descricao || 'Sem descrição'}</p>
+                            <small class="text-muted">Status: ${projeto.status || 'Ativo'}</small>
+                        `;
+                        recentActivity.appendChild(activityItem);
+                    });
+
+                } else {
+                    recentActivity.innerHTML = `
+                        <div class="activity-item">
+                            <div class="d-flex justify-content-between">
+                                <strong>Nenhuma atividade recente</strong>
+                                <small class="text-muted">Agora</small>
+                            </div>
+                            <p class="mb-0">Comece criando seu primeiro projeto!</p>
+                        </div>
+                    `;
+                }
+
+                console.log('✅ Atividade recente carregada com sucesso');
+
+            } catch (error) {
+                console.error('❌ Erro ao carregar atividade recente:', error);
+                recentActivity.innerHTML = `
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>Erro ao carregar atividades</strong>
+                            <small class="text-muted">Agora</small>
+                        </div>
+                        <p class="mb-0">Não foi possível carregar as atividades recentes.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Data desconhecida';
+            
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1) return 'Hoje';
+                if (diffDays === 2) return 'Ontem';
+                if (diffDays <= 7) return `Há ${diffDays - 1} dias`;
+                
+                return date.toLocaleDateString('pt-BR');
+            } catch (error) {
+                return 'Data inválida';
+            }
+        }
+
+        function showError(message) {
+            // Poderia usar um toast ou modal para mostrar erros
+            console.error('❌ Erro:', message);
+            
+            // Mostrar mensagem temporária no dashboard
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+            errorDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const container = document.querySelector('.container.py-4');
+            container.insertBefore(errorDiv, container.firstChild);
+            
+            // Auto-remover após 5 segundos
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Logout
+        btnLogout.addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                localStorage.removeItem('userData');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Atualizar estatísticas periodicamente (a cada 30 segundos)
+        setInterval(async () => {
+            const userData = localStorage.getItem("userData");
+            const token = localStorage.getItem("token");
+            
+            if (userData && token) {
+                const api = new ApiService(token, "http://localhost:5000");
+                await loadStatistics(api);
+            }
+        }, 30000);
+
+        console.log('🚀 Dashboard inicializado com sucesso!');
+        console.log('💡 URLs no formato SINGULAR:');
+        console.log('   - /api/usuario/');
+        console.log('   - /api/projeto/');
+        console.log('   - /api/tarefa/');
+    </script>
+</body>
+</html>

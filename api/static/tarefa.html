@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Gerenciamento de Tarefas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    body {
+      padding: 2em;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      font-weight: 600;
+    }
+
+    .btn {
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .table {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .table th {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+    }
+
+    .concluida-true { 
+      text-decoration: line-through; 
+      color: #6c757d; 
+      background-color: #d4edda;
+    }
+    
+    .concluida-false { 
+      font-weight: bold; 
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+    }
+    
+    .status-pendente {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-concluida {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+      color: #667eea !important;
+    }
+
+    .btn-logout {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container">
+      <a class="navbar-brand" href="dashboard.html">
+        <i class="bi bi-kanban"></i> Sistema de Projetos
+      </a>
+      <div class="d-flex align-items-center">
+        <span class="navbar-text me-3" id="userWelcome"></span>
+        <a href="usuario.html" class="btn btn-outline-primary me-2">
+          <i class="bi bi-people"></i> Usuários
+        </a>
+        <a href="projeto.html" class="btn btn-outline-success me-2">
+          <i class="bi bi-folder"></i> Projetos
+        </a>
+        <a href="tarefa.html" class="btn btn-outline-warning me-2">
+          <i class="bi bi-check-square"></i> Tarefas
+        </a>
+        <button class="btn btn-logout" id="btnLogout">
+          <i class="bi bi-box-arrow-right"></i> Sair
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="mb-4 text-dark" id="tituloPagina">
+      <i class="bi bi-check-square"></i> Gerenciamento de Tarefas
+    </h1>
+
+    <!-- ======================== INFO DO PROJETO ======================== -->
+    <div class="card mb-3" id="cardProjetoInfo" style="display: none;">
+      <div class="card-header">Projeto Selecionado</div>
+      <div class="card-body">
+        <strong id="infoProjetoNome"></strong>
+        <button id="btnVoltarProjetos" class="btn btn-outline-secondary btn-sm ms-3">Voltar para Projetos</button>
+      </div>
+    </div>
+
+    <!-- ======================== FORMULÁRIO DE CADASTRO ======================== -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-plus-circle"></i> Cadastro de Tarefa
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <input type="number" id="txtId" class="form-control mb-2" disabled placeholder="ID" />
+          <input type="text" id="txtTitulo" class="form-control mb-2" placeholder="Título da tarefa" />
+          
+          <div class="row mb-2">
+            <div class="col">
+              <label for="txtDataLimite" class="form-label">Data Limite</label>
+              <input type="date" id="txtDataLimite" class="form-control">
+            </div>
+            <div class="col">
+              <label for="cboProjeto" class="form-label">Projeto</label>
+              <select id="cboProjeto" class="form-select">
+                <option value="-1">Selecione um projeto</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-check mb-3">
+            <input type="checkbox" id="chkConcluida" class="form-check-input">
+            <label class="form-check-label" for="chkConcluida">Tarefa concluída</label>
+          </div>
+        </div>
+
+        <div class="mb-3 d-flex gap-2" id="divBotoes"></div>
+      </div>
+
+      <div id="divResposta" class="alert m-3" style="display: none;"></div>
+    </div>
+
+    <!-- ======================== TABELA DE TAREFAS ======================== -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <i class="bi bi-list-ul"></i> Lista de Tarefas
+        <button class="btn btn-sm btn-outline-light float-end" onclick="listAll()">
+          <i class="bi bi-arrow-clockwise"></i> Atualizar
+        </button>
+      </div>
+      <div class="card-body">
+        <div id="divTabela">
+          <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando tarefas...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="modalConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalConfirmLabel">
+            <i class="bi bi-exclamation-triangle text-warning"></i> Confirmação
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+            <i class="bi bi-trash"></i> Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import ApiService from './ApiService.js';
+
+    // ======================== AUTENTICAÇÃO ========================
+    let userData = localStorage.getItem("userData");
+    if (userData) {
+      userData = JSON.parse(userData);
+      
+      // Configurar saudação do usuário
+      const userInfo = userData.usuario || userData.data?.usuario || userData.data?.user?.usuario;
+      if (userInfo) {
+        const userName = userInfo.nome || userInfo.name || 'Usuário';
+        document.getElementById('userWelcome').textContent = `Olá, ${userName}`;
+      }
+    } else {
+      window.location.href = "login.html";
+    }
+
+    const token = localStorage.getItem("token") || userData.token || userData.data?.token;
+    
+    // ✅ CORREÇÃO: ApiService com URL base explícita para o backend na porta 5000
+    const api = new ApiService(token, "http://localhost:5000");
+
+    let API_DATA;
+    let projetosList = [];
+    let projetoSelecionado = null;
+
+    // ======================== ELEMENTOS HTML ========================
+    const txtId = document.getElementById("txtId");
+    const txtTitulo = document.getElementById("txtTitulo");
+    const txtDataLimite = document.getElementById("txtDataLimite");
+    const cboProjeto = document.getElementById("cboProjeto");
+    const chkConcluida = document.getElementById("chkConcluida");
+    const divBotoes = document.getElementById("divBotoes");
+    const divResposta = document.getElementById("divResposta");
+    const cardProjetoInfo = document.getElementById("cardProjetoInfo");
+    const infoProjetoNome = document.getElementById("infoProjetoNome");
+    const btnVoltarProjetos = document.getElementById("btnVoltarProjetos");
+    const tituloPagina = document.getElementById("tituloPagina");
+    const btnLogout = document.getElementById("btnLogout");
+
+    // ======================== VERIFICAR PARÂMETROS URL ========================
+    const urlParams = new URLSearchParams(window.location.search);
+    const projetoIdUrl = urlParams.get('projeto_id');
+    const projetoNomeUrl = urlParams.get('projeto_nome');
+
+    if (projetoIdUrl && projetoNomeUrl) {
+      projetoSelecionado = {
+        id: projetoIdUrl,
+        nome: decodeURIComponent(projetoNomeUrl)
+      };
+      cardProjetoInfo.style.display = 'block';
+      infoProjetoNome.textContent = projetoNomeUrl;
+      tituloPagina.textContent = `Tarefas do Projeto: ${projetoNomeUrl}`;
+    }
+
+    // ======================== FUNÇÃO AUXILIAR PARA CRIAR BOTÕES ========================
+    function createButton(text, className, icon = null) {
+      const btn = document.createElement("button");
+      btn.innerHTML = icon ? `<i class="bi ${icon}"></i> ${text}` : text;
+      btn.className = `btn ${className} flex-fill`;
+      return btn;
+    }
+
+    // ======================== BOTÕES CRUD ========================
+    const btnCriar = createButton("Criar", "btn-success", "bi-plus-circle");
+    btnCriar.onclick = async () => {
+      if (txtTitulo.value.trim() === "") {
+        showMessage("Título da tarefa é obrigatório", "warning");
+        return;
+      }
+
+      if (cboProjeto.value === "-1") {
+        showMessage("Selecione um projeto", "warning");
+        return;
+      }
+
+      const objetoCriar = {
+        "tarefa": {
+          "titulo": txtTitulo.value.trim(),
+          "data_limite": txtDataLimite.value || null,
+          "concluida": chkConcluida.checked,
+          "projeto_id": parseInt(cboProjeto.value)
+        }
+      };
+
+      try {
+        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
+        const resposta = await api.post("/api/tarefa/", objetoCriar);
+        console.log("Resposta criar tarefa:", resposta);
+        
+        if (resposta && resposta.success === false) {
+          showMessage(resposta.error?.message || "Erro ao criar tarefa", "danger");
+          return;
+        }
+        
+        if (resposta && resposta.success) {
+          showMessage("Tarefa criada com sucesso!", "success");
+          if (projetoSelecionado) {
+            listPorProjeto();
+          } else {
+            listAll();
+          }
+          limparFormulario();
+        } else {
+          showMessage("Erro ao criar tarefa: resposta inválida", "danger");
+        }
+      } catch (error) {
+        showMessage("Erro ao criar tarefa: " + error.message, "danger");
+      }
+    };
+    divBotoes.appendChild(btnCriar);
+
+    const btnAtualizar = createButton("Atualizar", "btn-warning", "bi-arrow-clockwise");
+    btnAtualizar.onclick = async () => {
+      const id = txtId.value.trim();
+      if (!id) {
+        showMessage("Selecione uma tarefa para atualizar", "danger");
+        return;
+      }
+
+      if (txtTitulo.value.trim() === "") {
+        showMessage("Título da tarefa é obrigatório", "warning");
+        return;
+      }
+
+      const objetoAtualizar = {
+        "tarefa": {
+          "titulo": txtTitulo.value.trim(),
+          "data_limite": txtDataLimite.value || null,
+          "concluida": chkConcluida.checked,
+          "projeto_id": parseInt(cboProjeto.value)
+        }
+      };
+
+      try {
+        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
+        const resposta = await api.put("/api/tarefa", id, objetoAtualizar);
+        console.log("Resposta atualizar tarefa:", resposta);
+        
+        if (resposta && resposta.success === false) {
+          showMessage(resposta.error?.message || "Erro ao atualizar tarefa", "danger");
+          return;
+        }
+        
+        if (resposta && resposta.success) {
+          showMessage("Tarefa atualizada com sucesso!", "success");
+          if (projetoSelecionado) {
+            listPorProjeto();
+          } else {
+            listAll();
+          }
+          limparFormulario();
+        } else {
+          showMessage("Erro ao atualizar tarefa: resposta inválida", "danger");
+        }
+      } catch (error) {
+        showMessage("Erro ao atualizar tarefa: " + error.message, "danger");
+      }
+    };
+    divBotoes.appendChild(btnAtualizar);
+
+    const btnExcluir = createButton("Excluir", "btn-danger", "bi-trash");
+    btnExcluir.onclick = function () {
+      const id = txtId.value.trim();
+      if (!id) {
+        showMessage("Selecione uma tarefa para excluir", "warning");
+        return;
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById('modalConfirm'));
+      modal.show();
+
+      const btnConfirmDelete = document.getElementById("btnConfirmDelete");
+      btnConfirmDelete.replaceWith(btnConfirmDelete.cloneNode(true));
+      const newBtnConfirm = document.getElementById("btnConfirmDelete");
+
+      newBtnConfirm.onclick = async function () {
+        try {
+          // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
+          const resposta = await api.delete("/api/tarefa", id);
+          
+          if (resposta && resposta.success === false) {
+            showMessage(resposta.error?.message || "Erro ao excluir tarefa", "danger");
+            return;
+          }
+          
+          if (resposta && resposta.success) {
+            if (projetoSelecionado) {
+              listPorProjeto();
+            } else {
+              listAll();
+            }
+            showMessage(`Tarefa ID ${id} excluída com sucesso.`, "success");
+            limparFormulario();
+          } else {
+            showMessage("Erro ao excluir tarefa: resposta inválida", "danger");
+          }
+        } catch (error) {
+          showMessage(`Erro ao excluir tarefa: ${error.message}`, "danger");
+        } finally {
+          modal.hide();
+        }
+      };
+    };
+    divBotoes.appendChild(btnExcluir);
+
+    const btnLimpar = createButton("Limpar", "btn-info", "bi-eraser");
+    btnLimpar.onclick = limparFormulario;
+    divBotoes.appendChild(btnLimpar);
+
+    // ======================== FUNÇÕES DE SUPORTE ========================
+    function showMessage(message, type) {
+      divResposta.textContent = message;
+      divResposta.className = `alert alert-${type} m-3`;
+      divResposta.style.display = 'block';
+
+      if (type === 'success') {
+        setTimeout(() => {
+          divResposta.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    async function carregarProjetos() {
+      try {
+        // ✅ CORREÇÃO: /api/projeto/ (formato singular)
+        const resposta = await api.get("/api/projeto/");
+        
+        if (resposta && resposta.success === false) {
+          console.error("Erro ao carregar projetos:", resposta.error?.message);
+          return;
+        }
+        
+        projetosList = [];
+        
+        // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
+        if (resposta && Array.isArray(resposta)) {
+          projetosList = resposta;
+        } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+          projetosList = resposta.data;
+        } else if (resposta && resposta.success && Array.isArray(resposta.data?.projetos)) {
+          projetosList = resposta.data.projetos;
+        } else if (resposta && resposta.projetos && Array.isArray(resposta.projetos)) {
+          projetosList = resposta.projetos;
+        }
+        
+        // Limpar e preencher o select de projetos
+        cboProjeto.innerHTML = '<option value="-1">Selecione um projeto</option>';
+        projetosList.forEach(projeto => {
+          const option = document.createElement("option");
+          option.value = projeto.id;
+          option.textContent = projeto.nome || projeto.titulo;
+          cboProjeto.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar projetos:", error);
+        showMessage("Erro ao carregar projetos: " + error.message, "danger");
+      }
+    }
+
+    async function listAll() {
+      try {
+        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
+        const resposta = await api.get("/api/tarefa/");
+        
+        if (resposta && resposta.success === false) {
+          showMessage("Erro ao carregar tarefas: " + (resposta.error?.message || "Erro desconhecido"), "danger");
+          return;
+        }
+        
+        console.log("Dados carregados:", resposta);
+        renderTable(resposta);
+      } catch (error) {
+        showMessage("Erro ao carregar tarefas: " + error.message, "danger");
+      }
+    }
+
+    async function listPorProjeto() {
+      if (!projetoSelecionado) return;
+      
+      try {
+        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
+        const resposta = await api.get("/api/tarefa/");
+        
+        if (resposta && resposta.success === false) {
+          showMessage("Erro ao carregar tarefas: " + (resposta.error?.message || "Erro desconhecido"), "danger");
+          return;
+        }
+        
+        let todasTarefas = [];
+        
+        // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
+        if (resposta && Array.isArray(resposta)) {
+          todasTarefas = resposta;
+        } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+          todasTarefas = resposta.data;
+        } else if (resposta && resposta.success && Array.isArray(resposta.data?.tarefas)) {
+          todasTarefas = resposta.data.tarefas;
+        } else if (resposta && resposta.tarefas && Array.isArray(resposta.tarefas)) {
+          todasTarefas = resposta.tarefas;
+        }
+        
+        // Filtrar tarefas pelo projeto selecionado
+        const tarefasDoProjeto = todasTarefas.filter(tarefa => 
+          tarefa.projeto_id == projetoSelecionado.id
+        );
+        
+        renderTable(tarefasDoProjeto);
+      } catch (error) {
+        showMessage("Erro ao carregar tarefas do projeto: " + error.message, "danger");
+      }
+    }
+
+    function limparFormulario() {
+      txtId.value = "";
+      txtTitulo.value = "";
+      txtDataLimite.value = "";
+      cboProjeto.value = "-1";
+      chkConcluida.checked = false;
+      divResposta.style.display = "none";
+    }
+
+    function renderTable(dados) {
+      const divTabela = document.getElementById("divTabela");
+      divTabela.innerHTML = "";
+
+      let tarefas = [];
+
+      // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
+      if (dados && Array.isArray(dados)) {
+        tarefas = dados;
+      } else if (dados && dados.data && Array.isArray(dados.data)) {
+        tarefas = dados.data;
+      } else if (dados && dados.success && Array.isArray(dados.data?.tarefas)) {
+        tarefas = dados.data.tarefas;
+      } else if (dados && dados.tarefas && Array.isArray(dados.tarefas)) {
+        tarefas = dados.tarefas;
+      }
+
+      if (!tarefas || tarefas.length === 0) {
+        divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhuma Tarefa encontrada</div>';
+        return;
+      }
+
+      const table = document.createElement("table");
+      table.className = "table table-bordered table-striped table-hover";
+
+      const thead = document.createElement("thead");
+      thead.className = "table-light";
+      const trHead = document.createElement("tr");
+
+      ["ID", "Título", "Projeto", "Data Limite", "Status", "Ações"].forEach(text => {
+        const th = document.createElement("th");
+        th.textContent = text;
+        trHead.appendChild(th);
+      });
+
+      thead.appendChild(trHead);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      tarefas.forEach(tarefa => {
+        const tr = document.createElement("tr");
+        tr.className = `concluida-${tarefa.concluida}`;
+
+        // ID
+        const tdId = document.createElement("td");
+        tdId.textContent = tarefa.id;
+        tr.appendChild(tdId);
+
+        // Título
+        const tdTitulo = document.createElement("td");
+        tdTitulo.textContent = tarefa.titulo;
+        tr.appendChild(tdTitulo);
+
+        // Projeto
+        const tdProjeto = document.createElement("td");
+        const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
+        tdProjeto.textContent = projeto ? (projeto.nome || projeto.titulo) : 'N/A';
+        tr.appendChild(tdProjeto);
+
+        // Data Limite
+        const tdDataLimite = document.createElement("td");
+        tdDataLimite.textContent = tarefa.data_limite ? 
+          new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A';
+        tr.appendChild(tdDataLimite);
+
+        // Status
+        const tdStatus = document.createElement("td");
+        const statusClass = tarefa.concluida ? "status-concluida" : "status-pendente";
+        const statusText = tarefa.concluida ? "Concluída" : "Pendente";
+        tdStatus.innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+        tr.appendChild(tdStatus);
+
+        // Ações
+        const tdAcoes = document.createElement("td");
+        const divBotoes = document.createElement("div");
+        divBotoes.className = "d-flex gap-2";
+
+        const btnSel = createButton("Selecionar", "btn-info btn-sm", "bi-pencil");
+        btnSel.onclick = () => {
+          txtId.value = tarefa.id;
+          txtTitulo.value = tarefa.titulo;
+          
+          // ✅ CORREÇÃO CRÍTICA: Converter DATETIME para DATE no input
+          if (tarefa.data_limite) {
+            const dateObj = new Date(tarefa.data_limite);
+            const formattedDate = dateObj.toISOString().split('T')[0];
+            txtDataLimite.value = formattedDate;
+          } else {
+            txtDataLimite.value = "";
+          }
+          
+          cboProjeto.value = tarefa.projeto_id;
+          chkConcluida.checked = tarefa.concluida;
+          showMessage("Tarefa selecionada para edição", "info");
+        };
+        divBotoes.appendChild(btnSel);
+
+        tdAcoes.appendChild(divBotoes);
+        tr.appendChild(tdAcoes);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      divTabela.appendChild(table);
+    }
+
+    // Botão Voltar para Projetos
+    btnVoltarProjetos.addEventListener('click', function() {
+      window.location.href = "projeto.html";
+    });
+
+    // Logout
+    btnLogout.addEventListener('click', function() {
+      if (confirm('Tem certeza que deseja sair?')) {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Carregar dados ao iniciar
+    carregarProjetos();
+    if (projetoSelecionado) {
+      listPorProjeto();
+    } else {
+      listAll();
+    }
+
+    console.log("🚀 Página de tarefas carregada!");
+    console.log("💡 URLs no formato SINGULAR:");
+    console.log("   - GET /api/tarefa/");
+    console.log("   - POST /api/tarefa/");
+    console.log("   - PUT /api/tarefa/{id}");
+    console.log("   - DELETE /api/tarefa/{id}");
+    console.log("   - GET /api/projeto/");
+  </script>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+</body>
+</html>
