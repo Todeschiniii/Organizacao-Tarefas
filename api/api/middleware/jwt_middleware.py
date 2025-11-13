@@ -141,7 +141,7 @@ class JwtMiddleware:
         """
         if not self.__jwt_instance.payload:
             return None
-        return self.__jwt_instance.payload.get("idFuncionario")
+        return self.__jwt_instance.payload.get("id")
 
     def get_user_email(self):
         """

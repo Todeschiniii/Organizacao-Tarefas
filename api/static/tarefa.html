@@ -9,6 +9,20 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <style>
+    .form-check-input {
+      cursor: pointer;
+      transform: scale(1.2);
+    }
+
+    .form-check-input:checked {
+      background-color: #198754;
+      border-color: #198754;
+    }
+
+    .table td:first-child {
+      width: 50px;
+      text-align: center;
+    }
     body {
       padding: 2em;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -538,6 +552,7 @@
     }
 
     function renderTable(dados) {
+
       const divTabela = document.getElementById("divTabela");
       divTabela.innerHTML = "";
 
@@ -545,18 +560,18 @@
 
       // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
       if (dados && Array.isArray(dados)) {
-        tarefas = dados;
+          tarefas = dados;
       } else if (dados && dados.data && Array.isArray(dados.data)) {
-        tarefas = dados.data;
+          tarefas = dados.data;
       } else if (dados && dados.success && Array.isArray(dados.data?.tarefas)) {
-        tarefas = dados.data.tarefas;
+          tarefas = dados.data.tarefas;
       } else if (dados && dados.tarefas && Array.isArray(dados.tarefas)) {
-        tarefas = dados.tarefas;
+          tarefas = dados.tarefas;
       }
 
       if (!tarefas || tarefas.length === 0) {
-        divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhuma Tarefa encontrada</div>';
-        return;
+          divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhuma Tarefa encontrada</div>';
+          return;
       }
 
       const table = document.createElement("table");
@@ -566,10 +581,11 @@
       thead.className = "table-light";
       const trHead = document.createElement("tr");
 
-      ["ID", "Título", "Projeto", "Data Limite", "Status", "Ações"].forEach(text => {
-        const th = document.createElement("th");
-        th.textContent = text;
-        trHead.appendChild(th);
+      // ✅ CORREÇÃO: Adicionar coluna "Concluída"
+      ["", "ID", "Título", "Projeto", "Data Limite", "Status", "Ações"].forEach(text => {
+          const th = document.createElement("th");
+          th.textContent = text;
+          trHead.appendChild(th);
       });
 
       thead.appendChild(trHead);
@@ -578,67 +594,109 @@
       const tbody = document.createElement("tbody");
 
       tarefas.forEach(tarefa => {
-        const tr = document.createElement("tr");
-        tr.className = `concluida-${tarefa.concluida}`;
+          const tr = document.createElement("tr");
+          tr.className = `concluida-${tarefa.concluida}`;
 
-        // ID
-        const tdId = document.createElement("td");
-        tdId.textContent = tarefa.id;
-        tr.appendChild(tdId);
+          // ✅ CORREÇÃO: Checkbox para marcar como concluída
+          const tdCheckbox = document.createElement("td");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "form-check-input";
+          checkbox.checked = tarefa.concluida;
+          checkbox.onchange = async function() {
+              try {
+                  const objetoAtualizar = {
+                      "tarefa": {
+                          "concluida": checkbox.checked,
+                          // Mantém os outros campos para não perder dados
+                          "titulo": tarefa.titulo,
+                          "data_limite": tarefa.data_limite,
+                          "projeto_id": tarefa.projeto_id
+                      }
+                  };
 
-        // Título
-        const tdTitulo = document.createElement("td");
-        tdTitulo.textContent = tarefa.titulo;
-        tr.appendChild(tdTitulo);
+                  const resposta = await api.put("/api/tarefa", tarefa.id, objetoAtualizar);
+                  
+                  if (resposta && resposta.success) {
+                      showMessage(`Tarefa ${checkbox.checked ? 'concluída' : 'reaberta'} com sucesso!`, "success");
+                      // Atualiza a linha visualmente
+                      tr.className = `concluida-${checkbox.checked}`;
+                      
+                      // Atualiza o status badge
+                      const statusBadge = tr.querySelector('.status-badge');
+                      if (statusBadge) {
+                          statusBadge.className = `status-badge ${checkbox.checked ? 'status-concluida' : 'status-pendente'}`;
+                          statusBadge.textContent = checkbox.checked ? "Concluída" : "Pendente";
+                      }
+                  } else {
+                      showMessage("Erro ao atualizar tarefa", "danger");
+                      checkbox.checked = !checkbox.checked; // Reverte a mudança
+                  }
+              } catch (error) {
+                  showMessage("Erro ao atualizar tarefa: " + error.message, "danger");
+                  checkbox.checked = !checkbox.checked; // Reverte a mudança
+              }
+          };
+          tdCheckbox.appendChild(checkbox);
+          tr.appendChild(tdCheckbox);
 
-        // Projeto
-        const tdProjeto = document.createElement("td");
-        const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
-        tdProjeto.textContent = projeto ? (projeto.nome || projeto.titulo) : 'N/A';
-        tr.appendChild(tdProjeto);
+          // ID
+          const tdId = document.createElement("td");
+          tdId.textContent = tarefa.id;
+          tr.appendChild(tdId);
 
-        // Data Limite
-        const tdDataLimite = document.createElement("td");
-        tdDataLimite.textContent = tarefa.data_limite ? 
-          new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A';
-        tr.appendChild(tdDataLimite);
+          // Título
+          const tdTitulo = document.createElement("td");
+          tdTitulo.textContent = tarefa.titulo;
+          tr.appendChild(tdTitulo);
 
-        // Status
-        const tdStatus = document.createElement("td");
-        const statusClass = tarefa.concluida ? "status-concluida" : "status-pendente";
-        const statusText = tarefa.concluida ? "Concluída" : "Pendente";
-        tdStatus.innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
-        tr.appendChild(tdStatus);
+          // Projeto
+          const tdProjeto = document.createElement("td");
+          const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
+          tdProjeto.textContent = projeto ? (projeto.nome || projeto.titulo) : 'N/A';
+          tr.appendChild(tdProjeto);
 
-        // Ações
-        const tdAcoes = document.createElement("td");
-        const divBotoes = document.createElement("div");
-        divBotoes.className = "d-flex gap-2";
+          // Data Limite
+          const tdDataLimite = document.createElement("td");
+          tdDataLimite.textContent = tarefa.data_limite ? 
+              new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A';
+          tr.appendChild(tdDataLimite);
 
-        const btnSel = createButton("Selecionar", "btn-info btn-sm", "bi-pencil");
-        btnSel.onclick = () => {
-          txtId.value = tarefa.id;
-          txtTitulo.value = tarefa.titulo;
-          
-          // ✅ CORREÇÃO CRÍTICA: Converter DATETIME para DATE no input
-          if (tarefa.data_limite) {
-            const dateObj = new Date(tarefa.data_limite);
-            const formattedDate = dateObj.toISOString().split('T')[0];
-            txtDataLimite.value = formattedDate;
-          } else {
-            txtDataLimite.value = "";
-          }
-          
-          cboProjeto.value = tarefa.projeto_id;
-          chkConcluida.checked = tarefa.concluida;
-          showMessage("Tarefa selecionada para edição", "info");
-        };
-        divBotoes.appendChild(btnSel);
+          // Status
+          const tdStatus = document.createElement("td");
+          const statusClass = tarefa.concluida ? "status-concluida" : "status-pendente";
+          const statusText = tarefa.concluida ? "Concluída" : "Pendente";
+          tdStatus.innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+          tr.appendChild(tdStatus);
 
-        tdAcoes.appendChild(divBotoes);
-        tr.appendChild(tdAcoes);
+          // Ações
+          const tdAcoes = document.createElement("td");
+          const divBotoes = document.createElement("div");
+          divBotoes.className = "d-flex gap-2";
 
-        tbody.appendChild(tr);
+          const btnSel = createButton("Editar", "btn-info btn-sm", "bi-pencil");
+          btnSel.onclick = () => {
+              txtId.value = tarefa.id;
+              txtTitulo.value = tarefa.titulo;
+              
+              if (tarefa.data_limite) {
+                  const dateObj = new Date(tarefa.data_limite);
+                  const formattedDate = dateObj.toISOString().split('T')[0];
+                  txtDataLimite.value = formattedDate;
+              } else {
+                  txtDataLimite.value = "";
+              }
+              
+              cboProjeto.value = tarefa.projeto_id;
+              chkConcluida.checked = tarefa.concluida;
+              showMessage("Tarefa selecionada para edição", "info");
+          };
+          divBotoes.appendChild(btnSel);
+
+          tdAcoes.appendChild(divBotoes);
+          tr.appendChild(tdAcoes);
+
+          tbody.appendChild(tr);
       });
 
       table.appendChild(tbody);

@@ -99,12 +99,15 @@ class UsuarioDAO:
             usuario.email = row["email"]
             usuario.senha_hash = row["senha_hash"]
             
-            # Converter string para datetime
+            # ✅ CORREÇÃO: Tratamento melhorado para datas
             if row["data_criacao"]:
                 if hasattr(row["data_criacao"], 'isoformat'):
                     usuario.data_criacao = row["data_criacao"]
                 else:
-                    usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
+                    try:
+                        usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S.%f')
             
             return usuario
 
@@ -136,12 +139,15 @@ class UsuarioDAO:
             usuario.email = row["email"]
             usuario.senha_hash = row["senha_hash"]
             
-            # Converter string para datetime
+            # ✅ CORREÇÃO: Tratamento melhorado para datas
             if row["data_criacao"]:
                 if hasattr(row["data_criacao"], 'isoformat'):
                     usuario.data_criacao = row["data_criacao"]
                 else:
-                    usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
+                    try:
+                        usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S.%f')
             
             return usuario
 
@@ -170,12 +176,15 @@ class UsuarioDAO:
                 usuario.email = row["email"]
                 usuario.senha_hash = row["senha_hash"]
                 
-                # Converter string para datetime
+                # ✅ CORREÇÃO: Tratamento melhorado para datas
                 if row["data_criacao"]:
                     if hasattr(row["data_criacao"], 'isoformat'):
                         usuario.data_criacao = row["data_criacao"]
                     else:
-                        usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
+                        try:
+                            usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
+                        except ValueError:
+                            usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S.%f')
                 
                 usuarios.append(usuario)
 

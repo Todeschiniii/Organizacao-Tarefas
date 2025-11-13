@@ -73,7 +73,7 @@ class UsuarioService:
 
     def loginUsuario(self, login_data):
         """
-        Autentica usuário
+        Autentica usuário e retorna token JWT
         """
         print("🟢 UsuarioService.loginUsuario()")
         try:
@@ -95,13 +95,30 @@ class UsuarioService:
                 raise ErrorResponse("Email ou senha incorretos", 401)
 
             print(f"✅ Login bem-sucedido para: {usuario_db.nome}")
-            # Retorna dados do usuário (sem senha)
+            
+            # ✅ CORREÇÃO: GERAR TOKEN JWT
+            from api.http.meu_token_jwt import MeuTokenJWT  # Import aqui para evitar circular imports
+            
+            token_jwt = MeuTokenJWT()
+            
+            # Claims para o token (ajuste conforme seus campos)
+            claims = {
+                "email": usuario_db.email,
+                "name": usuario_db.nome,
+                "idFuncionario": usuario_db.id,  # Ou "idUsuario" se preferir
+                "role": "user"  # Defina o role conforme sua lógica
+            }
+            
+            token = token_jwt.gerarToken(claims)
+            
+            # Retorna dados do usuário E o token
             return {
                 'usuario': {
                     'id': usuario_db.id,
                     'nome': usuario_db.nome,
                     'email': usuario_db.email
-                }
+                },
+                'token': token  # ✅ TOKEN ADICIONADO AQUI
             }
 
         except ErrorResponse:
@@ -110,7 +127,6 @@ class UsuarioService:
             print(f"❌ Erro inesperado em loginUsuario: {e}")
             print(f"🔍 Stack trace: {traceback.format_exc()}")
             raise ErrorResponse("Erro interno ao fazer login", 500)
-
     def findById(self, id):
         """
         Busca usuário por ID

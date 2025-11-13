@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 import mysql.connector
 from mysql.connector import Error
@@ -43,23 +43,29 @@ class MySQLDatabase:
             'password': '',
             'charset': 'utf8mb4',
             'collation': 'utf8mb4_unicode_ci',
-            'port': 3306
+            'port': 3306,
+            'autocommit': True,  # ✅ CORREÇÃO: Adicionado autocommit
         }
         self.connect()
     
     def connect(self):
         """Estabelece conexão com o MySQL"""
         try:
+            # ✅ CORREÇÃO: Configuração simplificada sem pool
             self.connection = mysql.connector.connect(**self.config)
-            if self.connection.is_connected():
+            if self.connection and self.connection.is_connected():
                 print("✅ Conectado ao MySQL Database!")
                 return self.connection
+            else:
+                print("❌ Conexão estabelecida mas não está conectada")
+                return None
         except Error as e:
             print(f"❌ Erro ao conectar com MySQL: {e}")
             print("💡 Verifique se:")
-            print("   1. MySQL está instalado e rodando")
-            print("   2. O banco 'projeto' existe")
-            print("   3. Usuário e senha estão corretos")
+            print("   1. XAMPP MySQL está RODANDO")
+            print("   2. O banco 'projeto' existe") 
+            print("   3. Usuário 'root' sem senha está correto")
+            print("   4. Porta 3306 está livre")
             return None
     
     def execute_query(self, query, params=None, fetch=False):
@@ -68,11 +74,15 @@ class MySQLDatabase:
         """
         cursor = None
         try:
-            # Reconecta se necessário
-            if not self.connection or not self.connection.is_connected():
+            # ✅ CORREÇÃO: Verificação SEGURA da conexão
+            if (self.connection is None or 
+                not hasattr(self.connection, 'is_connected') or 
+                not self.connection.is_connected()):
+                
+                print("🔄 Reconectando ao MySQL...")
                 self.connect()
-                if not self.connection:
-                    raise Error("Não foi possível conectar ao banco de dados")
+                if self.connection is None:
+                    raise Error("Não foi possível conectar ao banco de dados - conexão é None")
             
             cursor = self.connection.cursor(dictionary=True)
             
@@ -84,7 +94,9 @@ class MySQLDatabase:
             
             # Para INSERT, UPDATE, DELETE
             if not fetch:
-                self.connection.commit()
+                # ✅ CORREÇÃO: Commit apenas se não estiver em autocommit
+                if not self.connection.autocommit:
+                    self.connection.commit()
                 if query.strip().upper().startswith('INSERT'):
                     return cursor.lastrowid
                 return cursor.rowcount
@@ -95,8 +107,14 @@ class MySQLDatabase:
             
         except Error as e:
             print(f"❌ Erro na query: {e}")
-            if self.connection:
-                self.connection.rollback()
+            # ✅ CORREÇÃO: Rollback seguro
+            if (self.connection is not None and 
+                hasattr(self.connection, 'rollback') and 
+                not self.connection.autocommit):
+                try:
+                    self.connection.rollback()
+                except:
+                    pass  # Ignora erro no rollback
             raise e
         finally:
             if cursor:
@@ -104,9 +122,15 @@ class MySQLDatabase:
     
     def close(self):
         """Fecha a conexão com o banco"""
-        if self.connection and self.connection.is_connected():
+        # ✅ CORREÇÃO: Verificação SEGURA antes de fechar
+        if (self.connection is not None and 
+            hasattr(self.connection, 'is_connected') and 
+            self.connection.is_connected()):
+            
             self.connection.close()
             print("🔒 Conexão MySQL fechada!")
+        else:
+            print("ℹ️  Conexão MySQL já estava fechada ou é None")
 
 def create_app():
     """
@@ -114,12 +138,14 @@ def create_app():
     """
     app = Flask(__name__)
     
-    # ✅ CORREÇÃO: Configuração SIMPLES do CORS
+    # ✅ CORREÇÃO: Configuração CORS DINÂMICA
     CORS(app, 
-     origins=["http://localhost", "http://127.0.0.1"], 
-     supports_credentials=True,
-     allow_headers=["Content-Type", "Authorization", "Accept"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+        origins=["http://localhost", "http://127.0.0.1", "http://localhost:5500", "http://127.0.0.1:5500", "*"],
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "Accept", "X-Requested-With"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        expose_headers=["Content-Type", "Authorization"]
+    )
     
     # Configurações da aplicação
     app.config['SECRET_KEY'] = 'sua-chave-secreta-aqui'
@@ -128,7 +154,7 @@ def create_app():
     try:
         database_dependency = MySQLDatabase()
         if not database_dependency.connection:
-            raise Exception("Falha na conexão com MySQL")
+            raise Exception("Falha na conexão com MySQL - verifique se MySQL está rodando no XAMPP")
         print("🚀 MySQL Database inicializado com sucesso!")
     except Exception as e:
         print(f"❌ Erro ao inicializar MySQL: {e}")
@@ -220,6 +246,23 @@ def create_app():
     app.register_blueprint(projeto_roteador.create_routes(), url_prefix='/api/projeto')
     app.register_blueprint(tarefa_roteador.create_routes(), url_prefix='/api/tarefa')
     
+    # ✅ CORREÇÃO: Middleware CORS DINÂMICO para todas as rotas
+    @app.after_request
+    def after_request(response):
+        origin = request.headers.get('Origin')
+        allowed_origins = ["http://localhost", "http://127.0.0.1", "http://localhost:5500", "http://127.0.0.1:5500"]
+        
+        if origin in allowed_origins:
+            response.headers.add('Access-Control-Allow-Origin', origin)
+        else:
+            # Fallback para desenvolvimento
+            response.headers.add('Access-Control-Allow-Origin', 'http://localhost')
+            
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,X-Requested-With')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response
+    
     # ✅ CORREÇÃO: Rotas de verificação
     @app.route('/health', methods=['GET'])
     def health_check():
@@ -247,23 +290,6 @@ def create_app():
             }
         }
     
-    # ✅ CORREÇÃO: Rota de teste para cadastro
-    @app.route('/test-cadastro', methods=['POST'])
-    def test_cadastro():
-        """Rota para testar cadastro diretamente"""
-        try:
-            from api.control.usuario_control import UsuarioControl
-            control = UsuarioControl(usuario_service)
-            return control.store()
-        except Exception as e:
-            return {
-                "success": False,
-                "error": {
-                    "message": f"Erro no teste: {str(e)}",
-                    "code": 500
-                }
-            }, 500
-    
     # Fechar conexão ao encerrar
     @app.teardown_appcontext
     def close_db_connection(exception=None):
@@ -274,7 +300,7 @@ def create_app():
     print("🚀 FLASK APP INICIALIZADA COM SUCESSO!")
     print("📍 URL: http://localhost:5000")
     print("📊 Banco de dados: projeto")
-    print("✅ CORS configurado")
+    print("✅ CORS configurado dinamicamente")
     print("=" * 50)
     
     return app

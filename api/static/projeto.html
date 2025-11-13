@@ -283,14 +283,14 @@
       const dataFim = txtDataFim.value ? formatDateForInput(txtDataFim.value) : null;
 
       const objetoCriar = {
-        "projeto": {
-          "nome": txtNome.value.trim(),
-          "descricao": txtDescricao.value.trim(),
-          "status": selStatus.value,
-          "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null,
-          "data_inicio": dataInicio,
-          "data_fim": dataFim
-        }
+          "projeto": {
+              "nome": txtNome.value.trim(),
+              "descricao": txtDescricao.value.trim(),
+              "data_inicio": txtDataInicio.value || null,
+              "data_fim": txtDataFim.value || null,  // ✅ CORREÇÃO: Adicionar data_fim
+              "status": cboStatus.value,
+              "usuario_id": parseInt(cboUsuario.value)
+          }
       };
 
       try {

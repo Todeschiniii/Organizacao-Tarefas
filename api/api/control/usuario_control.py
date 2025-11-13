@@ -28,12 +28,30 @@ class UsuarioControl:
                 }), 400
 
             resultado = self.__usuario_service.loginUsuario(json_usuario)
+            
+            # ✅ CORREÇÃO: Verifica se o token foi gerado e retorna a estrutura correta
+            if 'token' not in resultado:
+                print("❌ Token não foi gerado no serviço de login")
+                return jsonify({
+                    "success": False,
+                    "error": {
+                        "message": "Erro interno: token não gerado",
+                        "code": 500
+                    }
+                }), 500
+            
+            # ✅ CORREÇÃO: Retorna a estrutura padronizada com token
             return jsonify({
                 "success": True,
                 "message": "Login efetuado com sucesso!",
-                "data": resultado
+                "data": {
+                    "usuario": resultado['usuario'],
+                    "token": resultado['token']  # ✅ Token incluído na resposta
+                }
             }), 200
+            
         except ErrorResponse as e:
+            print(f"❌ ErrorResponse em login: {e.message}")
             return jsonify({
                 "success": False,
                 "error": {

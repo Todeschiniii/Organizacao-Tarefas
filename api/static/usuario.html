@@ -231,7 +231,7 @@
         "usuario": {
           "nome": txtNome.value.trim(),
           "email": txtEmail.value.trim(),
-          "senha_hash": txtSenha.value.trim()
+          "senha": txtSenha.value.trim()
         }
       };
 
@@ -276,7 +276,7 @@
 
       // Se a senha foi preenchida, inclui no update
       if (txtSenha.value.trim()) {
-        objetoAtualizar.usuario.senha_hash = txtSenha.value.trim();
+        objetoAtualizar.usuario.senha = txtSenha.value.trim();
       }
 
       // ✅ CORREÇÃO: Usa put com URL correta (sem barra extra)
