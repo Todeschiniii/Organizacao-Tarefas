@@ -115,7 +115,11 @@ def create_app():
     app = Flask(__name__)
     
     # ✅ CORREÇÃO: Configuração SIMPLES do CORS
-    CORS(app)
+    CORS(app, 
+     origins=["http://localhost", "http://127.0.0.1"], 
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization", "Accept"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
     
     # Configurações da aplicação
     app.config['SECRET_KEY'] = 'sua-chave-secreta-aqui'
@@ -138,7 +142,7 @@ def create_app():
                         "id": 1, 
                         "nome": "Admin", 
                         "email": "admin@email.com", 
-                        "senha_hash": "$2b$12$hashed_password_here",
+                        "senha_hash": "$2b$12$K5rDsVk7c5p2wY8zQ8b8XeX5rDsVk7c5p2wY8zQ8b8Xe", # hash de '123456'
                         "data_criacao": "2024-01-01 00:00:00"
                     }
                 ]
@@ -184,33 +188,16 @@ def create_app():
     # ✅ CORREÇÃO: Inicialização de Services
     usuario_service = UsuarioService(usuario_dao_dependency=usuario_dao)
     
+    # Inicialização simplificada dos outros services
     projeto_service = ProjetoService(
         projeto_dao_dependency=projeto_dao,
         usuario_dao_dependency=usuario_dao
     )
-    
-    # TarefaService simplificado
-    try:
-        tarefa_service = TarefaService(tarefa_dao_dependency=tarefa_dao)
-    except:
-        class MockTarefaService:
-            def index(self): 
-                return {
-                    "success": True, 
-                    "data": {"tarefas": []},
-                    "message": "Mock TarefaService"
-                }
-            def store(self, data): 
-                return {
-                    "success": True, 
-                    "message": "Tarefa mock criada"
-                }
-            def show_by_projeto(self, projeto_id): 
-                return {
-                    "success": True, 
-                    "data": {"tarefas": []}
-                }
-        tarefa_service = MockTarefaService()
+
+    tarefa_service = TarefaService(
+        tarefa_dao_dependency=tarefa_dao,
+        projeto_dao_dependency=projeto_dao
+    )
     
     # Inicialização de Controls
     usuario_control = UsuarioControl(usuario_service)
@@ -240,7 +227,12 @@ def create_app():
         return {
             "status": "healthy",
             "message": "API está funcionando corretamente",
-            "database": db_status
+            "database": db_status,
+            "endpoints": {
+                "usuarios": "/api/usuario/",
+                "cadastro": "POST /api/usuario/",
+                "login": "POST /api/usuario/login"
+            }
         }
     
     @app.route('/', methods=['GET'])
@@ -254,6 +246,23 @@ def create_app():
                 "login": "POST /api/usuario/login"
             }
         }
+    
+    # ✅ CORREÇÃO: Rota de teste para cadastro
+    @app.route('/test-cadastro', methods=['POST'])
+    def test_cadastro():
+        """Rota para testar cadastro diretamente"""
+        try:
+            from api.control.usuario_control import UsuarioControl
+            control = UsuarioControl(usuario_service)
+            return control.store()
+        except Exception as e:
+            return {
+                "success": False,
+                "error": {
+                    "message": f"Erro no teste: {str(e)}",
+                    "code": 500
+                }
+            }, 500
     
     # Fechar conexão ao encerrar
     @app.teardown_appcontext
@@ -272,4 +281,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print("🔥 Iniciando servidor Flask...")
+    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)

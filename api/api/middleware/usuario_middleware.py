@@ -15,10 +15,6 @@ class UsuarioMiddleware:
     def validate_body(self, f):
         """
         Decorator para validar o corpo da requisição para criação de um novo usuário.
-
-        Verifica apenas a existência:
-        - O objeto 'usuario' existe
-        - Campos obrigatórios: nome, email, senha_hash
         """
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -30,8 +26,8 @@ class UsuarioMiddleware:
 
             usuario = body['usuario']
 
-            # Apenas verificar existência dos campos obrigatórios
-            campos_obrigatorios = ["nome", "email", "senha_hash"]
+            # ✅ CORREÇÃO CRÍTICA: Mudar de "senha_hash" para "senha"
+            campos_obrigatorios = ["nome", "email", "senha"]
             for campo in campos_obrigatorios:
                 if campo not in usuario:
                     raise ErrorResponse(400, "Erro na validação de dados", {"message": f"O campo '{campo}' é obrigatório!"})

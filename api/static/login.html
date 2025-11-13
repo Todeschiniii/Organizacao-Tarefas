@@ -294,22 +294,26 @@
                 const resposta = await api.post("/api/usuario/login", dadosLogin);
                 console.log("📨 Resposta da API:", resposta);
 
+                // ✅ ADICIONE isto no login.html após o login bem-sucedido:
                 if (resposta && resposta.success) {
+                    console.log('🔍 ESTRUTURA COMPLETA DA RESPOSTA DO LOGIN:', resposta);
+                    
                     showMessage("Login realizado com sucesso! Redirecionando...", "success");
                     
                     // Salvar dados do usuário no localStorage
                     localStorage.setItem("userData", JSON.stringify(resposta.data));
+                    
+                    // ✅ DEBUG: Mostrar o que está sendo salvo
+                    console.log('💾 Dados salvos no localStorage:', resposta.data);
+                    
                     if (resposta.data.token) {
                         localStorage.setItem("token", resposta.data.token);
                     }
                     
-                    // Redirecionar após breve delay
+                    // Redirecionar
                     setTimeout(() => {
                         window.location.href = "dashboard.html";
-                    }, 1000);
-                    
-                } else {
-                    showMessage(resposta?.error?.message || "Erro ao fazer login", "danger");
+                    }, 1500);
                 }
 
             } catch (error) {
@@ -346,8 +350,19 @@
                 } else if (resposta && resposta.usuarios && Array.isArray(resposta.usuarios)) {
                     usuarios = resposta.usuarios;
                 } else if (resposta && resposta.error) {
-                    // Se houver erro (como 401), tenta buscar sem autenticação
+                    // ✅ CORREÇÃO: Só mostra fallback se houver erro real
                     console.warn("Erro ao carregar usuários:", resposta.error);
+                    
+                    // Se for erro de autenticação, não tenta fallback (é esperado)
+                    if (resposta.error.code === 401 || resposta.error.message?.includes('token')) {
+                        usersList.innerHTML = `
+                            <div class="alert alert-info">
+                                <small>Faça login para ver a lista completa de usuários.</small>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
                     await carregarUsuariosFallback();
                     return;
                 } else {
@@ -382,21 +397,28 @@
          */
         async function carregarUsuariosFallback() {
             try {
-                // Tenta um endpoint alternativo ou método diferente
-                const resposta = await api.get("/api/usuario/todos");
-                if (resposta && Array.isArray(resposta)) {
-                    exibirUsuarios(resposta);
-                    return;
-                }
+                // ✅ CORREÇÃO: NÃO tente /api/usuario/todos (não existe)
+                // Em vez disso, mostra mensagem informativa
+                console.log('⚠️ Endpoint principal falhou, usando fallback estático');
+                
+                usersList.innerHTML = `
+                    <div class="alert alert-info">
+                        <small>
+                            <strong>Nenhum usuário carregado automaticamente</strong><br>
+                            Digite manualmente seu email e senha cadastrados.<br>
+                            <em>Ou cadastre um novo usuário primeiro.</em>
+                        </small>
+                    </div>
+                `;
+                
             } catch (fallbackError) {
-                console.log('Tentativa fallback também falhou:', fallbackError);
+                console.log('Fallback também falhou:', fallbackError);
+                usersList.innerHTML = `
+                    <div class="alert alert-warning">
+                        <small>Digite manualmente seu email e senha cadastrados.</small>
+                    </div>
+                `;
             }
-
-            usersList.innerHTML = `
-                <div class="alert alert-info">
-                    <small>Digite manualmente seu email e senha cadastrados.</small>
-                </div>
-            `;
         }
 
         /**

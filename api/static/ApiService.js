@@ -63,7 +63,7 @@ export default class ApiService {
                 method: "GET",
                 headers: headers,
                 mode: 'cors', // ✅ CORREÇÃO: Explicita modo CORS
-                credentials: 'include' // ✅ CORREÇÃO: Inclui credenciais
+                credentials: 'same-origin' // ✅ CORREÇÃO: Inclui credenciais
             });
 
             // ✅ CORREÇÃO MELHORADA: Para CORS, verifica se a resposta foi bloqueada
@@ -148,7 +148,7 @@ export default class ApiService {
                 method: "GET",
                 headers: headers,
                 mode: 'cors',
-                credentials: 'include'
+                credentials: 'same-origin'
             });
 
             // ✅ CORREÇÃO: Para CORS, verifica se a resposta foi bloqueada
@@ -220,7 +220,7 @@ export default class ApiService {
                 headers: headers,
                 body: JSON.stringify(jsonObject),
                 mode: 'cors',
-                credentials: 'include'
+                credentials: 'same-origin'
             });
 
             // ✅ CORREÇÃO MELHORADA: Para CORS, verifica se a resposta foi bloqueada
@@ -303,7 +303,7 @@ export default class ApiService {
                 headers: headers,
                 body: JSON.stringify(jsonObject),
                 mode: 'cors',
-                credentials: 'include'
+                credentials: 'same-origin'
             });
 
             // ✅ CORREÇÃO: Para CORS, verifica se a resposta foi bloqueada
@@ -384,7 +384,7 @@ export default class ApiService {
                 method: "DELETE",
                 headers: headers,
                 mode: 'cors',
-                credentials: 'include'
+                credentials: 'same-origin'
             });
 
             // ✅ CORREÇÃO: Para CORS, verifica se a resposta foi bloqueada

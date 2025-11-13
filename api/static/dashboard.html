@@ -292,23 +292,49 @@
         const completedCount = document.getElementById('completedCount');
         const recentActivity = document.getElementById('recentActivity');
 
-        // Verificar autenticação
+        // ✅ CORREÇÃO: Verificação de autenticação mais tolerante
         let userData = localStorage.getItem("userData");
 
         if (!userData) {
+            console.log('❌ Nenhum userData encontrado, redirecionando para login...');
             window.location.href = "login.html";
         } else {
-            userData = JSON.parse(userData);
-            initializeDashboard();
+            try {
+                userData = JSON.parse(userData);
+                console.log('✅ UserData encontrado:', userData);
+                initializeDashboard();
+            } catch (error) {
+                console.error('❌ Erro ao fazer parse do userData:', error);
+                localStorage.removeItem('userData');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
         }
 
         async function initializeDashboard() {
-            // ✅ CORREÇÃO: Estrutura correta dos dados do usuário
-            const userInfo = userData.usuario || userData.data?.usuario || userData.data?.user?.usuario;
+            // ✅ NOVA VERIFICAÇÃO: Estrutura mais simples
+            let userInfo;
             
-            if (!userInfo) {
+            if (userData.usuario) {
+                userInfo = userData.usuario;
+            } else if (userData.data && userData.data.usuario) {
+                userInfo = userData.data.usuario;
+            } else if (userData.data) {
+                userInfo = userData.data; // Pode ser que os dados estejam diretamente em data
+            } else {
+                userInfo = userData; // Ou os dados podem estar no nível raiz
+            }
+
+            console.log('🔍 Estrutura completa do userData:', userData);
+            console.log('🔍 userInfo extraído:', userInfo);
+            
+            if (!userInfo || (!userInfo.nome && !userInfo.email)) {
                 console.error('Estrutura de dados do usuário inválida:', userData);
                 showError('Erro ao carregar dados do usuário');
+                // ✅ CORREÇÃO: Limpa dados inválidos e redireciona
+                localStorage.removeItem('userData');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
                 return;
             }
 
@@ -319,12 +345,12 @@
             welcomeMessage.textContent = `Bem-vindo(a), ${userName}!`;
             welcomeSubtitle.textContent = `Gerencie seus projetos e tarefas de forma eficiente.`;
 
-            // ✅ CORREÇÃO: ApiService com URL base explícita
+            // ✅ CORREÇÃO: Verificação de token mais flexível
             const token = localStorage.getItem("token") || userData.token || userData.data?.token;
+            
             if (!token) {
-                console.error('Token não encontrado');
-                window.location.href = "login.html";
-                return;
+                console.warn('Token não encontrado, tentando continuar sem autenticação...');
+                // Continua sem token, mas algumas funcionalidades podem não funcionar
             }
 
             const api = new ApiService(token, "http://localhost:5000");
@@ -338,7 +364,7 @@
                 
             } catch (error) {
                 console.error('Erro ao carregar dashboard:', error);
-                showError('Erro ao carregar dados do dashboard');
+                showError('Algumas funcionalidades podem não estar disponíveis');
             }
         }
 

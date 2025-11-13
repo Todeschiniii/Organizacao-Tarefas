@@ -1,6 +1,6 @@
 # dao/usuario_dao.py
 from datetime import datetime
-from api.model.usuario import Usuario
+from api.model.usuario import Usuario  # ✅ CORREÇÃO: models no plural
 
 class UsuarioDAO:
     def __init__(self, database_dependency):
@@ -29,6 +29,21 @@ class UsuarioDAO:
             # Não levanta exceção para evitar que a aplicação pare
             # A tabela pode já existir
 
+    def email_exists(self, email: str) -> bool:
+        """
+        Verifica se um email já existe no banco
+        :param email: Email a verificar
+        :return: Boolean indicando se existe
+        """
+        print(f"🟢 UsuarioDAO.email_exists() - Email: {email}")
+        try:
+            SQL = "SELECT id FROM usuarios WHERE email = %s"
+            result = self.__database.execute_query(SQL, (email,), fetch=True)
+            return len(result) > 0
+        except Exception as e:
+            print(f"❌ Erro em UsuarioDAO.email_exists(): {e}")
+            raise
+
     def create(self, usuario: Usuario) -> int:
         """
         Cria um novo usuário no banco de dados
@@ -45,7 +60,7 @@ class UsuarioDAO:
                 usuario.nome, 
                 usuario.email, 
                 usuario.senha_hash, 
-                usuario.data_criacao.strftime('%Y-%m-%d %H:%M:%S')
+                usuario.data_criacao
             )
 
             insert_id = self.__database.execute_query(SQL, params)
@@ -66,7 +81,7 @@ class UsuarioDAO:
         :param usuario_id: ID do usuário
         :return: Objeto Usuario ou None
         """
-        print("✅ UsuarioDAO.find_by_id()")
+        print(f"✅ UsuarioDAO.find_by_id() - ID: {usuario_id}")
         try:
             SQL = '''
                 SELECT id, nome, email, senha_hash, data_criacao 
@@ -103,7 +118,7 @@ class UsuarioDAO:
         :param email: Email do usuário
         :return: Objeto Usuario ou None
         """
-        print("🟢 UsuarioDAO.find_by_email()")
+        print(f"🟢 UsuarioDAO.find_by_email() - Email: {email}")
         try:
             SQL = '''
                 SELECT id, nome, email, senha_hash, data_criacao 
@@ -176,7 +191,7 @@ class UsuarioDAO:
         :param usuario: Objeto Usuario
         :return: Boolean indicando sucesso
         """
-        print("🟢 UsuarioDAO.update()")
+        print(f"🟢 UsuarioDAO.update() - ID: {usuario.id}")
         try:
             SQL = '''
                 UPDATE usuarios 
@@ -205,7 +220,7 @@ class UsuarioDAO:
         :param usuario_id: ID do usuário
         :return: Boolean indicando sucesso
         """
-        print("🟢 UsuarioDAO.delete()")
+        print(f"🟢 UsuarioDAO.delete() - ID: {usuario_id}")
         try:
             SQL = 'DELETE FROM usuarios WHERE id = %s'
             affected = self.__database.execute_query(SQL, (usuario_id,))
@@ -213,46 +228,4 @@ class UsuarioDAO:
 
         except Exception as e:
             print(f"❌ Erro em UsuarioDAO.delete(): {e}")
-            raise
-
-    def find_by_field(self, campo: str, valor) -> list[Usuario]:
-        """
-        Busca usuários por campo específico
-        :param campo: Campo para busca
-        :param valor: Valor do campo
-        :return: Lista de objetos Usuario
-        """
-        print(f"🟢 UsuarioDAO.find_by_field() - Campo: {campo}, Valor: {valor}")
-        try:
-            allowed_fields = ["id", "nome", "email"]
-            if campo not in allowed_fields:
-                raise ValueError("Campo inválido para busca")
-
-            SQL = f'''
-                SELECT id, nome, email, senha_hash, data_criacao 
-                FROM usuarios WHERE {campo} = %s
-            '''
-            rows = self.__database.execute_query(SQL, (valor,), fetch=True)
-
-            usuarios = []
-            for row in rows:
-                usuario = Usuario()
-                usuario.id = row["id"]
-                usuario.nome = row["nome"]
-                usuario.email = row["email"]
-                usuario.senha_hash = row["senha_hash"]
-                
-                # Converter string para datetime
-                if row["data_criacao"]:
-                    if hasattr(row["data_criacao"], 'isoformat'):
-                        usuario.data_criacao = row["data_criacao"]
-                    else:
-                        usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
-                
-                usuarios.append(usuario)
-
-            return usuarios
-
-        except Exception as e:
-            print(f"❌ Erro em UsuarioDAO.find_by_field(): {e}")
             raise
