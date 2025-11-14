@@ -89,6 +89,32 @@
       color: #155724;
     }
     
+    .status-andamento {
+      background-color: #cce7ff;
+      color: #004085;
+    }
+    
+    .prioridade-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+    }
+    
+    .prioridade-alta {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .prioridade-media {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .prioridade-baixa {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    
     .navbar-brand {
       font-weight: 700;
       color: #667eea !important;
@@ -106,6 +132,14 @@
     .btn-logout:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+    
+    .user-badge {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
     }
   </style>
 </head>
@@ -158,23 +192,50 @@
         <div class="mb-3">
           <input type="number" id="txtId" class="form-control mb-2" disabled placeholder="ID" />
           <input type="text" id="txtTitulo" class="form-control mb-2" placeholder="Título da tarefa" />
+          <textarea id="txtDescricao" class="form-control mb-2" placeholder="Descrição da tarefa" rows="2"></textarea>
           
           <div class="row mb-2">
-            <div class="col">
+            <div class="col-md-4">
               <label for="txtDataLimite" class="form-label">Data Limite</label>
               <input type="date" id="txtDataLimite" class="form-control">
             </div>
-            <div class="col">
+            <div class="col-md-4">
               <label for="cboProjeto" class="form-label">Projeto</label>
               <select id="cboProjeto" class="form-select">
                 <option value="-1">Selecione um projeto</option>
               </select>
             </div>
+            <div class="col-md-4">
+              <label for="cboResponsavel" class="form-label">Responsável</label>
+              <select id="cboResponsavel" class="form-select">
+                <option value="-1">Selecione o responsável</option>
+              </select>
+            </div>
           </div>
 
-          <div class="form-check mb-3">
-            <input type="checkbox" id="chkConcluida" class="form-check-input">
-            <label class="form-check-label" for="chkConcluida">Tarefa concluída</label>
+          <div class="row mb-2">
+            <div class="col-md-4">
+              <label for="cboStatus" class="form-label">Status</label>
+              <select id="cboStatus" class="form-select">
+                <option value="pendente">Pendente</option>
+                <option value="andamento">Em Andamento</option>
+                <option value="concluida">Concluída</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="cboPrioridade" class="form-label">Prioridade</label>
+              <select id="cboPrioridade" class="form-select">
+                <option value="baixa">Baixa</option>
+                <option value="media" selected>Média</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <div class="form-check mt-4">
+                <input type="checkbox" id="chkConcluida" class="form-check-input">
+                <label class="form-check-label" for="chkConcluida">Tarefa concluída</label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -184,13 +245,64 @@
       <div id="divResposta" class="alert m-3" style="display: none;"></div>
     </div>
 
+    <!-- ======================== FILTROS ======================== -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-funnel"></i> Filtros
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <label for="filtroStatus" class="form-label">Status</label>
+            <select id="filtroStatus" class="form-select">
+              <option value="todos">Todos</option>
+              <option value="pendente">Pendente</option>
+              <option value="andamento">Em Andamento</option>
+              <option value="concluida">Concluída</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filtroPrioridade" class="form-label">Prioridade</label>
+            <select id="filtroPrioridade" class="form-select">
+              <option value="todos">Todos</option>
+              <option value="alta">Alta</option>
+              <option value="media">Média</option>
+              <option value="baixa">Baixa</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filtroResponsavel" class="form-label">Responsável</label>
+            <select id="filtroResponsavel" class="form-select">
+              <option value="todos">Todos</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">&nbsp;</label>
+            <div class="d-grid">
+              <button class="btn btn-primary" onclick="aplicarFiltros()">
+                <i class="bi bi-funnel"></i> Aplicar Filtros
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ======================== TABELA DE TAREFAS ======================== -->
     <div class="card mt-4">
-      <div class="card-header">
-        <i class="bi bi-list-ul"></i> Lista de Tarefas
-        <button class="btn btn-sm btn-outline-light float-end" onclick="listAll()">
-          <i class="bi bi-arrow-clockwise"></i> Atualizar
-        </button>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-list-ul"></i> Lista de Tarefas
+          <span id="contadorTarefas" class="badge bg-primary ms-2">0</span>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-light me-2" onclick="listAll()">
+            <i class="bi bi-arrow-clockwise"></i> Atualizar
+          </button>
+          <button class="btn btn-sm btn-outline-light" onclick="exportarTarefas()">
+            <i class="bi bi-download"></i> Exportar
+          </button>
+        </div>
       </div>
       <div class="card-body">
         <div id="divTabela">
@@ -247,20 +359,29 @@
     }
 
     const token = localStorage.getItem("token") || userData.token || userData.data?.token;
-    
-    // ✅ CORREÇÃO: ApiService com URL base explícita para o backend na porta 5000
     const api = new ApiService(token, "http://localhost:5000");
+
+    console.log("🚀 ApiService inicializado para Tarefas");
 
     let API_DATA;
     let projetosList = [];
+    let usuariosList = [];
     let projetoSelecionado = null;
+    let tarefasList = [];
 
     // ======================== ELEMENTOS HTML ========================
     const txtId = document.getElementById("txtId");
     const txtTitulo = document.getElementById("txtTitulo");
+    const txtDescricao = document.getElementById("txtDescricao");
     const txtDataLimite = document.getElementById("txtDataLimite");
     const cboProjeto = document.getElementById("cboProjeto");
+    const cboResponsavel = document.getElementById("cboResponsavel");
+    const cboStatus = document.getElementById("cboStatus");
+    const cboPrioridade = document.getElementById("cboPrioridade");
     const chkConcluida = document.getElementById("chkConcluida");
+    const filtroStatus = document.getElementById("filtroStatus");
+    const filtroPrioridade = document.getElementById("filtroPrioridade");
+    const filtroResponsavel = document.getElementById("filtroResponsavel");
     const divBotoes = document.getElementById("divBotoes");
     const divResposta = document.getElementById("divResposta");
     const cardProjetoInfo = document.getElementById("cardProjetoInfo");
@@ -268,6 +389,7 @@
     const btnVoltarProjetos = document.getElementById("btnVoltarProjetos");
     const tituloPagina = document.getElementById("tituloPagina");
     const btnLogout = document.getElementById("btnLogout");
+    const contadorTarefas = document.getElementById("contadorTarefas");
 
     // ======================== VERIFICAR PARÂMETROS URL ========================
     const urlParams = new URLSearchParams(window.location.search);
@@ -305,17 +427,26 @@
         return;
       }
 
+      if (cboResponsavel.value === "-1") {
+        showMessage("Selecione um responsável", "warning");
+        return;
+      }
+
       const objetoCriar = {
         "tarefa": {
           "titulo": txtTitulo.value.trim(),
+          "descricao": txtDescricao.value.trim(),
           "data_limite": txtDataLimite.value || null,
+          "status": cboStatus.value,
+          "prioridade": cboPrioridade.value,
           "concluida": chkConcluida.checked,
-          "projeto_id": parseInt(cboProjeto.value)
+          "projeto_id": parseInt(cboProjeto.value),
+          "usuario_responsavel_id": parseInt(cboResponsavel.value)
+          // usuario_atribuidor_id será definido automaticamente pelo backend com base no token
         }
       };
 
       try {
-        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
         const resposta = await api.post("/api/tarefa/", objetoCriar);
         console.log("Resposta criar tarefa:", resposta);
         
@@ -357,14 +488,17 @@
       const objetoAtualizar = {
         "tarefa": {
           "titulo": txtTitulo.value.trim(),
+          "descricao": txtDescricao.value.trim(),
           "data_limite": txtDataLimite.value || null,
+          "status": cboStatus.value,
+          "prioridade": cboPrioridade.value,
           "concluida": chkConcluida.checked,
-          "projeto_id": parseInt(cboProjeto.value)
+          "projeto_id": parseInt(cboProjeto.value),
+          "usuario_responsavel_id": parseInt(cboResponsavel.value)
         }
       };
 
       try {
-        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
         const resposta = await api.put("/api/tarefa", id, objetoAtualizar);
         console.log("Resposta atualizar tarefa:", resposta);
         
@@ -407,7 +541,6 @@
 
       newBtnConfirm.onclick = async function () {
         try {
-          // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
           const resposta = await api.delete("/api/tarefa", id);
           
           if (resposta && resposta.success === false) {
@@ -454,7 +587,6 @@
 
     async function carregarProjetos() {
       try {
-        // ✅ CORREÇÃO: /api/projeto/ (formato singular)
         const resposta = await api.get("/api/projeto/");
         
         if (resposta && resposta.success === false) {
@@ -464,7 +596,6 @@
         
         projetosList = [];
         
-        // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
         if (resposta && Array.isArray(resposta)) {
           projetosList = resposta;
         } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
@@ -475,7 +606,6 @@
           projetosList = resposta.projetos;
         }
         
-        // Limpar e preencher o select de projetos
         cboProjeto.innerHTML = '<option value="-1">Selecione um projeto</option>';
         projetosList.forEach(projeto => {
           const option = document.createElement("option");
@@ -489,9 +619,69 @@
       }
     }
 
+    async function carregarUsuarios() {
+      try {
+        const resposta = await api.get("/api/usuario/");
+        
+        if (resposta && resposta.success === false) {
+          console.error("Erro ao carregar usuários:", resposta.error?.message);
+          return;
+        }
+        
+        usuariosList = [];
+        
+        if (resposta && Array.isArray(resposta)) {
+          usuariosList = resposta;
+        } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+          usuariosList = resposta.data;
+        } else if (resposta && resposta.success && Array.isArray(resposta.data?.usuarios)) {
+          usuariosList = resposta.data.usuarios;
+        } else if (resposta && resposta.usuarios && Array.isArray(resposta.usuarios)) {
+          usuariosList = resposta.usuarios;
+        }
+        
+        // Preencher select de responsáveis
+        cboResponsavel.innerHTML = '<option value="-1">Selecione o responsável</option>';
+        filtroResponsavel.innerHTML = '<option value="todos">Todos</option>';
+        
+        usuariosList.forEach(usuario => {
+          const option = document.createElement("option");
+          option.value = usuario.id;
+          option.textContent = usuario.nome || usuario.name;
+          cboResponsavel.appendChild(option);
+          
+          const optionFiltro = option.cloneNode(true);
+          optionFiltro.value = usuario.id;
+          filtroResponsavel.appendChild(optionFiltro);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar usuários:", error);
+        // Se não conseguir carregar usuários, usa uma lista estática
+        usuariosList = [
+          { id: 1, nome: "Ana Silva" },
+          { id: 2, nome: "Bruno Costa" },
+          { id: 3, nome: "Carlos Oliveira" },
+          { id: 4, nome: "Davi Santos" }
+        ];
+        
+        cboResponsavel.innerHTML = '<option value="-1">Selecione o responsável</option>';
+        filtroResponsavel.innerHTML = '<option value="todos">Todos</option>';
+        
+        usuariosList.forEach(usuario => {
+          const option = document.createElement("option");
+          option.value = usuario.id;
+          option.textContent = usuario.nome;
+          cboResponsavel.appendChild(option);
+          
+          const optionFiltro = option.cloneNode(true);
+          optionFiltro.value = usuario.id;
+          filtroResponsavel.appendChild(optionFiltro);
+        });
+      }
+    }
+
     async function listAll() {
       try {
-        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
         const resposta = await api.get("/api/tarefa/");
         
         if (resposta && resposta.success === false) {
@@ -500,17 +690,33 @@
         }
         
         console.log("Dados carregados:", resposta);
-        renderTable(resposta);
+        tarefasList = processarRespostaTarefas(resposta);
+        renderTable(tarefasList);
       } catch (error) {
         showMessage("Erro ao carregar tarefas: " + error.message, "danger");
       }
+    }
+
+    function processarRespostaTarefas(resposta) {
+      let tarefas = [];
+      
+      if (resposta && Array.isArray(resposta)) {
+        tarefas = resposta;
+      } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+        tarefas = resposta.data;
+      } else if (resposta && resposta.success && Array.isArray(resposta.data?.tarefas)) {
+        tarefas = resposta.data.tarefas;
+      } else if (resposta && resposta.tarefas && Array.isArray(resposta.tarefas)) {
+        tarefas = resposta.tarefas;
+      }
+      
+      return tarefas;
     }
 
     async function listPorProjeto() {
       if (!projetoSelecionado) return;
       
       try {
-        // ✅ CORREÇÃO: /api/tarefa/ (formato singular)
         const resposta = await api.get("/api/tarefa/");
         
         if (resposta && resposta.success === false) {
@@ -518,61 +724,105 @@
           return;
         }
         
-        let todasTarefas = [];
-        
-        // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
-        if (resposta && Array.isArray(resposta)) {
-          todasTarefas = resposta;
-        } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
-          todasTarefas = resposta.data;
-        } else if (resposta && resposta.success && Array.isArray(resposta.data?.tarefas)) {
-          todasTarefas = resposta.data.tarefas;
-        } else if (resposta && resposta.tarefas && Array.isArray(resposta.tarefas)) {
-          todasTarefas = resposta.tarefas;
-        }
+        const todasTarefas = processarRespostaTarefas(resposta);
         
         // Filtrar tarefas pelo projeto selecionado
         const tarefasDoProjeto = todasTarefas.filter(tarefa => 
           tarefa.projeto_id == projetoSelecionado.id
         );
         
+        tarefasList = tarefasDoProjeto;
         renderTable(tarefasDoProjeto);
       } catch (error) {
         showMessage("Erro ao carregar tarefas do projeto: " + error.message, "danger");
       }
     }
 
+    function aplicarFiltros() {
+      let tarefasFiltradas = [...tarefasList];
+      
+      // Aplicar filtro de status
+      if (filtroStatus.value !== 'todos') {
+        tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+          tarefa.status === filtroStatus.value
+        );
+      }
+      
+      // Aplicar filtro de prioridade
+      if (filtroPrioridade.value !== 'todos') {
+        tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+          tarefa.prioridade === filtroPrioridade.value
+        );
+      }
+      
+      // Aplicar filtro de responsável
+      if (filtroResponsavel.value !== 'todos') {
+        tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+          tarefa.usuario_responsavel_id == filtroResponsavel.value
+        );
+      }
+      
+      renderTable(tarefasFiltradas);
+    }
+
     function limparFormulario() {
       txtId.value = "";
       txtTitulo.value = "";
+      txtDescricao.value = "";
       txtDataLimite.value = "";
       cboProjeto.value = "-1";
+      cboResponsavel.value = "-1";
+      cboStatus.value = "pendente";
+      cboPrioridade.value = "media";
       chkConcluida.checked = false;
       divResposta.style.display = "none";
     }
 
-    function renderTable(dados) {
+    function exportarTarefas() {
+      const csv = converterParaCSV(tarefasList);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tarefas.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
 
+    function converterParaCSV(tarefas) {
+      const headers = ['ID', 'Título', 'Descrição', 'Projeto', 'Responsável', 'Status', 'Prioridade', 'Data Limite', 'Concluída'];
+      const rows = tarefas.map(tarefa => {
+        const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
+        const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+        return [
+          tarefa.id,
+          `"${tarefa.titulo}"`,
+          `"${tarefa.descricao || ''}"`,
+          `"${projeto ? (projeto.nome || projeto.titulo) : 'N/A'}"`,
+          `"${responsavel ? responsavel.nome : 'N/A'}"`,
+          tarefa.status,
+          tarefa.prioridade,
+          tarefa.data_limite ? new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A',
+          tarefa.concluida ? 'Sim' : 'Não'
+        ];
+      });
+      
+      return [headers, ...rows].map(row => row.join(',')).join('\n');
+    }
+
+    function renderTable(dados) {
       const divTabela = document.getElementById("divTabela");
       divTabela.innerHTML = "";
 
-      let tarefas = [];
-
-      // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
-      if (dados && Array.isArray(dados)) {
-          tarefas = dados;
-      } else if (dados && dados.data && Array.isArray(dados.data)) {
-          tarefas = dados.data;
-      } else if (dados && dados.success && Array.isArray(dados.data?.tarefas)) {
-          tarefas = dados.data.tarefas;
-      } else if (dados && dados.tarefas && Array.isArray(dados.tarefas)) {
-          tarefas = dados.tarefas;
-      }
+      let tarefas = dados || [];
 
       if (!tarefas || tarefas.length === 0) {
           divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhuma Tarefa encontrada</div>';
+          contadorTarefas.textContent = '0';
           return;
       }
+
+      contadorTarefas.textContent = tarefas.length;
 
       const table = document.createElement("table");
       table.className = "table table-bordered table-striped table-hover";
@@ -581,8 +831,7 @@
       thead.className = "table-light";
       const trHead = document.createElement("tr");
 
-      // ✅ CORREÇÃO: Adicionar coluna "Concluída"
-      ["", "ID", "Título", "Projeto", "Data Limite", "Status", "Ações"].forEach(text => {
+      ["", "ID", "Título", "Projeto", "Responsável", "Status", "Prioridade", "Data Limite", "Ações"].forEach(text => {
           const th = document.createElement("th");
           th.textContent = text;
           trHead.appendChild(th);
@@ -597,45 +846,42 @@
           const tr = document.createElement("tr");
           tr.className = `concluida-${tarefa.concluida}`;
 
-          // ✅ CORREÇÃO: Checkbox para marcar como concluída
+          // Checkbox para marcar como concluída
           const tdCheckbox = document.createElement("td");
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
           checkbox.className = "form-check-input";
           checkbox.checked = tarefa.concluida;
           checkbox.onchange = async function() {
-              try {
-                  const objetoAtualizar = {
-                      "tarefa": {
-                          "concluida": checkbox.checked,
-                          // Mantém os outros campos para não perder dados
-                          "titulo": tarefa.titulo,
-                          "data_limite": tarefa.data_limite,
-                          "projeto_id": tarefa.projeto_id
-                      }
-                  };
+            try {
+                const objetoAtualizar = {
+                    "tarefa": {
+                        "concluida": checkbox.checked,
+                        "status": checkbox.checked ? "concluida" : "pendente"
+                    }
+                };
 
-                  const resposta = await api.put("/api/tarefa", tarefa.id, objetoAtualizar);
-                  
-                  if (resposta && resposta.success) {
-                      showMessage(`Tarefa ${checkbox.checked ? 'concluída' : 'reaberta'} com sucesso!`, "success");
-                      // Atualiza a linha visualmente
-                      tr.className = `concluida-${checkbox.checked}`;
-                      
-                      // Atualiza o status badge
-                      const statusBadge = tr.querySelector('.status-badge');
-                      if (statusBadge) {
-                          statusBadge.className = `status-badge ${checkbox.checked ? 'status-concluida' : 'status-pendente'}`;
-                          statusBadge.textContent = checkbox.checked ? "Concluída" : "Pendente";
-                      }
-                  } else {
-                      showMessage("Erro ao atualizar tarefa", "danger");
-                      checkbox.checked = !checkbox.checked; // Reverte a mudança
-                  }
-              } catch (error) {
-                  showMessage("Erro ao atualizar tarefa: " + error.message, "danger");
-                  checkbox.checked = !checkbox.checked; // Reverte a mudança
-              }
+                console.log(`🔄 Marcando tarefa ${tarefa.id} como concluída: ${checkbox.checked}`);
+                
+                const resposta = await api.put("/api/tarefa", tarefa.id, objetoAtualizar);
+                
+                if (resposta && resposta.success) {
+                    showMessage(`Tarefa ${checkbox.checked ? 'concluída' : 'reaberta'} com sucesso!`, "success");
+                    tr.className = `concluida-${checkbox.checked}`;
+                    
+                    const statusBadge = tr.querySelector('.status-badge');
+                    if (statusBadge) {
+                        statusBadge.className = `status-badge ${checkbox.checked ? 'status-concluida' : 'status-pendente'}`;
+                        statusBadge.textContent = checkbox.checked ? "Concluída" : "Pendente";
+                    }
+                } else {
+                    showMessage("Erro ao atualizar tarefa", "danger");
+                    checkbox.checked = !checkbox.checked;
+                }
+            } catch (error) {
+                showMessage("Erro ao atualizar tarefa: " + error.message, "danger");
+                checkbox.checked = !checkbox.checked;
+            }
           };
           tdCheckbox.appendChild(checkbox);
           tr.appendChild(tdCheckbox);
@@ -648,7 +894,6 @@
           // Título
           const tdTitulo = document.createElement("td");
           tdTitulo.textContent = tarefa.titulo;
-          tr.appendChild(tdTitulo);
 
           // Projeto
           const tdProjeto = document.createElement("td");
@@ -719,6 +964,7 @@
 
     // Carregar dados ao iniciar
     carregarProjetos();
+    carregarUsuarios(); 
     if (projetoSelecionado) {
       listPorProjeto();
     } else {

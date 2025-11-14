@@ -21,8 +21,8 @@ class ProjetoControl:
         print("⬆️  ProjetoControl.constructor()")
         self.__projeto_service = projeto_service
 
-    def store(self):
-        """Cria um novo projeto"""
+    def store(self, usuario_id: int = None):
+        """Cria um novo projeto para o usuário autenticado"""
         print("🔵 ProjetoControl.store()")
         try:
             json_projeto = request.json.get("projeto")
@@ -35,7 +35,9 @@ class ProjetoControl:
                     }
                 }), 400
 
-            newIdProjeto = self.__projeto_service.createProjeto(json_projeto)
+            # ✅ CORREÇÃO: Passa o usuario_id do usuário autenticado
+            newIdProjeto = self.__projeto_service.createProjeto(json_projeto, usuario_id)
+            
             return jsonify({
                 "success": True,
                 "message": "Projeto criado com sucesso",
@@ -45,8 +47,9 @@ class ProjetoControl:
                         "nome": json_projeto.get("nome"),
                         "descricao": json_projeto.get("descricao"),
                         "data_inicio": json_projeto.get("data_inicio"),
-                        "status": json_projeto.get("status", "Pendente"),
-                        "usuario_id": json_projeto.get("usuario_id")
+                        "data_fim": json_projeto.get("data_fim"),
+                        "status": json_projeto.get("status", "pendente"),
+                        "usuario_id": usuario_id  # ✅ CORREÇÃO: Retorna o usuario_id correto
                     }
                 }
             }), 201
@@ -69,11 +72,12 @@ class ProjetoControl:
                 }
             }), 500
 
-    def index(self):
-        """Lista todos os projetos cadastrados"""
+    def index(self, usuario_id: int = None):
+        """Lista todos os projetos do usuário autenticado"""
         print("🔵 ProjetoControl.index()")
         try:
-            lista_projetos = self.__projeto_service.findAll()
+            # ✅ CORREÇÃO: Passa o usuario_id para buscar apenas projetos do usuário
+            lista_projetos = self.__projeto_service.findAll(usuario_id)
             return jsonify({
                 "success": True,
                 "message": "Executado com sucesso",
@@ -98,11 +102,12 @@ class ProjetoControl:
                 }
             }), 500
 
-    def show(self, id):
-        """Busca um projeto pelo ID"""
+    def show(self, id, usuario_id: int = None):
+        """Busca um projeto pelo ID (só retorna se pertencer ao usuário)"""
         print("🔵 ProjetoControl.show()")
         try:
-            projeto = self.__projeto_service.findById(id)
+            # ✅ CORREÇÃO: Passa o usuario_id para verificar permissão
+            projeto = self.__projeto_service.findById(id, usuario_id)
             return jsonify({
                 "success": True,
                 "message": "Executado com sucesso",
@@ -127,11 +132,12 @@ class ProjetoControl:
                 }
             }), 500
 
-    def update(self, id):
-        """Atualiza os dados de um projeto existente"""
+    def update(self, id, usuario_id: int = None):
+        """Atualiza os dados de um projeto existente (só se pertencer ao usuário)"""
         print("🔵 ProjetoControl.update()")
         try:
-            projeto_atualizado = self.__projeto_service.updateProjeto(id, request.json)
+            # ✅ CORREÇÃO: Passa o usuario_id para verificar permissão
+            projeto_atualizado = self.__projeto_service.updateProjeto(id, request.json, usuario_id)
 
             return jsonify({
                 "success": True,
@@ -141,8 +147,10 @@ class ProjetoControl:
                         "id": int(id),
                         "nome": request.json.get("projeto", {}).get("nome"),
                         "descricao": request.json.get("projeto", {}).get("descricao"),
+                        "data_inicio": request.json.get("projeto", {}).get("data_inicio"),
+                        "data_fim": request.json.get("projeto", {}).get("data_fim"),
                         "status": request.json.get("projeto", {}).get("status"),
-                        "usuario_id": request.json.get("projeto", {}).get("usuario_id")
+                        "usuario_id": usuario_id  # ✅ CORREÇÃO: Retorna o usuario_id correto
                     }
                 }
             }), 200
@@ -165,11 +173,12 @@ class ProjetoControl:
                 }
             }), 500
 
-    def destroy(self, id):
-        """Remove um projeto pelo ID"""
+    def destroy(self, id, usuario_id: int = None):
+        """Remove um projeto pelo ID (só se pertencer ao usuário)"""
         print("🔵 ProjetoControl.destroy()")
         try:
-            excluiu = self.__projeto_service.deleteProjeto(id)
+            # ✅ CORREÇÃO: Passa o usuario_id para verificar permissão
+            excluiu = self.__projeto_service.deleteProjeto(id, usuario_id)
             return jsonify({
                 "success": True,
                 "message": "Projeto excluído com sucesso"
@@ -222,168 +231,241 @@ class ProjetoControl:
                 }
             }), 500
 
+    def show_meus_projetos(self, usuario_id: int):
+        """Lista todos os projetos do usuário autenticado"""
+        print("🔵 ProjetoControl.show_meus_projetos()")
+        try:
+            projetos = self.__projeto_service.findByUsuarioId(usuario_id)
+            return jsonify({
+                "success": True,
+                "message": "Executado com sucesso",
+                "data": {"projetos": projetos}
+            }), 200
+        except ErrorResponse as e:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": e.message,
+                    "details": e.details,
+                    "code": e.status_code
+                }
+            }), e.status_code
+        except Exception as e:
+            print(f"❌ Erro inesperado em show_meus_projetos: {traceback.format_exc()}")
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": "Erro interno no servidor",
+                    "code": 500
+                }
+            }), 500
 
-# -*- coding: utf-8 -*-
-from flask import Blueprint, request, jsonify
-from api.middleware.jwt_middleware import JwtMiddleware
-from api.middleware.tarefa_middleware import TarefaMiddleware
-from api.control.tarefa_control import TarefaControl
+    def count_projetos(self, usuario_id: int = None):
+        """Retorna a contagem de projetos do usuário"""
+        print("🔵 ProjetoControl.count_projetos()")
+        try:
+            if usuario_id:
+                projetos = self.__projeto_service.findByUsuarioId(usuario_id)
+                total = len(projetos)
+                
+                # Contar por status
+                status_count = {}
+                for projeto in projetos:
+                    status = projeto.get('status', 'pendente')
+                    status_count[status] = status_count.get(status, 0) + 1
+            else:
+                projetos = self.__projeto_service.findAll()
+                total = len(projetos)
+                status_count = {"total": total}
 
-class TarefaRoteador:
-    """
-    Classe responsável por configurar todas as rotas da entidade Tarefa no Flask.
+            return jsonify({
+                "success": True,
+                "message": "Executado com sucesso",
+                "data": {
+                    "total": total,
+                    "por_status": status_count
+                }
+            }), 200
+        except ErrorResponse as e:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": e.message,
+                    "details": e.details,
+                    "code": e.status_code
+                }
+            }), e.status_code
+        except Exception as e:
+            print(f"❌ Erro inesperado em count_projetos: {traceback.format_exc()}")
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": "Erro interno no servidor",
+                    "code": 500
+                }
+            }), 500
 
-    Objetivos:
-    - Criar um Blueprint isolado para as rotas de Tarefa.
-    - Receber middlewares e controlador via injeção de dependência.
-    - Aplicar autenticação JWT e validações antes de chamar o controlador.
-    """
-
-    def __init__(self, jwt_middleware: JwtMiddleware, tarefa_middleware: TarefaMiddleware, tarefa_control: TarefaControl):
-        """
-        Construtor do roteador.
-
-        :param jwt_middleware: Middleware responsável por validar token JWT.
-        :param tarefa_middleware: Middleware com validações específicas para Tarefa.
-        :param tarefa_control: Controlador que implementa a lógica de negócio.
-        """
-        print("⬆️  TarefaRoteador.__init__()")
-        self.__jwt_middleware = jwt_middleware
-        self.__tarefa_middleware = tarefa_middleware
-        self.__tarefa_control = tarefa_control
-
-        # ✅ CORREÇÃO: Blueprint com nome no singular
-        self.__blueprint = Blueprint('tarefa', __name__)
-
-    def create_routes(self):
-        """
-        Configura e retorna todas as rotas REST da entidade Tarefa.
-
-        Rotas implementadas:
-        - POST /        -> Cria uma nova tarefa
-        - GET /         -> Lista todas as tarefas
-        - GET /<id>     -> Retorna uma tarefa por ID
-        - PUT /<id>     -> Atualiza uma tarefa por ID
-        - DELETE /<id>  -> Remove uma tarefa por ID
-        - GET /projeto/<projeto_id> -> Lista tarefas por projeto
-        - PUT /<id>/concluir -> Marca tarefa como concluída
-        - GET /minhas-tarefas -> Lista tarefas do usuário autenticado
-        """
-
-        # POST / -> cria uma tarefa
-        @self.__blueprint.route('/', methods=['POST'])
-        @self.__jwt_middleware.validate_token
-        @self.__tarefa_middleware.validate_body
-        def store():
-            """
-            Rota responsável por criar uma nova tarefa.
-            Requer autenticação JWT.
-            """
-            return self.__tarefa_control.store()
-
-        # GET / -> lista todas as tarefas
-        @self.__blueprint.route('/', methods=['GET'])
-        @self.__jwt_middleware.validate_token
-        def index():
-            """
-            Rota responsável por listar todas as tarefas cadastradas no sistema.
-            Requer autenticação JWT.
-            """
-            return self.__tarefa_control.index()
-
-        # GET /<id> -> retorna uma tarefa específica
-        @self.__blueprint.route('/<int:id>', methods=['GET'])
-        @self.__jwt_middleware.validate_token
-        @self.__tarefa_middleware.validate_id_param
-        def show(id):
-            """
-            Rota que retorna uma tarefa específica pelo seu ID.
-            Requer autenticação JWT.
-
-            :param id: int - ID da tarefa vindo da URI.
-            """
-            return self.__tarefa_control.show(id)
-
-        # PUT /<id> -> atualiza uma tarefa
-        @self.__blueprint.route('/<int:id>', methods=['PUT'])
-        @self.__jwt_middleware.validate_token
-        @self.__tarefa_middleware.validate_id_param
-        @self.__tarefa_middleware.validate_body_update
-        def update(id):
-            """
-            Rota que atualiza uma tarefa existente.
-            Requer autenticação JWT.
-
-            :param id: int - ID da tarefa a ser atualizada.
-            """
-            return self.__tarefa_control.update(id)
-
-        # DELETE /<id> -> remove uma tarefa
-        @self.__blueprint.route('/<int:id>', methods=['DELETE'])
-        @self.__jwt_middleware.validate_token
-        @self.__tarefa_middleware.validate_id_param
-        def destroy(id):
-            """
-            Rota que remove uma tarefa pelo seu ID.
-            Requer autenticação JWT.
-
-            :param id: int - ID da tarefa a ser removida.
-            """
-            return self.__tarefa_control.destroy(id)
-
-        # GET /projeto/<projeto_id> -> lista tarefas por projeto
-        @self.__blueprint.route('/projeto/<int:projeto_id>', methods=['GET'])
-        @self.__jwt_middleware.validate_token
-        @self.__tarefa_middleware.validate_projeto_id_param
-        def show_by_projeto(projeto_id):
-            """
-            Rota que retorna todas as tarefas de um projeto específico.
-            Requer autenticação JWT.
-
-            :param projeto_id: int - ID do projeto.
-            """
-            return self.__tarefa_control.show_by_projeto(projeto_id)
-
-        # PUT /<id>/concluir -> marca tarefa como concluída
-        @self.__blueprint.route('/<int:id>/concluir', methods=['PUT'])
-        @self.__jwt_middleware.validate_token
-        @self.__tarefa_middleware.validate_id_param
-        def marcar_concluida(id):
-            """
-            Rota que marca uma tarefa como concluída.
-            Requer autenticação JWT.
-
-            :param id: int - ID da tarefa a ser marcada como concluída.
-            """
-            return self.__tarefa_control.marcar_concluida(id)
-
-        # GET /minhas-tarefas -> lista tarefas do usuário autenticado
-        @self.__blueprint.route('/minhas-tarefas', methods=['GET'])
-        @self.__jwt_middleware.validate_token
-        def show_minhas_tarefas():
-            """
-            Rota que retorna todas as tarefas dos projetos do usuário autenticado.
-            Requer autenticação JWT.
-            """
-            # Obtém o ID do usuário do token JWT
-            user_id = self.__jwt_middleware.get_user_id()
-            if not user_id:
+    def update_status(self, id, usuario_id: int = None):
+        """Atualiza apenas o status de um projeto"""
+        print("🔵 ProjetoControl.update_status()")
+        try:
+            json_data = request.json.get("projeto", {})
+            novo_status = json_data.get("status")
+            
+            if not novo_status:
                 return jsonify({
                     "success": False,
                     "error": {
-                        "message": "Não foi possível identificar o usuário",
-                        "code": 401
+                        "message": "Status não fornecido",
+                        "code": 400
                     }
-                }), 401
-            
-            # Esta rota precisaria de um método específico no service/control
-            # que busca tarefas por usuário (não apenas por projeto)
-            # Por enquanto, vamos usar uma implementação básica
+                }), 400
+
+            # Busca o projeto atual
+            projeto_atual = self.__projeto_service.findById(id, usuario_id)
+            if not projeto_atual:
+                return jsonify({
+                    "success": False,
+                    "error": {
+                        "message": "Projeto não encontrado",
+                        "code": 404
+                    }
+                }), 404
+
+            # Atualiza apenas o status
+            dados_atualizacao = {
+                "projeto": {
+                    "nome": projeto_atual.get("nome"),
+                    "descricao": projeto_atual.get("descricao"),
+                    "data_inicio": projeto_atual.get("data_inicio"),
+                    "data_fim": projeto_atual.get("data_fim"),
+                    "status": novo_status,
+                    "usuario_id": usuario_id
+                }
+            }
+
+            projeto_atualizado = self.__projeto_service.updateProjeto(id, dados_atualizacao, usuario_id)
+
             return jsonify({
                 "success": True,
-                "message": "Rota em desenvolvimento - minhas-tarefas",
-                "data": {"user_id": user_id}
+                "message": f"Status do projeto atualizado para '{novo_status}'",
+                "data": {
+                    "projeto": {
+                        "id": int(id),
+                        "status": novo_status
+                    }
+                }
             }), 200
+        except ErrorResponse as e:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": e.message,
+                    "details": e.details,
+                    "code": e.status_code
+                }
+            }), e.status_code
+        except Exception as e:
+            print(f"❌ Erro inesperado em update_status: {traceback.format_exc()}")
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": "Erro interno no servidor",
+                    "code": 500
+                }
+            }), 500
 
-        # Retorna o Blueprint configurado para registro na aplicação Flask
-        return self.__blueprint
+    def search_projetos(self, usuario_id: int = None):
+        """Busca projetos por termo (nome ou descrição)"""
+        print("🔵 ProjetoControl.search_projetos()")
+        try:
+            termo = request.args.get('q', '').strip()
+            if not termo:
+                return jsonify({
+                    "success": False,
+                    "error": {
+                        "message": "Termo de busca não fornecido",
+                        "code": 400
+                    }
+                }), 400
+
+            # Busca todos os projetos do usuário
+            projetos = self.__projeto_service.findAll(usuario_id)
+            
+            # Filtra por termo
+            projetos_filtrados = []
+            for projeto in projetos:
+                nome = projeto.get('nome', '').lower()
+                descricao = projeto.get('descricao', '').lower()
+                termo_lower = termo.lower()
+                
+                if termo_lower in nome or termo_lower in descricao:
+                    projetos_filtrados.append(projeto)
+
+            return jsonify({
+                "success": True,
+                "message": "Busca realizada com sucesso",
+                "data": {
+                    "projetos": projetos_filtrados,
+                    "total_encontrado": len(projetos_filtrados),
+                    "termo_busca": termo
+                }
+            }), 200
+        except ErrorResponse as e:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": e.message,
+                    "details": e.details,
+                    "code": e.status_code
+                }
+            }), e.status_code
+        except Exception as e:
+            print(f"❌ Erro inesperado em search_projetos: {traceback.format_exc()}")
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": "Erro interno no servidor",
+                    "code": 500
+                }
+            }), 500
+
+    def get_projetos_recentes(self, usuario_id: int = None, limite: int = 5):
+        """Retorna os projetos mais recentes do usuário"""
+        print("🔵 ProjetoControl.get_projetos_recentes()")
+        try:
+            projetos = self.__projeto_service.findAll(usuario_id)
+            
+            # Ordena por data de criação (mais recentes primeiro) e limita
+            projetos_ordenados = sorted(
+                projetos, 
+                key=lambda x: x.get('data_criacao', ''), 
+                reverse=True
+            )[:limite]
+
+            return jsonify({
+                "success": True,
+                "message": "Projetos recentes recuperados com sucesso",
+                "data": {
+                    "projetos": projetos_ordenados,
+                    "total": len(projetos_ordenados)
+                }
+            }), 200
+        except ErrorResponse as e:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": e.message,
+                    "details": e.details,
+                    "code": e.status_code
+                }
+            }), e.status_code
+        except Exception as e:
+            print(f"❌ Erro inesperado em get_projetos_recentes: {traceback.format_exc()}")
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": "Erro interno no servidor",
+                    "code": 500
+                }
+            }), 500

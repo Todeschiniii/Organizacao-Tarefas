@@ -6,45 +6,37 @@ from api.utils.error_response import ErrorResponse
 import traceback
 from datetime import datetime
 
-
-"""
-Classe responsável pela camada de serviço para a entidade Projeto.
-
-Observações sobre injeção de dependência:
-- O ProjetoService recebe instâncias de ProjetoDAO e UsuarioDAO via construtor.
-- Isso desacopla o serviço das implementações concretas dos DAOs.
-- Facilita testes unitários e uso de mocks.
-"""
 class ProjetoService:
     def __init__(self, projeto_dao_dependency: ProjetoDAO, usuario_dao_dependency: UsuarioDAO):
-        """
-        Construtor da classe ProjetoService
-
-        :param projeto_dao_dependency: ProjetoDAO
-        :param usuario_dao_dependency: UsuarioDAO
-        """
         print("⬆️  ProjetoService.__init__()")
         self.__projetoDAO = projeto_dao_dependency
         self.__usuarioDAO = usuario_dao_dependency
 
-    def createProjeto(self, jsonProjeto: dict) -> int:
+    def createProjeto(self, jsonProjeto: dict, usuario_id: int = None) -> int:
         """
         Cria um novo projeto.
+        Se usuario_id for fornecido, garante que o projeto seja criado para esse usuário.
         """
         print("🟣 ProjetoService.createProjeto()")
+        print(f"📝 Dados recebidos para criar projeto: {jsonProjeto}")
 
         try:
             objProjeto = Projeto()
             objProjeto.nome = jsonProjeto["nome"]
             objProjeto.descricao = jsonProjeto.get("descricao")
             objProjeto.data_inicio = jsonProjeto.get("data_inicio")
-            objProjeto.data_fim = jsonProjeto.get("data_fim")  # ✅ CORREÇÃO: Adicionar data_fim
+            objProjeto.data_fim = jsonProjeto.get("data_fim")
             objProjeto.status = jsonProjeto.get("status", "pendente")
-            objProjeto.usuario_id = jsonProjeto["usuario_id"]
+            
+            # ✅ CORREÇÃO: Define o usuario_id do usuário autenticado
+            if usuario_id:
+                objProjeto.usuario_id = usuario_id
+            else:
+                objProjeto.usuario_id = jsonProjeto.get("usuario_id")
 
-            # ✅ CORREÇÃO: Verifica se usuário existe - find_by_id retorna Usuario ou None
+            # Verifica se usuário existe
             usuarioExiste = self.__usuarioDAO.find_by_id(objProjeto.usuario_id)
-            if not usuarioExiste:  # ✅ CORREÇÃO: Removeu o len()
+            if not usuarioExiste:
                 raise ErrorResponse(
                     400,
                     "Usuário não encontrado",
@@ -63,34 +55,39 @@ class ProjetoService:
             print(f"🔍 Stack trace: {traceback.format_exc()}")
             raise ErrorResponse(f"Erro interno ao criar projeto: {str(e)}", 500)
 
-    def findAll(self) -> list[dict]:
+    def findAll(self, usuario_id: int = None) -> list[dict]:
         """
         Retorna todos os projetos.
+        Se usuario_id for fornecido, retorna apenas projetos desse usuário.
         """
         print("🟣 ProjetoService.findAll()")
         try:
-            return self.__projetoDAO.findAll()
+            return self.__projetoDAO.findAll(usuario_id)
         except Exception as e:
             print(f"❌ Erro inesperado em findAll: {e}")
             print(f"🔍 Stack trace: {traceback.format_exc()}")
             raise ErrorResponse("Erro interno ao buscar projetos", 500)
 
-    def findById(self, id: int) -> dict:
+    def findById(self, id: int, usuario_id: int = None) -> dict:
         """
         Busca projeto por ID.
-
-        :param id: int
-        :return: dict
-        :raises ErrorResponse: se projeto não for encontrado
+        Se usuario_id for fornecido, só retorna se o projeto pertencer ao usuário.
         """
         try:
-            projeto = self.__projetoDAO.findById(id)
+            projeto = self.__projetoDAO.findById(id, usuario_id)
             if not projeto:
-                raise ErrorResponse(
-                    404,
-                    "Projeto não encontrado",
-                    {"message": f"Não existe projeto com id {id}"}
-                )
+                if usuario_id:
+                    raise ErrorResponse(
+                        404,
+                        "Projeto não encontrado",
+                        {"message": f"Não existe projeto com id {id} para o usuário {usuario_id}"}
+                    )
+                else:
+                    raise ErrorResponse(
+                        404,
+                        "Projeto não encontrado",
+                        {"message": f"Não existe projeto com id {id}"}
+                    )
             return projeto
         except ErrorResponse:
             raise
@@ -99,15 +96,13 @@ class ProjetoService:
             print(f"🔍 Stack trace: {traceback.format_exc()}")
             raise ErrorResponse("Erro interno ao buscar projeto", 500)
 
-    def updateProjeto(self, id: int, requestBody: dict) -> bool:
+    def updateProjeto(self, id: int, requestBody: dict, usuario_id: int = None) -> bool:
         """
         Atualiza dados de um projeto.
-
-        :param id: int
-        :param requestBody: dict {"projeto": {...}}
-        :return: bool
+        Se usuario_id for fornecido, só atualiza se o projeto pertencer ao usuário.
         """
         print("🟣 ProjetoService.updateProjeto()")
+        print(f"📝 Dados recebidos para atualizar projeto {id}: {requestBody}")
 
         try:
             jsonProjeto = requestBody["projeto"]
@@ -117,13 +112,19 @@ class ProjetoService:
             objProjeto.nome = jsonProjeto["nome"]
             objProjeto.descricao = jsonProjeto.get("descricao")
             objProjeto.data_inicio = jsonProjeto.get("data_inicio")
+            objProjeto.data_fim = jsonProjeto.get("data_fim")
             objProjeto.status = jsonProjeto["status"]
-            objProjeto.usuario_id = jsonProjeto.get("usuario_id")
+            
+            # ✅ CORREÇÃO: Define o usuario_id do usuário autenticado
+            if usuario_id:
+                objProjeto.usuario_id = usuario_id
+            else:
+                objProjeto.usuario_id = jsonProjeto.get("usuario_id")
 
-            # ✅ CORREÇÃO: Verifica se usuário existe se usuario_id foi fornecido
+            # Verifica se usuário existe se usuario_id foi fornecido
             if objProjeto.usuario_id:
                 usuarioExiste = self.__usuarioDAO.find_by_id(objProjeto.usuario_id)
-                if not usuarioExiste:  # ✅ CORREÇÃO: Removeu o len()
+                if not usuarioExiste:
                     raise ErrorResponse(
                         400,
                         "Usuário não encontrado",
@@ -142,16 +143,14 @@ class ProjetoService:
             print(f"🔍 Stack trace: {traceback.format_exc()}")
             raise ErrorResponse(f"Erro interno ao atualizar projeto: {str(e)}", 500)
 
-    def deleteProjeto(self, id: int) -> bool:
+    def deleteProjeto(self, id: int, usuario_id: int = None) -> bool:
         """
         Remove projeto por ID.
-
-        :param id: int
-        :return: bool
+        Se usuario_id for fornecido, só deleta se o projeto pertencer ao usuário.
         """
         print("🟣 ProjetoService.deleteProjeto()")
         try:
-            return self.__projetoDAO.delete(id)
+            return self.__projetoDAO.delete(id, usuario_id)
         except Exception as e:
             print(f"❌ Erro inesperado em deleteProjeto: {e}")
             print(f"🔍 Stack trace: {traceback.format_exc()}")
@@ -160,17 +159,13 @@ class ProjetoService:
     def findByUsuarioId(self, usuario_id: int) -> list[dict]:
         """
         Busca projetos por ID do usuário.
-
-        :param usuario_id: int
-        :return: list[dict]
-        :raises ErrorResponse: se usuário não for encontrado
         """
         print("🟣 ProjetoService.findByUsuarioId()")
         
         try:
-            # ✅ CORREÇÃO: Verifica se o usuário existe - find_by_id retorna Usuario ou None
+            # Verifica se o usuário existe
             usuarioExiste = self.__usuarioDAO.find_by_id(usuario_id)
-            if not usuarioExiste:  # ✅ CORREÇÃO: Removeu o len()
+            if not usuarioExiste:
                 raise ErrorResponse(
                     404,
                     "Usuário não encontrado",

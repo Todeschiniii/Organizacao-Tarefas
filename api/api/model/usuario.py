@@ -10,7 +10,9 @@ class Usuario:
         self.__nome = None
         self.__email = None
         self.__senha_hash = None
+        self.__empresa = None
         self.__data_criacao = None
+        self.__data_atualizacao = None
 
     @property
     def id(self):
@@ -168,6 +170,30 @@ class Usuario:
         self.__senha_hash = senha_hash
 
     @property
+    def empresa(self):
+        """
+        Getter para empresa
+        :return: str - Nome da empresa do usuário
+        """
+        return self.__empresa
+
+    @empresa.setter
+    def empresa(self, value):
+        """
+        Define a empresa do usuário.
+
+        :param value: str - Nome da empresa (pode ser None)
+        """
+        if value is None:
+            self.__empresa = None
+            return
+
+        if not isinstance(value, str):
+            raise ValueError("empresa deve ser uma string.")
+
+        self.__empresa = value.strip()
+
+    @property
     def data_criacao(self):
         """
         Getter para data_criacao
@@ -201,6 +227,31 @@ class Usuario:
 
         self.__data_criacao = value
 
+    @property
+    def data_atualizacao(self):
+        """
+        Getter para data_atualizacao
+        :return: datetime - Data de atualização do usuário
+        """
+        return self.__data_atualizacao
+
+    @data_atualizacao.setter
+    def data_atualizacao(self, value):
+        """
+        Define a data de atualização do usuário.
+
+        :param value: datetime - Data de atualização do usuário.
+        """
+        if value is None:
+            self.__data_atualizacao = None
+            return
+            
+        from datetime import datetime
+        if not isinstance(value, datetime):
+            raise ValueError("data_atualizacao deve ser um objeto datetime.")
+
+        self.__data_atualizacao = value
+
     def to_dict(self):
         """
         Converte o objeto Usuario para dicionário
@@ -209,5 +260,7 @@ class Usuario:
             'id': self.__id,
             'nome': self.__nome,
             'email': self.__email,
-            'data_criacao': self.__data_criacao.strftime('%Y-%m-%d %H:%M:%S') if self.__data_criacao else None
+            'empresa': self.__empresa,
+            'data_criacao': self.__data_criacao.strftime('%Y-%m-%d %H:%M:%S') if self.__data_criacao else None,
+            'data_atualizacao': self.__data_atualizacao.strftime('%Y-%m-%d %H:%M:%S') if self.__data_atualizacao else None
         }

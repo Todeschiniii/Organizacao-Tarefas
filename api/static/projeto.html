@@ -178,9 +178,6 @@
     <div class="card mt-4">
       <div class="card-header">
         <i class="bi bi-list-ul"></i> Lista de Projetos
-        <button class="btn btn-sm btn-outline-light float-end" onclick="listAll()">
-          <i class="bi bi-arrow-clockwise"></i> Atualizar
-        </button>
       </div>
       <div class="card-body">
         <div id="divTabela">
@@ -266,52 +263,48 @@
     // ======================== BOTÕES CRUD ========================
     const btnCriar = createButton("Criar", "btn-success", "bi-plus-circle");
     btnCriar.onclick = async () => {
-      if (txtNome.value.trim() === "") {
-        showMessage("Nome é obrigatório", "warning");
-        txtNome.focus();
-        return;
-      }
-
-      if (!selStatus.value) {
-        showMessage("Status é obrigatório", "warning");
-        selStatus.focus();
-        return;
-      }
-
-      // ✅ CORREÇÃO: Formata as datas para o formato correto (yyyy-MM-dd)
-      const dataInicio = txtDataInicio.value ? formatDateForInput(txtDataInicio.value) : null;
-      const dataFim = txtDataFim.value ? formatDateForInput(txtDataFim.value) : null;
-
-      const objetoCriar = {
-          "projeto": {
-              "nome": txtNome.value.trim(),
-              "descricao": txtDescricao.value.trim(),
-              "data_inicio": txtDataInicio.value || null,
-              "data_fim": txtDataFim.value || null,  // ✅ CORREÇÃO: Adicionar data_fim
-              "status": cboStatus.value,
-              "usuario_id": parseInt(cboUsuario.value)
-          }
-      };
-
-      try {
-        const resposta = await api.post("/api/projeto/", objetoCriar);
-        
-        // ✅ CORREÇÃO: Verificação completa da resposta
-        if (resposta && resposta.success === false) {
-          showMessage(resposta.error?.message || "Erro ao criar projeto", "danger");
-          return;
+        if (txtNome.value.trim() === "") {
+            showMessage("Nome é obrigatório", "warning");
+            txtNome.focus();
+            return;
         }
-        
-        if (resposta && resposta.success) {
-          showMessage("Projeto criado com sucesso!", "success");
-          listAll();
-          limparFormulario();
-        } else {
-          showMessage("Erro ao criar projeto: resposta inválida", "danger");
+
+        if (!selStatus.value) {
+            showMessage("Status é obrigatório", "warning");
+            selStatus.focus();
+            return;
         }
-      } catch (error) {
-        showMessage("Erro ao criar projeto: " + error.message, "danger");
-      }
+
+        // ✅ CORREÇÃO: Variáveis com nomes corretos
+        const objetoCriar = {
+            "projeto": {
+                "nome": txtNome.value.trim(),
+                "descricao": txtDescricao.value.trim(),
+                "data_inicio": txtDataInicio.value || null,
+                "data_fim": txtDataFim.value || null,
+                "status": selStatus.value,  // ✅ CORREÇÃO: selStatus
+                "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null  // ✅ CORREÇÃO: selUsuario
+            }
+        };
+
+        try {
+            const resposta = await api.post("/api/projeto/", objetoCriar);
+            
+            if (resposta && resposta.success === false) {
+                showMessage(resposta.error?.message || "Erro ao criar projeto", "danger");
+                return;
+            }
+            
+            if (resposta && resposta.success) {
+                showMessage("Projeto criado com sucesso!", "success");
+                listAll();
+                limparFormulario();
+            } else {
+                showMessage("Erro ao criar projeto: resposta inválida", "danger");
+            }
+        } catch (error) {
+            showMessage("Erro ao criar projeto: " + error.message, "danger");
+        }
     };
     divBotoes.appendChild(btnCriar);
 
@@ -680,6 +673,8 @@
       }
     });
 
+    document.getElementById('btnAtualizarLista').addEventListener('click', listAll);
+    
     // Carregar dados ao iniciar
     carregarUsuarios();
     listAll();

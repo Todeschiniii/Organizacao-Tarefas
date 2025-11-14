@@ -1,6 +1,6 @@
 # dao/usuario_dao.py
 from datetime import datetime
-from api.model.usuario import Usuario  # ✅ CORREÇÃO: models no plural
+from api.model.usuario import Usuario
 
 class UsuarioDAO:
     def __init__(self, database_dependency):
@@ -12,22 +12,21 @@ class UsuarioDAO:
         """Cria as tabelas necessárias se não existirem"""
         print("🟢 UsuarioDAO._create_tables()")
         try:
-            # ✅ CORREÇÃO: Sintaxe MySQL para criar tabela
             SQL = '''
                 CREATE TABLE IF NOT EXISTS usuarios (
                     id INT PRIMARY KEY AUTO_INCREMENT,
                     nome VARCHAR(255) NOT NULL,
                     email VARCHAR(255) UNIQUE NOT NULL,
                     senha_hash VARCHAR(255) NOT NULL,
-                    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    empresa VARCHAR(255) NULL,
+                    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 )
             '''
             self.__database.execute_query(SQL)
             print("✅ Tabela 'usuarios' criada/verificada com sucesso!")
         except Exception as e:
             print(f"❌ Erro em UsuarioDAO._create_tables(): {e}")
-            # Não levanta exceção para evitar que a aplicação pare
-            # A tabela pode já existir
 
     def email_exists(self, email: str) -> bool:
         """
@@ -53,13 +52,14 @@ class UsuarioDAO:
         print("🟢 UsuarioDAO.create()")
         try:
             SQL = '''
-                INSERT INTO usuarios (nome, email, senha_hash, data_criacao)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO usuarios (nome, email, senha_hash, empresa, data_criacao)
+                VALUES (%s, %s, %s, %s, %s)
             '''
             params = (
                 usuario.nome, 
                 usuario.email, 
                 usuario.senha_hash, 
+                usuario.empresa,
                 usuario.data_criacao
             )
 
@@ -84,7 +84,7 @@ class UsuarioDAO:
         print(f"✅ UsuarioDAO.find_by_id() - ID: {usuario_id}")
         try:
             SQL = '''
-                SELECT id, nome, email, senha_hash, data_criacao 
+                SELECT id, nome, email, senha_hash, empresa, data_criacao, data_atualizacao
                 FROM usuarios WHERE id = %s
             '''
             rows = self.__database.execute_query(SQL, (usuario_id,), fetch=True)
@@ -98,8 +98,9 @@ class UsuarioDAO:
             usuario.nome = row["nome"]
             usuario.email = row["email"]
             usuario.senha_hash = row["senha_hash"]
+            usuario.empresa = row["empresa"]
             
-            # ✅ CORREÇÃO: Tratamento melhorado para datas
+            # Tratamento para datas
             if row["data_criacao"]:
                 if hasattr(row["data_criacao"], 'isoformat'):
                     usuario.data_criacao = row["data_criacao"]
@@ -108,6 +109,15 @@ class UsuarioDAO:
                         usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
                     except ValueError:
                         usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S.%f')
+            
+            if row["data_atualizacao"]:
+                if hasattr(row["data_atualizacao"], 'isoformat'):
+                    usuario.data_atualizacao = row["data_atualizacao"]
+                else:
+                    try:
+                        usuario.data_atualizacao = datetime.strptime(str(row["data_atualizacao"]), '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        usuario.data_atualizacao = datetime.strptime(str(row["data_atualizacao"]), '%Y-%m-%d %H:%M:%S.%f')
             
             return usuario
 
@@ -124,7 +134,7 @@ class UsuarioDAO:
         print(f"🟢 UsuarioDAO.find_by_email() - Email: {email}")
         try:
             SQL = '''
-                SELECT id, nome, email, senha_hash, data_criacao 
+                SELECT id, nome, email, senha_hash, empresa, data_criacao, data_atualizacao
                 FROM usuarios WHERE email = %s
             '''
             rows = self.__database.execute_query(SQL, (email,), fetch=True)
@@ -138,8 +148,9 @@ class UsuarioDAO:
             usuario.nome = row["nome"]
             usuario.email = row["email"]
             usuario.senha_hash = row["senha_hash"]
+            usuario.empresa = row["empresa"]
             
-            # ✅ CORREÇÃO: Tratamento melhorado para datas
+            # Tratamento para datas
             if row["data_criacao"]:
                 if hasattr(row["data_criacao"], 'isoformat'):
                     usuario.data_criacao = row["data_criacao"]
@@ -148,6 +159,15 @@ class UsuarioDAO:
                         usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
                     except ValueError:
                         usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S.%f')
+            
+            if row["data_atualizacao"]:
+                if hasattr(row["data_atualizacao"], 'isoformat'):
+                    usuario.data_atualizacao = row["data_atualizacao"]
+                else:
+                    try:
+                        usuario.data_atualizacao = datetime.strptime(str(row["data_atualizacao"]), '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        usuario.data_atualizacao = datetime.strptime(str(row["data_atualizacao"]), '%Y-%m-%d %H:%M:%S.%f')
             
             return usuario
 
@@ -163,8 +183,8 @@ class UsuarioDAO:
         print("🟢 UsuarioDAO.find_all()")
         try:
             SQL = '''
-                SELECT id, nome, email, senha_hash, data_criacao 
-                FROM usuarios ORDER BY id
+                SELECT id, nome, email, senha_hash, empresa, data_criacao, data_atualizacao
+                FROM usuarios ORDER BY nome
             '''
             rows = self.__database.execute_query(SQL, fetch=True)
 
@@ -175,8 +195,9 @@ class UsuarioDAO:
                 usuario.nome = row["nome"]
                 usuario.email = row["email"]
                 usuario.senha_hash = row["senha_hash"]
+                usuario.empresa = row["empresa"]
                 
-                # ✅ CORREÇÃO: Tratamento melhorado para datas
+                # Tratamento para datas
                 if row["data_criacao"]:
                     if hasattr(row["data_criacao"], 'isoformat'):
                         usuario.data_criacao = row["data_criacao"]
@@ -185,6 +206,15 @@ class UsuarioDAO:
                             usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S')
                         except ValueError:
                             usuario.data_criacao = datetime.strptime(str(row["data_criacao"]), '%Y-%m-%d %H:%M:%S.%f')
+                
+                if row["data_atualizacao"]:
+                    if hasattr(row["data_atualizacao"], 'isoformat'):
+                        usuario.data_atualizacao = row["data_atualizacao"]
+                    else:
+                        try:
+                            usuario.data_atualizacao = datetime.strptime(str(row["data_atualizacao"]), '%Y-%m-%d %H:%M:%S')
+                        except ValueError:
+                            usuario.data_atualizacao = datetime.strptime(str(row["data_atualizacao"]), '%Y-%m-%d %H:%M:%S.%f')
                 
                 usuarios.append(usuario)
 
@@ -204,13 +234,14 @@ class UsuarioDAO:
         try:
             SQL = '''
                 UPDATE usuarios 
-                SET nome = %s, email = %s, senha_hash = %s
+                SET nome = %s, email = %s, senha_hash = %s, empresa = %s
                 WHERE id = %s
             '''
             params = (
                 usuario.nome, 
                 usuario.email, 
                 usuario.senha_hash, 
+                usuario.empresa,
                 usuario.id
             )
 

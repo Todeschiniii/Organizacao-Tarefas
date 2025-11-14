@@ -60,6 +60,21 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
+        .btn-register {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
         .alert {
             border-radius: 10px;
             border: none;
@@ -150,6 +165,13 @@
             font-size: 0.8em;
             color: #6c757d;
         }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5em;
+            padding-top: 1.5em;
+            border-top: 1px solid #dee2e6;
+        }
     </style>
 </head>
 
@@ -174,6 +196,12 @@
         <!-- Botão de Login -->
         <div class="mb-3">
             <button id="btnLogin" class="btn btn-login w-100">Entrar</button>
+        </div>
+
+        <!-- Link para Cadastro -->
+        <div class="register-link">
+            <p class="text-muted mb-2">Não tem uma conta?</p>
+            <button id="btnGoToRegister" class="btn btn-register w-100">Cadastre-se</button>
         </div>
 
         <!-- Mensagens de resposta -->
@@ -210,6 +238,7 @@
         const txtEmail = document.getElementById("txtEmail");
         const txtSenha = document.getElementById("txtSenha");
         const btnLogin = document.getElementById("btnLogin");
+        const btnGoToRegister = document.getElementById("btnGoToRegister");
         const btnRefreshUsers = document.getElementById("btnRefreshUsers");
         const divResposta = document.getElementById("divResposta");
         const usersList = document.getElementById("usersList");
@@ -294,7 +323,6 @@
                 const resposta = await api.post("/api/usuario/login", dadosLogin);
                 console.log("📨 Resposta da API:", resposta);
 
-                // ✅ ADICIONE isto no login.html após o login bem-sucedido:
                 if (resposta && resposta.success) {
                     console.log('🔍 ESTRUTURA COMPLETA DA RESPOSTA DO LOGIN:', resposta);
                     
@@ -303,7 +331,6 @@
                     // Salvar dados do usuário no localStorage
                     localStorage.setItem("userData", JSON.stringify(resposta.data));
                     
-                    // ✅ DEBUG: Mostrar o que está sendo salvo
                     console.log('💾 Dados salvos no localStorage:', resposta.data);
                     
                     if (resposta.data.token) {
@@ -340,7 +367,6 @@
 
                 let usuarios = [];
 
-                // ✅ CORREÇÃO MELHORADA: Lida com diferentes estruturas de resposta
                 if (resposta && Array.isArray(resposta)) {
                     usuarios = resposta;
                 } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
@@ -350,10 +376,8 @@
                 } else if (resposta && resposta.usuarios && Array.isArray(resposta.usuarios)) {
                     usuarios = resposta.usuarios;
                 } else if (resposta && resposta.error) {
-                    // ✅ CORREÇÃO: Só mostra fallback se houver erro real
                     console.warn("Erro ao carregar usuários:", resposta.error);
                     
-                    // Se for erro de autenticação, não tenta fallback (é esperado)
                     if (resposta.error.code === 401 || resposta.error.message?.includes('token')) {
                         usersList.innerHTML = `
                             <div class="alert alert-info">
@@ -397,8 +421,6 @@
          */
         async function carregarUsuariosFallback() {
             try {
-                // ✅ CORREÇÃO: NÃO tente /api/usuario/todos (não existe)
-                // Em vez disso, mostra mensagem informativa
                 console.log('⚠️ Endpoint principal falhou, usando fallback estático');
                 
                 usersList.innerHTML = `
@@ -484,6 +506,9 @@
 
         // Event Listeners
         btnLogin.addEventListener("click", realizarLogin);
+        btnGoToRegister.addEventListener("click", () => {
+            window.location.href = "register.html";
+        });
         btnRefreshUsers.addEventListener("click", carregarUsuarios);
 
         // Permitir login com Enter

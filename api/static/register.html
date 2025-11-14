@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Cadastro - Sistema de Projetos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2em;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 2em;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 0.5em;
+        }
+
+        .logo p {
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .password-strength {
+            height: 5px;
+            border-radius: 5px;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak {
+            background-color: #dc3545;
+            width: 25%;
+        }
+
+        .strength-medium {
+            background-color: #ffc107;
+            width: 50%;
+        }
+
+        .strength-strong {
+            background-color: #28a745;
+            width: 100%;
+        }
+
+        .form-text {
+            font-size: 0.85em;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5em;
+            padding-top: 1.5em;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .terms-text {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <h1>📊 Sistema de Projetos</h1>
+            <p>Crie sua conta para começar</p>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="txtNome" class="form-label">Nome Completo *</label>
+                <input type="text" id="txtNome" class="form-control" placeholder="Seu nome completo" />
+                <div class="form-text">Como você gostaria de ser chamado</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="txtEmail" class="form-label">Email *</label>
+                <input type="email" id="txtEmail" class="form-control" placeholder="seu@email.com" />
+                <div class="form-text">Seu melhor email</div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="txtEmpresa" class="form-label">Empresa (Opcional)</label>
+            <input type="text" id="txtEmpresa" class="form-control" placeholder="Nome da sua empresa" />
+            <div class="form-text">Deixe em branco se for uso pessoal</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="txtSenha" class="form-label">Senha *</label>
+                <input type="password" id="txtSenha" class="form-control" placeholder="Crie uma senha" />
+                <div id="passwordStrength" class="password-strength"></div>
+                <div class="form-text">Mínimo 6 caracteres</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="txtConfirmarSenha" class="form-label">Confirmar Senha *</label>
+                <input type="password" id="txtConfirmarSenha" class="form-control" placeholder="Repita a senha" />
+                <div class="form-text">As senhas devem ser iguais</div>
+            </div>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" id="checkTermos" class="form-check-input" />
+            <label for="checkTermos" class="form-check-label terms-text">
+                Concordo com os <a href="#" class="text-decoration-none">Termos de Uso</a> e 
+                <a href="#" class="text-decoration-none">Política de Privacidade</a> *
+            </label>
+        </div>
+
+        <!-- Botão de Cadastro -->
+        <div class="mb-3">
+            <button id="btnRegister" class="btn btn-register w-100">Criar Conta</button>
+        </div>
+
+        <!-- Link para Login -->
+        <div class="login-link">
+            <p class="text-muted mb-2">Já tem uma conta?</p>
+            <button id="btnGoToLogin" class="btn btn-login w-100">Fazer Login</button>
+        </div>
+
+        <!-- Mensagens de resposta -->
+        <div id="divResposta" class="alert" style="display: none;"></div>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                Sistema de Gerenciamento de Projetos v1.0
+            </small>
+        </div>
+    </div>
+
+    <script type="module">
+        import ApiService from './ApiService.js';
+
+        // Referências para elementos do DOM
+        const txtNome = document.getElementById("txtNome");
+        const txtEmail = document.getElementById("txtEmail");
+        const txtEmpresa = document.getElementById("txtEmpresa");
+        const txtSenha = document.getElementById("txtSenha");
+        const txtConfirmarSenha = document.getElementById("txtConfirmarSenha");
+        const checkTermos = document.getElementById("checkTermos");
+        const btnRegister = document.getElementById("btnRegister");
+        const btnGoToLogin = document.getElementById("btnGoToLogin");
+        const divResposta = document.getElementById("divResposta");
+        const passwordStrength = document.getElementById("passwordStrength");
+
+        // Verificar se já está logado
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+            window.location.href = "dashboard.html";
+        }
+
+        // ApiService instance
+        const api = new ApiService(null, "http://localhost:5000");
+
+        /**
+         * Exibe mensagem na tela
+         * @param {string} message - Mensagem a ser exibida
+         * @param {string} type - Tipo da mensagem (success, danger, warning, info)
+         */
+        function showMessage(message, type) {
+            divResposta.textContent = message;
+            divResposta.className = `alert alert-${type}`;
+            divResposta.style.display = 'block';
+            
+            // Auto-esconder mensagens de sucesso após 5 segundos
+            if (type === 'success') {
+                setTimeout(() => {
+                    divResposta.style.display = 'none';
+                }, 5000);
+            }
+
+            // Scroll para a mensagem
+            divResposta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /**
+         * Avalia a força da senha
+         */
+        function avaliarForcaSenha(senha) {
+            if (!senha) {
+                passwordStrength.className = 'password-strength';
+                passwordStrength.style.width = '0%';
+                return;
+            }
+
+            let forca = 0;
+            
+            // Comprimento mínimo
+            if (senha.length >= 6) forca += 25;
+            if (senha.length >= 8) forca += 15;
+            
+            // Caracteres diversos
+            if (/[a-z]/.test(senha)) forca += 15;
+            if (/[A-Z]/.test(senha)) forca += 15;
+            if (/[0-9]/.test(senha)) forca += 15;
+            if (/[^A-Za-z0-9]/.test(senha)) forca += 15;
+
+            // Atualizar visual
+            if (forca < 50) {
+                passwordStrength.className = 'password-strength strength-weak';
+            } else if (forca < 75) {
+                passwordStrength.className = 'password-strength strength-medium';
+            } else {
+                passwordStrength.className = 'password-strength strength-strong';
+            }
+        }
+
+        /**
+         * Valida os campos do formulário
+         * @returns {boolean} True se válido, False se inválido
+         */
+        function validarFormulario() {
+            // Validar nome
+            if (txtNome.value.trim() === "") {
+                showMessage("Nome completo é obrigatório", "warning");
+                txtNome.focus();
+                return false;
+            }
+
+            if (txtNome.value.trim().length < 2) {
+                showMessage("Nome deve ter pelo menos 2 caracteres", "warning");
+                txtNome.focus();
+                return false;
+            }
+
+            // Validar email
+            if (txtEmail.value.trim() === "") {
+                showMessage("Email é obrigatório", "warning");
+                txtEmail.focus();
+                return false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(txtEmail.value)) {
+                showMessage("Formato de email inválido", "warning");
+                txtEmail.focus();
+                return false;
+            }
+
+            // Validar senha
+            if (txtSenha.value.trim() === "") {
+                showMessage("Senha é obrigatória", "warning");
+                txtSenha.focus();
+                return false;
+            }
+
+            if (txtSenha.value.length < 6) {
+                showMessage("A senha deve ter pelo menos 6 caracteres", "warning");
+                txtSenha.focus();
+                return false;
+            }
+
+            // Validar confirmação de senha
+            if (txtConfirmarSenha.value.trim() === "") {
+                showMessage("Confirmação de senha é obrigatória", "warning");
+                txtConfirmarSenha.focus();
+                return false;
+            }
+
+            if (txtSenha.value !== txtConfirmarSenha.value) {
+                showMessage("As senhas não coincidem", "warning");
+                txtConfirmarSenha.focus();
+                txtConfirmarSenha.select();
+                return false;
+            }
+
+            // Validar termos
+            if (!checkTermos.checked) {
+                showMessage("Você deve aceitar os termos de uso para continuar", "warning");
+                checkTermos.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Realiza o cadastro do usuário
+         */
+        async function realizarCadastro() {
+            // Validar formulário
+            if (!validarFormulario()) {
+                return;
+            }
+
+            // Mostrar loading no botão
+            btnRegister.disabled = true;
+            btnRegister.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Criando conta...';
+
+            try {
+                const dadosCadastro = {
+                    "usuario": {
+                        "nome": txtNome.value.trim(),
+                        "email": txtEmail.value.trim(),
+                        "senha": txtSenha.value.trim(),
+                        "empresa": txtEmpresa.value.trim() || null
+                    }
+                };
+
+                console.log("📝 Enviando requisição de cadastro...", dadosCadastro);
+
+                const resposta = await api.post("/api/usuario/", dadosCadastro);
+                console.log("📨 Resposta da API:", resposta);
+
+                if (resposta && resposta.success) {
+                    console.log('✅ Cadastro realizado com sucesso:', resposta);
+                    
+                    showMessage("Conta criada com sucesso! Redirecionando para login...", "success");
+                    
+                    // Limpar formulário
+                    txtNome.value = '';
+                    txtEmail.value = '';
+                    txtEmpresa.value = '';
+                    txtSenha.value = '';
+                    txtConfirmarSenha.value = '';
+                    checkTermos.checked = false;
+                    
+                    // Redirecionar para login após 3 segundos
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 3000);
+                } else {
+                    // Tratar erros específicos da API
+                    const errorMessage = resposta.error?.message || "Erro ao criar conta. Tente novamente.";
+                    showMessage(errorMessage, "danger");
+                }
+
+            } catch (error) {
+                console.error("❌ Erro no cadastro:", error);
+                
+                // Mensagem mais amigável para o usuário
+                if (error.message?.includes('Failed to fetch')) {
+                    showMessage("Erro de conexão. Verifique se o servidor Flask está rodando.", "danger");
+                } else if (error.message?.includes('409')) {
+                    showMessage("Este email já está cadastrado no sistema.", "warning");
+                } else {
+                    showMessage("Erro ao criar conta. Tente novamente.", "danger");
+                }
+            } finally {
+                // Restaurar botão
+                btnRegister.disabled = false;
+                btnRegister.textContent = "Criar Conta";
+            }
+        }
+
+        // Event Listeners
+        btnRegister.addEventListener("click", realizarCadastro);
+        btnGoToLogin.addEventListener("click", () => {
+            window.location.href = "login.html";
+        });
+
+        // Avaliar força da senha em tempo real
+        txtSenha.addEventListener("input", function() {
+            avaliarForcaSenha(this.value);
+        });
+
+        // Permitir cadastro com Enter
+        txtConfirmarSenha.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                realizarCadastro();
+            }
+        });
+
+        // Focar no campo de nome ao carregar a página
+        txtNome.focus();
+
+        console.log("🚀 Página de cadastro carregada!");
+    </script>
+</body>
+</html>

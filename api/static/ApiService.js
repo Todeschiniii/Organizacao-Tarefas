@@ -1,5 +1,5 @@
 /**
- * Classe ApiService para facilitar chamadas HTTP (GET, POST, PUT, DELETE) a APIs RESTful.
+ * Classe ApiService para facilitar chamadas HTTP (GET, POST, PUT, DELETE, PATCH) a APIs RESTful.
  * Suporta autenticação via token Bearer e fornece métodos reutilizáveis para diferentes tipos de requisições.
  */
 export default class ApiService {
@@ -14,7 +14,31 @@ export default class ApiService {
     constructor(token = null, baseURL = "http://localhost:5000") {
         this.#token = token;
         this.#baseURL = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL; // Remove barra final
+        
+        // ✅ DEBUG: Verificar se todos os métodos estão disponíveis
         console.log(`🔄 ApiService inicializado - BaseURL: ${this.#baseURL}`);
+        console.log("📋 Métodos disponíveis no ApiService:");
+        console.log("  - get:", typeof this.get);
+        console.log("  - post:", typeof this.post);
+        console.log("  - put:", typeof this.put);
+        console.log("  - delete:", typeof this.delete);
+        console.log("  - patch:", typeof this.patch); // ← Este deve ser "function"
+        
+        // ✅ CORREÇÃO: Forçar bind dos métodos se necessário
+        this._bindMethods();
+    }
+
+    /**
+     * Garante que todos os métodos estão corretamente vinculados
+     */
+    _bindMethods() {
+        this.get = this.get.bind(this);
+        this.post = this.post.bind(this);
+        this.put = this.put.bind(this);
+        this.delete = this.delete.bind(this);
+        this.patch = this.patch.bind(this);
+        this.getById = this.getById.bind(this);
+        this.simpleGet = this.simpleGet.bind(this);
     }
 
     /**
@@ -428,6 +452,91 @@ export default class ApiService {
 
         } catch (error) {
             console.error("❌ Erro ao deletar dados:", error.message);
+            return {
+                success: false,
+                error: {
+                    message: error.message,
+                    code: 500
+                }
+            };
+        }
+    }
+
+    /**
+     * Método para atualização parcial de um recurso via PATCH.
+     * Ideal para atualizar apenas campos específicos (como checkbox de concluída).
+     * @param {string} uri - URL do recurso para PATCH.
+     * @param {Object} jsonObject - Objeto com os campos a serem atualizados.
+     * @returns {Promise<Object>} Retorna JSON da resposta ou objeto de erro padronizado.
+     */
+    async patch(uri, jsonObject) {
+        try {
+            console.log("🔄🔍 Iniciando PATCH...");
+            
+            // ✅ CORREÇÃO: Usa atributos privados corretamente
+            const cleanUri = uri.startsWith('/') ? uri : `/${uri}`;
+            const fullUrl = `${this.#baseURL}${cleanUri}`;
+            
+            const headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            };
+
+            if (this.#token) {
+                headers["Authorization"] = `Bearer ${this.#token}`;
+            }
+
+            console.log("🔄 Fazendo PATCH para:", fullUrl, jsonObject);
+            
+            const response = await fetch(fullUrl, {
+                method: "PATCH",
+                headers: headers,
+                body: JSON.stringify(jsonObject),
+                mode: 'cors',
+                credentials: 'same-origin'
+            });
+
+            // ✅ CORREÇÃO: Para CORS, verifica se a resposta foi bloqueada
+            if (response.status === 0 || response.type === 'opaque') {
+                throw new Error('CORS Policy blocked the request');
+            }
+
+            if (!response.ok) {
+                // Tenta obter mensagem de erro da resposta
+                let errorMessage = `HTTP Error: ${response.status} ${response.statusText}`;
+                try {
+                    const errorText = await response.text();
+                    if (errorText) {
+                        const errorJson = JSON.parse(errorText);
+                        errorMessage = errorJson.error?.message || errorJson.message || errorMessage;
+                    }
+                } catch (e) {
+                    // Ignora erro de parse
+                }
+                throw new Error(errorMessage);
+            }
+
+            const text = await response.text();
+            let jsonObj;
+            
+            try {
+                jsonObj = text ? JSON.parse(text) : {};
+            } catch (parseError) {
+                console.error("❌ Resposta não é JSON válido:", text.substring(0, 100));
+                return {
+                    success: false,
+                    error: {
+                        message: `Resposta não é JSON: ${response.status} ${response.statusText}`,
+                        code: response.status
+                    }
+                };
+            }
+
+            console.log("✅ PATCH bem-sucedido:", fullUrl, jsonObj);
+            return jsonObj;
+
+        } catch (error) {
+            console.error("❌ Erro ao fazer PATCH:", error.message);
             return {
                 success: false,
                 error: {

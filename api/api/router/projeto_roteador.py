@@ -27,7 +27,6 @@ class ProjetoRoteador:
         self.__projeto_middleware = projeto_middleware
         self.__projeto_control = projeto_control
 
-        # ✅ CORREÇÃO: Blueprint com nome no singular
         self.__blueprint = Blueprint('projeto', __name__)
 
     def create_routes(self):
@@ -35,16 +34,16 @@ class ProjetoRoteador:
         Configura e retorna todas as rotas REST da entidade Projeto.
 
         Rotas implementadas:
-        - POST /        -> Cria um novo projeto
-        - GET /         -> Lista todos os projetos
-        - GET /<id>     -> Retorna um projeto por ID
-        - PUT /<id>     -> Atualiza um projeto por ID
-        - DELETE /<id>  -> Remove um projeto por ID
-        - GET /usuario/<usuario_id> -> Lista projetos por usuário
+        - POST /        -> Cria um novo projeto PARA O USUÁRIO
+        - GET /         -> Lista todos os projetos DO USUÁRIO
+        - GET /<id>     -> Retorna um projeto por ID (só se for do usuário)
+        - PUT /<id>     -> Atualiza um projeto por ID (só se for do usuário)
+        - DELETE /<id>  -> Remove um projeto por ID (só se for do usuário)
+        - GET /usuario/<usuario_id> -> Lista projetos por usuário (só admin)
         - GET /meus-projetos -> Lista projetos do usuário autenticado
         """
 
-        # POST / -> cria um projeto
+        # POST / -> cria um projeto PARA O USUÁRIO
         @self.__blueprint.route('/', methods=['POST'])
         @self.__jwt_middleware.validate_token
         @self.__projeto_middleware.validate_body
@@ -52,20 +51,25 @@ class ProjetoRoteador:
             """
             Rota responsável por criar um novo projeto.
             Requer autenticação JWT.
+            O projeto será criado para o usuário autenticado.
             """
-            return self.__projeto_control.store()
+            # ✅ CORREÇÃO: Obtém o ID do usuário do token
+            user_id = self.__jwt_middleware.get_user_id()
+            return self.__projeto_control.store(user_id)
 
-        # GET / -> lista todos os projetos
+        # GET / -> lista todos os projetos DO USUÁRIO
         @self.__blueprint.route('/', methods=['GET'])
         @self.__jwt_middleware.validate_token
         def index():
             """
-            Rota responsável por listar todos os projetos cadastrados no sistema.
+            Rota responsável por listar todos os projetos do usuário autenticado.
             Requer autenticação JWT.
             """
-            return self.__projeto_control.index()
+            # ✅ CORREÇÃO: Obtém o ID do usuário do token
+            user_id = self.__jwt_middleware.get_user_id()
+            return self.__projeto_control.index(user_id)
 
-        # GET /<id> -> retorna um projeto específico
+        # GET /<id> -> retorna um projeto específico (só se for do usuário)
         @self.__blueprint.route('/<int:id>', methods=['GET'])
         @self.__jwt_middleware.validate_token
         @self.__projeto_middleware.validate_id_param
@@ -73,12 +77,15 @@ class ProjetoRoteador:
             """
             Rota que retorna um projeto específico pelo seu ID.
             Requer autenticação JWT.
+            Só retorna se o projeto pertencer ao usuário.
 
             :param id: int - ID do projeto vindo da URI.
             """
-            return self.__projeto_control.show(id)
+            # ✅ CORREÇÃO: Obtém o ID do usuário do token
+            user_id = self.__jwt_middleware.get_user_id()
+            return self.__projeto_control.show(id, user_id)
 
-        # PUT /<id> -> atualiza um projeto
+        # PUT /<id> -> atualiza um projeto (só se for do usuário)
         @self.__blueprint.route('/<int:id>', methods=['PUT'])
         @self.__jwt_middleware.validate_token
         @self.__projeto_middleware.validate_id_param
@@ -87,12 +94,15 @@ class ProjetoRoteador:
             """
             Rota que atualiza um projeto existente.
             Requer autenticação JWT.
+            Só atualiza se o projeto pertencer ao usuário.
 
             :param id: int - ID do projeto a ser atualizado.
             """
-            return self.__projeto_control.update(id)
+            # ✅ CORREÇÃO: Obtém o ID do usuário do token
+            user_id = self.__jwt_middleware.get_user_id()
+            return self.__projeto_control.update(id, user_id)
 
-        # DELETE /<id> -> remove um projeto
+        # DELETE /<id> -> remove um projeto (só se for do usuário)
         @self.__blueprint.route('/<int:id>', methods=['DELETE'])
         @self.__jwt_middleware.validate_token
         @self.__projeto_middleware.validate_id_param
@@ -100,12 +110,15 @@ class ProjetoRoteador:
             """
             Rota que remove um projeto pelo seu ID.
             Requer autenticação JWT.
+            Só remove se o projeto pertencer ao usuário.
 
             :param id: int - ID do projeto a ser removido.
             """
-            return self.__projeto_control.destroy(id)
+            # ✅ CORREÇÃO: Obtém o ID do usuário do token
+            user_id = self.__jwt_middleware.get_user_id()
+            return self.__projeto_control.destroy(id, user_id)
 
-        # GET /usuario/<usuario_id> -> lista projetos por usuário
+        # GET /usuario/<usuario_id> -> lista projetos por usuário (só admin)
         @self.__blueprint.route('/usuario/<int:usuario_id>', methods=['GET'])
         @self.__jwt_middleware.validate_token
         @self.__projeto_middleware.validate_usuario_id_param
@@ -113,8 +126,7 @@ class ProjetoRoteador:
             """
             Rota que retorna todos os projetos de um usuário específico.
             Requer autenticação JWT.
-
-            :param usuario_id: int - ID do usuário.
+            (Normalmente só admin pode ver projetos de outros usuários)
             """
             return self.__projeto_control.show_by_usuario(usuario_id)
 
@@ -137,7 +149,8 @@ class ProjetoRoteador:
                     }
                 }), 401
             
-            return self.__projeto_control.show_by_usuario(user_id)
+            # ✅ CORREÇÃO: Usa o método index que agora filtra por usuário
+            return self.__projeto_control.index(user_id)
 
         # Retorna o Blueprint configurado para registro na aplicação Flask
         return self.__blueprint

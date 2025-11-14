@@ -1,0 +1,15 @@
+ERROR:root:Erro global: [400] Erro na validação de dados | Detalhes: {'message': "O campo 'titulo' é obrigatório!"}
+Traceback (most recent call last):
+  File "c:\Users\mateu\AppData\Local\Programs\Python\Python310\lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\Users\mateu\AppData\Local\Programs\Python\Python310\lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "C:\xampp\htdocs\api\api\middleware\jwt_middleware.py", line 56, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\xampp\htdocs\api\api\middleware\tarefa_middleware.py", line 80, in decorated_function
+    return f(*args, **kwargs)
+  File "C:\xampp\htdocs\api\api\middleware\tarefa_middleware.py", line 64, in decorated_function
+    raise ErrorResponse(400, "Erro na validação de dados", {"message": f"O campo '{campo}' é obrigatório!"})
+api.utils.error_response.ErrorResponse: [400] Erro na validação de dados | Detalhes: {'message': "O campo 'titulo' é obrigatório!"}
+
+INFO:werkzeug:127.0.0.1 - - [14/Nov/2025 00:27:42] "[35m[1mPUT /api/tarefa/16 HTTP/1.1[0m" 500 -
