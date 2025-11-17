@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS projetos (
     INDEX idx_usuario_id (usuario_id)
 );
 
--- Tabela de Tarefas (ATUALIZADA com responsável e atribuidor)
+-- Tabela de Tarefas (ATUALIZADA com responsável e atribuidor - SEM data_criacao/data_atualizacao)
 CREATE TABLE IF NOT EXISTS tarefas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     titulo VARCHAR(255) NOT NULL,
@@ -44,8 +44,7 @@ CREATE TABLE IF NOT EXISTS tarefas (
     usuario_responsavel_id INT NOT NULL,  -- Usuário RESPONSÁVEL pela execução da tarefa
     usuario_atribuidor_id INT NOT NULL,   -- Usuário que ATRIBUIU a tarefa
     
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- ❌ REMOVIDO: data_criacao e data_atualizacao
     
     -- Chaves estrangeiras
     FOREIGN KEY (projeto_id) REFERENCES projetos(id) ON DELETE CASCADE,
@@ -83,7 +82,7 @@ INSERT INTO projetos (nome, descricao, data_inicio, data_fim, status, usuario_id
 -- Projetos do Davi (usuário 4)
 ('Blog Pessoal', 'Meu blog pessoal sobre tecnologia.', '2025-11-05 10:00:00', NULL, 'andamento', 4);
 
--- Inserir tarefas (AGORA COM RESPONSÁVEL E ATRIBUIDOR)
+-- Inserir tarefas (AGORA COM RESPONSÁVEL E ATRIBUIDOR - SEM data_criacao/data_atualizacao)
 INSERT INTO tarefas (titulo, descricao, status, prioridade, concluida, data_limite, data_inicio, data_fim, projeto_id, usuario_responsavel_id, usuario_atribuidor_id) VALUES
 -- ✅ Tarefas onde Ana (usuário 1) é responsável
 ('Definir endpoints de produtos', 'Definir todos os endpoints da API de produtos', 'concluida', 'alta', TRUE, '2025-11-05 18:00:00', '2025-11-01 09:00:00', '2025-11-03 17:00:00', 1, 1, 1),
@@ -95,7 +94,7 @@ INSERT INTO tarefas (titulo, descricao, status, prioridade, concluida, data_limi
 ('Configurar ambiente React Native', 'Configurar ambiente de desenvolvimento', 'pendente', 'media', FALSE, '2026-02-05 18:00:00', NULL, NULL, 3, 2, 3), -- Atribuída por Carlos
 
 -- ✅ Tarefas onde Carlos (usuário 3) é responsável
-('Definir estrutura do banco', 'Criar modelo de dados do portal', 'pendente', 'alta', FALSE, '2025-11-15 18:00:00', NULL, NULL, 5, 3, 3),
+('Detarefasfinir estrutura do banco', 'Criar modelo de dados do portal', 'pendente', 'alta', FALSE, '2025-11-15 18:00:00', NULL, NULL, 5, 3, 3),
 ('Desenvolver template principal', 'Criar template base do portal', 'pendente', 'media', FALSE, '2025-11-20 18:00:00', NULL, NULL, 5, 3, 4), -- Atribuída por Davi
 
 -- ✅ Tarefas onde Davi (usuário 4) é responsável
@@ -106,3 +105,26 @@ INSERT INTO tarefas (titulo, descricao, status, prioridade, concluida, data_limi
 ('Revisar código da API', 'Revisar código dos endpoints implementados', 'pendente', 'alta', FALSE, '2025-11-08 18:00:00', NULL, NULL, 1, 3, 1), -- Carlos responsável, Ana atribuiu
 ('Testar funcionalidades', 'Realizar testes das funcionalidades implementadas', 'pendente', 'media', FALSE, '2025-11-09 18:00:00', NULL, NULL, 1, 4, 2), -- Davi responsável, Bruno atribuiu
 ('Documentar API', 'Criar documentação completa da API', 'pendente', 'baixa', FALSE, '2025-11-20 18:00:00', NULL, NULL, 1, 2, 3); -- Bruno responsável, Carlos atribuiu
+
+-- Adicionar índices para melhor performance
+CREATE INDEX idx_projetos_usuario_id ON projetos(usuario_id);
+CREATE INDEX idx_tarefas_usuario_responsavel ON tarefas(usuario_responsavel_id);
+CREATE INDEX idx_tarefas_usuario_atribuidor ON tarefas(usuario_atribuidor_id);
+
+-- Atualizar a view de tarefas para incluir informações do usuário
+CREATE OR REPLACE VIEW vw_tarefas_completa AS
+SELECT 
+    t.*,
+    p.nome as projeto_nome,
+    p.usuario_id as projeto_usuario_id,
+    ur.nome as responsavel_nome,
+    ua.nome as atribuidor_nome
+FROM tarefas t
+LEFT JOIN projetos p ON t.projeto_id = p.id
+LEFT JOIN usuarios ur ON t.usuario_responsavel_id = ur.id
+LEFT JOIN usuarios ua ON t.usuario_atribuidor_id = ua.id;
+
+-- TESTE ( CRUD ) --
+select *from usuarios;
+select *from projetos;
+select *from tarefas;

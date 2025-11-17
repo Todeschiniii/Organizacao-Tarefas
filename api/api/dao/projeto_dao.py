@@ -88,11 +88,13 @@ class ProjetoDAO:
                         p.data_fim,
                         p.status, 
                         p.usuario_id,
+                        p.data_criacao,
+                        p.data_atualizacao,
                         u.nome as usuario_nome
                     FROM projetos p
                     LEFT JOIN usuarios u ON p.usuario_id = u.id
                     WHERE p.usuario_id = %s
-                    ORDER BY p.id DESC
+                    ORDER BY p.data_criacao DESC
                 """
                 rows = self.__database.execute_query(SQL, (usuario_id,), fetch=True)
             else:
@@ -106,41 +108,18 @@ class ProjetoDAO:
                         p.data_fim,
                         p.status, 
                         p.usuario_id,
+                        p.data_criacao,
+                        p.data_atualizacao,
                         u.nome as usuario_nome
                     FROM projetos p
                     LEFT JOIN usuarios u ON p.usuario_id = u.id
-                    ORDER BY p.id DESC
+                    ORDER BY p.data_criacao DESC
                 """
                 rows = self.__database.execute_query(SQL, fetch=True)
 
             projetos = []
             for row in rows:
-                projeto_data = {
-                    "id": row["id"],
-                    "nome": row["nome"],
-                    "descricao": row["descricao"],
-                    "status": row["status"],
-                    "usuario_id": row["usuario_id"],
-                    "usuario_nome": row["usuario_nome"]
-                }
-                
-                # Tratamento seguro para datas
-                if row["data_inicio"]:
-                    if hasattr(row["data_inicio"], 'isoformat'):
-                        projeto_data["data_inicio"] = row["data_inicio"].isoformat()
-                    else:
-                        projeto_data["data_inicio"] = str(row["data_inicio"])
-                else:
-                    projeto_data["data_inicio"] = None
-                    
-                if row["data_fim"]:
-                    if hasattr(row["data_fim"], 'isoformat'):
-                        projeto_data["data_fim"] = row["data_fim"].isoformat()
-                    else:
-                        projeto_data["data_fim"] = str(row["data_fim"])
-                else:
-                    projeto_data["data_fim"] = None
-                
+                projeto_data = self._row_to_dict(row)
                 projetos.append(projeto_data)
                 
             return projetos
@@ -163,6 +142,8 @@ class ProjetoDAO:
                         p.data_fim,
                         p.status, 
                         p.usuario_id,
+                        p.data_criacao,
+                        p.data_atualizacao,
                         u.nome as usuario_nome
                     FROM projetos p
                     LEFT JOIN usuarios u ON p.usuario_id = u.id
@@ -179,6 +160,8 @@ class ProjetoDAO:
                         p.data_fim,
                         p.status, 
                         p.usuario_id,
+                        p.data_criacao,
+                        p.data_atualizacao,
                         u.nome as usuario_nome
                     FROM projetos p
                     LEFT JOIN usuarios u ON p.usuario_id = u.id
@@ -190,33 +173,7 @@ class ProjetoDAO:
                 return None
                 
             row = rows[0]
-            projeto_data = {
-                "id": row["id"],
-                "nome": row["nome"],
-                "descricao": row["descricao"],
-                "status": row["status"],
-                "usuario_id": row["usuario_id"],
-                "usuario_nome": row["usuario_nome"]
-            }
-            
-            # Tratamento seguro para datas
-            if row["data_inicio"]:
-                if hasattr(row["data_inicio"], 'isoformat'):
-                    projeto_data["data_inicio"] = row["data_inicio"].isoformat()
-                else:
-                    projeto_data["data_inicio"] = str(row["data_inicio"])
-            else:
-                projeto_data["data_inicio"] = None
-                
-            if row["data_fim"]:
-                if hasattr(row["data_fim"], 'isoformat'):
-                    projeto_data["data_fim"] = row["data_fim"].isoformat()
-                else:
-                    projeto_data["data_fim"] = str(row["data_fim"])
-            else:
-                projeto_data["data_fim"] = None
-                
-            return projeto_data
+            return self._row_to_dict(row)
             
         except Exception as e:
             print(f"❌ Erro em ProjetoDAO.findById(): {e}")
@@ -234,6 +191,8 @@ class ProjetoDAO:
                     p.data_fim,
                     p.status, 
                     p.usuario_id,
+                    p.data_criacao,
+                    p.data_atualizacao,
                     u.nome as usuario_nome
                 FROM projetos p
                 LEFT JOIN usuarios u ON p.usuario_id = u.id
@@ -244,36 +203,121 @@ class ProjetoDAO:
 
             projetos = []
             for row in rows:
-                projeto_data = {
-                    "id": row["id"],
-                    "nome": row["nome"],
-                    "descricao": row["descricao"],
-                    "status": row["status"],
-                    "usuario_id": row["usuario_id"],
-                    "usuario_nome": row["usuario_nome"]
-                }
-                
-                # Tratamento seguro para datas
-                if row["data_inicio"]:
-                    if hasattr(row["data_inicio"], 'isoformat'):
-                        projeto_data["data_inicio"] = row["data_inicio"].isoformat()
-                    else:
-                        projeto_data["data_inicio"] = str(row["data_inicio"])
-                else:
-                    projeto_data["data_inicio"] = None
-                    
-                if row["data_fim"]:
-                    if hasattr(row["data_fim"], 'isoformat'):
-                        projeto_data["data_fim"] = row["data_fim"].isoformat()
-                    else:
-                        projeto_data["data_fim"] = str(row["data_fim"])
-                else:
-                    projeto_data["data_fim"] = None
-                
+                projeto_data = self._row_to_dict(row)
                 projetos.append(projeto_data)
                 
             return projetos
             
         except Exception as e:
             print(f"❌ Erro em ProjetoDAO.findByUsuarioId(): {e}")
+            raise
+
+    def _row_to_dict(self, row: dict) -> dict:
+        """
+        ✅ NOVO: Método auxiliar para converter linha do banco em dicionário
+        """
+        projeto_data = {
+            "id": row["id"],
+            "nome": row["nome"],
+            "descricao": row["descricao"],
+            "status": row["status"],
+            "usuario_id": row["usuario_id"],
+            "usuario_nome": row.get("usuario_nome")
+        }
+        
+        # Tratamento seguro para datas
+        date_fields = ["data_inicio", "data_fim", "data_criacao", "data_atualizacao"]
+        for field in date_fields:
+            if row.get(field):
+                if hasattr(row[field], 'isoformat'):
+                    projeto_data[field] = row[field].isoformat()
+                else:
+                    projeto_data[field] = str(row[field])
+            else:
+                projeto_data[field] = None
+                
+        return projeto_data
+
+    # ✅ NOVO: Método para contar projetos por status
+    def count_by_status(self, usuario_id: int) -> dict:
+        """
+        Retorna contagem de projetos por status para um usuário
+        """
+        print("🟢 ProjetoDAO.count_by_status()")
+        try:
+            SQL = """
+                SELECT 
+                    status,
+                    COUNT(*) as total
+                FROM projetos 
+                WHERE usuario_id = %s
+                GROUP BY status
+            """
+            rows = self.__database.execute_query(SQL, (usuario_id,), fetch=True)
+            
+            result = {}
+            for row in rows:
+                result[row["status"]] = row["total"]
+                
+            return result
+            
+        except Exception as e:
+            print(f"❌ Erro em ProjetoDAO.count_by_status(): {e}")
+            return {}
+
+    # ✅ NOVO: Método para buscar projetos com filtros
+    def find_with_filters(self, usuario_id: int, filters: dict = None) -> list[dict]:
+        """
+        Busca projetos com filtros opcionais
+        """
+        print("🟢 ProjetoDAO.find_with_filters()")
+        try:
+            base_sql = """
+                SELECT 
+                    p.id, 
+                    p.nome, 
+                    p.descricao, 
+                    p.data_inicio, 
+                    p.data_fim,
+                    p.status, 
+                    p.usuario_id,
+                    p.data_criacao,
+                    p.data_atualizacao,
+                    u.nome as usuario_nome
+                FROM projetos p
+                LEFT JOIN usuarios u ON p.usuario_id = u.id
+                WHERE p.usuario_id = %s
+            """
+            
+            params = [usuario_id]
+            conditions = []
+            
+            # Aplicar filtros
+            if filters:
+                if filters.get('status'):
+                    conditions.append("p.status = %s")
+                    params.append(filters['status'])
+                
+                if filters.get('search_term'):
+                    conditions.append("(p.nome LIKE %s OR p.descricao LIKE %s)")
+                    params.append(f"%{filters['search_term']}%")
+                    params.append(f"%{filters['search_term']}%")
+            
+            # Construir query final
+            if conditions:
+                base_sql += " AND " + " AND ".join(conditions)
+            
+            base_sql += " ORDER BY p.data_criacao DESC"
+            
+            rows = self.__database.execute_query(base_sql, tuple(params), fetch=True)
+
+            projetos = []
+            for row in rows:
+                projeto_data = self._row_to_dict(row)
+                projetos.append(projeto_data)
+                
+            return projetos
+            
+        except Exception as e:
+            print(f"❌ Erro em ProjetoDAO.find_with_filters(): {e}")
             raise

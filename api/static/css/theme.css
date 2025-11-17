@@ -1,0 +1,833 @@
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --button-bg: #f0f0f0;
+  --button-border: #cccccc;
+  --button-hover: #e0e0e0;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --transition-speed: 0.5s;
+  --form-bg: #ffffff;
+  --form-border: #dee2e6;
+  --form-text: #333333;
+  --form-placeholder: #6c757d;
+  --select-bg: #ffffff;
+  --select-text: #333333;
+  --select-border: #dee2e6;
+  --btn-primary-bg: #007bff;
+  --btn-primary-border: #007bff;
+  --btn-primary-hover: #0056b3;
+  --btn-success-bg: #28a745;
+  --btn-success-border: #28a745;
+  --btn-success-hover: #218838;
+  --btn-warning-bg: #ffc107;
+  --btn-warning-border: #ffc107;
+  --btn-warning-hover: #e0a800;
+  --btn-danger-bg: #dc3545;
+  --btn-danger-border: #dc3545;
+  --btn-danger-hover: #c82333;
+  --btn-info-bg: #17a2b8;
+  --btn-info-border: #17a2b8;
+  --btn-info-hover: #138496;
+  --btn-secondary-bg: #6c757d;
+  --btn-secondary-border: #6c757d;
+  --btn-secondary-hover: #545b62;
+  --btn-light-bg: #f8f9fa;
+  --btn-light-border: #f8f9fa;
+  --btn-light-hover: #e2e6ea;
+  --btn-dark-bg: #343a40;
+  --btn-dark-border: #343a40;
+  --btn-dark-hover: #23272b;
+}
+
+[data-theme="dark"] {
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --button-bg: #2d2d2d;
+  --button-border: #444444;
+  --button-hover: #3d3d3d;
+  --shadow: rgba(255, 255, 255, 0.1);
+  --form-bg: #2d3748;
+  --form-border: #4a5568;
+  --form-text: #e2e8f0;
+  --form-placeholder: #a0aec0;
+  --select-bg: #2d3748;
+  --select-text: #e2e8f0;
+  --select-border: #4a5568;
+  --btn-primary-bg: #2b6cb0;
+  --btn-primary-border: #2b6cb0;
+  --btn-primary-hover: #2c5282;
+  --btn-success-bg: #276749;
+  --btn-success-border: #276749;
+  --btn-success-hover: #22543d;
+  --btn-warning-bg: #d69e2e;
+  --btn-warning-border: #d69e2e;
+  --btn-warning-hover: #b7791f;
+  --btn-danger-bg: #c53030;
+  --btn-danger-border: #c53030;
+  --btn-danger-hover: #9b2c2c;
+  --btn-info-bg: #3182ce;
+  --btn-info-border: #3182ce;
+  --btn-info-hover: #2c5aa0;
+  --btn-secondary-bg: #4a5568;
+  --btn-secondary-border: #4a5568;
+  --btn-secondary-hover: #2d3748;
+  --btn-light-bg: #4a5568;
+  --btn-light-border: #4a5568;
+  --btn-light-hover: #2d3748;
+  --btn-dark-bg: #1a202c;
+  --btn-dark-border: #1a202c;
+  --btn-dark-hover: #171923;
+}
+
+* {
+  transition: background-color var(--transition-speed) ease, 
+              color var(--transition-speed) ease, 
+              border-color var(--transition-speed) ease, 
+              box-shadow var(--transition-speed) ease;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 20px 100px;
+  font-family: Arial, sans-serif;
+}
+
+/* Botão de tema no canto superior esquerdo */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background-color: var(--button-bg);
+    border: 2px solid var(--button-border);
+    border-radius: 50px;
+    width: 80px; 
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 9px;
+    box-shadow: 0 2px 5px var(--shadow);
+    transition: all var(--transition-speed) ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--button-hover);
+    transform: scale(1.05);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle span {
+    font-size: 16px;
+    transition: transform var(--transition-speed) ease;
+    z-index: 2;
+}
+
+.theme-toggle::before {
+    content: '';
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    border-radius: 50%;
+    left: 3px;
+    transition: all var(--transition-speed) ease;
+    z-index: 1;
+}
+
+[data-theme="dark"] .theme-toggle::before {
+    left: calc(100% - 35px);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.theme-toggle .sun {
+    color: #ff8c00;
+}
+
+.theme-toggle .moon {
+    color: #764ba2;
+}
+
+/* ======================== BOTÕES ======================== */
+.btn {
+    border-radius: 10px;
+    transition: all var(--transition-speed) ease;
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+/* Botões com cores específicas */
+.btn-primary {
+    background-color: var(--btn-primary-bg);
+    border-color: var(--btn-primary-border);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--btn-primary-hover);
+    border-color: var(--btn-primary-hover);
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--btn-success-bg);
+    border-color: var(--btn-success-border);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: var(--btn-success-hover);
+    border-color: var(--btn-success-hover);
+    color: white;
+}
+
+.btn-warning {
+    background-color: var(--btn-warning-bg);
+    border-color: var(--btn-warning-border);
+    color: #1a202c;
+}
+
+.btn-warning:hover {
+    background-color: var(--btn-warning-hover);
+    border-color: var(--btn-warning-hover);
+    color: #1a202c;
+}
+
+.btn-danger {
+    background-color: var(--btn-danger-bg);
+    border-color: var(--btn-danger-border);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: var(--btn-danger-hover);
+    border-color: var(--btn-danger-hover);
+    color: white;
+}
+
+.btn-info {
+    background-color: var(--btn-info-bg);
+    border-color: var(--btn-info-border);
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: var(--btn-info-hover);
+    border-color: var(--btn-info-hover);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--btn-secondary-bg);
+    border-color: var(--btn-secondary-border);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--btn-secondary-hover);
+    border-color: var(--btn-secondary-hover);
+    color: white;
+}
+
+.btn-light {
+    background-color: var(--btn-light-bg);
+    border-color: var(--btn-light-border);
+    color: var(--text-color);
+}
+
+.btn-light:hover {
+    background-color: var(--btn-light-hover);
+    border-color: var(--btn-light-hover);
+    color: var(--text-color);
+}
+
+.btn-dark {
+    background-color: var(--btn-dark-bg);
+    border-color: var(--btn-dark-border);
+    color: white;
+}
+
+.btn-dark:hover {
+    background-color: var(--btn-dark-hover);
+    border-color: var(--btn-dark-hover);
+    color: white;
+}
+
+/* Botões outline */
+.btn-outline-primary {
+    color: var(--btn-primary-bg);
+    border-color: var(--btn-primary-border);
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--btn-primary-bg);
+    border-color: var(--btn-primary-border);
+    color: white;
+}
+
+.btn-outline-success {
+    color: var(--btn-success-bg);
+    border-color: var(--btn-success-border);
+    background-color: transparent;
+}
+
+.btn-outline-success:hover {
+    background-color: var(--btn-success-bg);
+    border-color: var(--btn-success-border);
+    color: white;
+}
+
+.btn-outline-warning {
+    color: var(--btn-warning-bg);
+    border-color: var(--btn-warning-border);
+    background-color: transparent;
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--btn-warning-bg);
+    border-color: var(--btn-warning-border);
+    color: #1a202c;
+}
+
+.btn-outline-danger {
+    color: var(--btn-danger-bg);
+    border-color: var(--btn-danger-border);
+    background-color: transparent;
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--btn-danger-bg);
+    border-color: var(--btn-danger-border);
+    color: white;
+}
+
+.btn-outline-info {
+    color: var(--btn-info-bg);
+    border-color: var(--btn-info-border);
+    background-color: transparent;
+}
+
+.btn-outline-info:hover {
+    background-color: var(--btn-info-bg);
+    border-color: var(--btn-info-border);
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: var(--btn-secondary-bg);
+    border-color: var(--btn-secondary-border);
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--btn-secondary-bg);
+    border-color: var(--btn-secondary-border);
+    color: white;
+}
+
+.btn-outline-light {
+    color: var(--btn-light-bg);
+    border-color: var(--btn-light-border);
+    background-color: transparent;
+}
+
+.btn-outline-light:hover {
+    background-color: var(--btn-light-bg);
+    border-color: var(--btn-light-border);
+    color: var(--text-color);
+}
+
+.btn-outline-dark {
+    color: var(--btn-dark-bg);
+    border-color: var(--btn-dark-border);
+    background-color: transparent;
+}
+
+.btn-outline-dark:hover {
+    background-color: var(--btn-dark-bg);
+    border-color: var(--btn-dark-border);
+    color: white;
+}
+
+/* Botão de CPF com contorno verde escuro */
+.btn-cpf {
+    background-color: transparent;
+    border: 2px solid #155724;
+    color: #155724;
+    font-weight: 600;
+}
+
+.btn-cpf:hover {
+    background-color: #155724;
+    border-color: #155724;
+    color: white;
+}
+
+[data-theme="dark"] .btn-cpf {
+    border-color: #9ae6b4;
+    color: #9ae6b4;
+}
+
+[data-theme="dark"] .btn-cpf:hover {
+    background-color: #22543d;
+    border-color: #9ae6b4;
+    color: #9ae6b4;
+}
+
+/* Botão de atualizar azul */
+.btn-atualizar {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    color: white;
+}
+
+.btn-atualizar:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    color: white;
+}
+
+[data-theme="dark"] .btn-atualizar {
+    background: linear-gradient(135deg, #2b6cb0, #2c5282);
+    border: none;
+    color: white;
+}
+
+[data-theme="dark"] .btn-atualizar:hover {
+    background: linear-gradient(135deg, #2c5282, #1a365d);
+    color: white;
+}
+
+/* Botão CSV preenchido verde (igual ao PDF) */
+.btn-csv {
+    background: linear-gradient(135deg, #28a745, #218838);
+    border: none;
+    color: white;
+}
+
+.btn-csv:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    color: white;
+}
+
+[data-theme="dark"] .btn-csv {
+    background: linear-gradient(135deg, #276749, #22543d);
+    border: none;
+    color: white;
+}
+
+[data-theme="dark"] .btn-csv:hover {
+    background: linear-gradient(135deg, #22543d, #1c4532);
+    color: white;
+}
+
+/* Botão PDF vermelho */
+.btn-export-pdf {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+    color: white;
+}
+
+.btn-export-pdf:hover {
+    background: linear-gradient(135deg, #c82333, #a71e2a);
+    color: white;
+}
+
+[data-theme="dark"] .btn-export-pdf {
+    background: linear-gradient(135deg, #c53030, #9b2c2c);
+    border: none;
+    color: white;
+}
+
+[data-theme="dark"] .btn-export-pdf:hover {
+    background: linear-gradient(135deg, #9b2c2c, #742a2a);
+    color: white;
+}
+
+/* Correção para botões que ficam brancos no modo claro */
+.btn-outline-light {
+    color: #6c757d;
+    border-color: #dee2e6;
+    background-color: transparent;
+}
+
+.btn-outline-light:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+}
+
+[data-theme="dark"] .btn-outline-light {
+    color: #e2e8f0;
+    border-color: #4a5568;
+    background-color: transparent;
+}
+
+[data-theme="dark"] .btn-outline-light:hover {
+    background-color: #4a5568;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+/* ======================== FORMULÁRIOS ======================== */
+.form-control {
+    background-color: var(--form-bg);
+    border: 1px solid var(--form-border);
+    color: var(--form-text);
+    transition: all var(--transition-speed) ease;
+}
+
+.form-control:focus {
+    background-color: var(--form-bg);
+    border-color: #667eea;
+    color: var(--form-text);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--form-placeholder);
+}
+
+.form-label {
+    color: var(--text-color);
+    transition: color var(--transition-speed) ease;
+}
+
+.form-text {
+    color: var(--form-placeholder) !important;
+    transition: color var(--transition-speed) ease;
+}
+
+.form-check-label {
+    color: var(--text-color);
+    transition: color var(--transition-speed) ease;
+}
+
+/* ======================== SELECTS ======================== */
+.form-select {
+    background-color: var(--select-bg);
+    border: 1px solid var(--select-border);
+    color: var(--select-text);
+    transition: all var(--transition-speed) ease;
+}
+
+.form-select:focus {
+    background-color: var(--select-bg);
+    border-color: #667eea;
+    color: var(--select-text);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-select option {
+    background-color: var(--select-bg);
+    color: var(--select-text);
+}
+
+/* ======================== COMPONENTES ESPECÍFICOS ======================== */
+
+/* Ajustes para tema escuro no login */
+[data-theme="dark"] .login-container {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .logo h1 {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .logo p {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .demo-accounts {
+    background: #4a5568;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .demo-accounts h6 {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .user-email {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .user-info {
+    color: #a0aec0;
+}
+
+/* Ajustes para tema escuro no register */
+[data-theme="dark"] .register-container {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .terms-text {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .login-link {
+    border-top-color: #4a5568;
+}
+
+[data-theme="dark"] .password-strength {
+    background-color: #4a5568;
+}
+
+[data-theme="dark"] .strength-weak {
+    background-color: #e53e3e;
+}
+
+[data-theme="dark"] .strength-medium {
+    background-color: #d69e2e;
+}
+
+[data-theme="dark"] .strength-strong {
+    background-color: #38a169;
+}
+
+/* Ajustes para tema escuro no dashboard */
+[data-theme="dark"] .sidebar {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .sidebar .nav-link {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .stats-card {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .stats-card p {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .recent-activity {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .activity-item {
+    background: #4a5568;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #a0aec0 !important;
+}
+
+[data-theme="dark"] .navbar-light {
+    background-color: #2d3748 !important;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .navbar-text {
+    color: #e2e8f0 !important;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 10px;
+    border: none;
+    transition: all var(--transition-speed) ease;
+}
+
+[data-theme="dark"] .alert {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border: 1px solid #4a5568;
+}
+
+/* Links */
+a {
+    color: #667eea;
+    transition: color var(--transition-speed) ease;
+}
+
+[data-theme="dark"] a {
+    color: #90cdf4;
+}
+
+a:hover {
+    color: #764ba2;
+}
+
+[data-theme="dark"] a:hover {
+    color: #63b3ed;
+}
+
+/* Badges */
+.badge {
+    transition: all var(--transition-speed) ease;
+}
+
+[data-theme="dark"] .badge.bg-primary {
+    background-color: #2b6cb0 !important;
+}
+
+[data-theme="dark"] .badge.bg-secondary {
+    background-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .badge.bg-success {
+    background-color: #276749 !important;
+}
+
+[data-theme="dark"] .badge.bg-danger {
+    background-color: #c53030 !important;
+}
+
+[data-theme="dark"] .badge.bg-warning {
+    background-color: #d69e2e !important;
+    color: #1a202c !important;
+}
+
+[data-theme="dark"] .badge.bg-info {
+    background-color: #3182ce !important;
+}
+
+/* ======================== LOGIN - DEMO ACCOUNTS ======================== */
+.demo-accounts {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1em;
+    margin-top: 1.5em;
+    font-size: 0.9em;
+    max-height: 200px;
+    overflow-y: auto;
+    transition: all var(--transition-speed) ease;
+}
+
+[data-theme="dark"] .demo-accounts {
+    background: #2d3748;
+    border: 1px solid #4a5568;
+    color: #e2e8f0;
+}
+
+.demo-accounts h6 {
+    color: #495057;
+    margin-bottom: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: color var(--transition-speed) ease;
+}
+
+[data-theme="dark"] .demo-accounts h6 {
+    color: #e2e8f0;
+}
+
+.demo-accounts ul {
+    margin-bottom: 0;
+    padding-left: 1em;
+}
+
+.demo-accounts li {
+    margin-bottom: 0.25em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+}
+
+[data-theme="dark"] .demo-accounts li {
+    border-bottom-color: #4a5568;
+    color: #e2e8f0;
+}
+
+.demo-accounts li:hover {
+    color: #667eea;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    padding-left: 8px;
+}
+
+[data-theme="dark"] .demo-accounts li:hover {
+    color: #90cdf4;
+    background-color: #4a5568;
+}
+
+.user-email {
+    font-weight: 500;
+    color: #495057;
+    transition: color var(--transition-speed) ease;
+}
+
+[data-theme="dark"] .user-email {
+    color: #e2e8f0;
+}
+
+.user-info {
+    font-size: 0.8em;
+    color: #6c757d;
+    transition: color var(--transition-speed) ease;
+}
+
+[data-theme="dark"] .user-info {
+    color: #a0aec0;
+}
+
+.refresh-btn {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .refresh-btn {
+    color: #90cdf4;
+}
+
+.refresh-btn:hover {
+    background-color: #e9ecef;
+}
+
+[data-theme="dark"] .refresh-btn:hover {
+    background-color: #4a5568;
+}
+
+.user-item {
+    transition: all 0.2s ease;
+}
+
+.user-item:hover {
+    transform: translateX(5px);
+}
+
+/* Loading spinner para o tema escuro */
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+[data-theme="dark"] .loading-spinner {
+    border: 2px solid #4a5568;
+    border-top: 2px solid #90cdf4;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

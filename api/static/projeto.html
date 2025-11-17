@@ -7,17 +7,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css">
   <style>
     body {
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
       padding: 2em;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] body {
+      background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
     }
 
     .card {
       border-radius: 15px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       border: none;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .card {
+      background: #2d3748;
+      color: #e2e8f0;
     }
 
     .card-header {
@@ -45,6 +58,21 @@
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
+    }
+
+    [data-theme="dark"] .table {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    [data-theme="dark"] .table td {
+      background: #2d3748;
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+
+    [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #4a5568;
     }
 
     .navbar-brand {
@@ -89,15 +117,304 @@
       border-radius: 4px;
       font-weight: 500;
     }
+    
+    [data-theme="dark"] .status-pendente {
+      background-color: #744210;
+      color: #fed7aa;
+    }
+    
+    [data-theme="dark"] .status-andamento {
+      background-color: #1e3a5f;
+      color: #93c5fd;
+    }
+    
+    [data-theme="dark"] .status-concluido {
+      background-color: #22543d;
+      color: #9ae6b4;
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+    }
+    
+    .btn-tarefas {
+      background: linear-gradient(135deg, #ffc107, #fd7e14);
+      border: none;
+      color: white;
+    }
+    
+    .btn-tarefas:hover {
+      background: linear-gradient(135deg, #fd7e14, #e55a00);
+      color: white;
+    }
+
+    [data-theme="dark"] .navbar-light {
+      background-color: #2d3748 !important;
+    }
+
+    [data-theme="dark"] .navbar-text {
+      color: #e2e8f0 !important;
+    }
+
+    [data-theme="dark"] .text-dark {
+      color: #e2e8f0 !important;
+    }
+
+    [data-theme="dark"] .text-muted {
+      color: #a0aec0 !important;
+    }
+
+    /* Modal no tema escuro */
+    [data-theme="dark"] .modal-content {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    [data-theme="dark"] .modal-header {
+      border-bottom-color: #4a5568;
+    }
+
+    [data-theme="dark"] .modal-footer {
+      border-top-color: #4a5568;
+    }
+
+    /* Destaque para resultados de busca */
+    .highlight {
+      background-color: #fff3cd !important;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .highlight {
+      background-color: #744210 !important;
+      color: #fed7aa !important;
+    }
+
+    .search-info {
+      font-size: 0.875rem;
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    [data-theme="dark"] .search-info {
+      color: #a0aec0;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-export-pdf {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+    }
+
+    .btn-export-pdf:hover {
+      background: linear-gradient(135deg, #c82333, #a71e2a);
+      color: white;
+    }
+
+    /* Estilos para visualização em cards */
+    .projeto-card-item {
+      border-left: 4px solid #667eea;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    
+    .projeto-card-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .projeto-card-item.pendente {
+      border-left-color: #ffc107;
+    }
+    
+    .projeto-card-item.andamento {
+      border-left-color: #17a2b8;
+    }
+    
+    .projeto-card-item.concluido {
+      border-left-color: #28a745;
+      opacity: 0.8;
+    }
+    
+    .projeto-info {
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+    
+    [data-theme="dark"] .projeto-info {
+      color: #a0aec0;
+    }
+    
+    .projeto-descricao {
+      max-height: 3em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .projeto-card-header {
+      display: flex;
+      justify-content: between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .projeto-card-titulo {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      flex: 1;
+    }
+
+    .projeto-card-metadata {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .projeto-card-datas {
+      font-size: 0.8rem;
+      color: #6c757d;
+    }
+
+    .projeto-card-acoes {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .progresso-projeto {
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      background-color: #e9ecef;
+      margin: 0.5rem 0;
+    }
+
+    .progresso-projeto .progress-bar {
+      transition: width 0.3s ease;
+    }
+
+    .dias-restantes {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+
+    .dias-urgente {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .dias-atencao {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .dias-normal {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .dias-concluido {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    /* Estilos para o modo Kanban */
+    .kanban-column {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 1rem;
+      min-height: 600px;
+    }
+
+    [data-theme="dark"] .kanban-column {
+      background: #2d3748;
+    }
+
+    .kanban-column-header {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid;
+      text-align: center;
+    }
+
+    .kanban-column-pendente .kanban-column-header {
+      border-color: #ffc107;
+      color: #856404;
+    }
+
+    .kanban-column-andamento .kanban-column-header {
+      border-color: #17a2b8;
+      color: #0c5460;
+    }
+
+    .kanban-column-concluido .kanban-column-header {
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .kanban-drop-zone {
+      min-height: 100px;
+      border: 2px dashed #dee2e6;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .kanban-drop-zone.drag-over {
+      border-color: #667eea;
+      background-color: rgba(102, 126, 234, 0.1);
+    }
+
+    /* Botão Atualizar corrigido */
+    .btn-outline-light {
+      border-color: #6c757d;
+      color: #6c757d;
+    }
+
+    .btn-outline-light:hover {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      color: white;
+    }
+
+    [data-theme="dark"] .btn-outline-light {
+      border-color: #a0aec0;
+      color: #a0aec0;
+    }
+
+    [data-theme="dark"] .btn-outline-light:hover {
+      background-color: #a0aec0;
+      border-color: #a0aec0;
+      color: #2d3748;
+    }
   </style>
 </head>
 
 <body>
+  <!-- Botão de Tema -->
+  <button id="themeToggle" class="theme-toggle">
+    <span class="sun">🌞</span>
+    <span class="moon">🌛</span>
+  </button>
+
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
     <div class="container">
       <a class="navbar-brand" href="dashboard.html">
-        <i class="bi bi-kanban"></i> Sistema de Projetos
+        <i class="bi bi-kanban"></i> Organização de Tarefas
       </a>
       <div class="d-flex align-items-center">
         <span class="navbar-text me-3" id="userWelcome"></span>
@@ -174,18 +491,167 @@
       <div id="divResposta" class="alert m-3" style="display: none;"></div>
     </div>
 
-    <!-- ======================== TABELA DE PROJETOS ======================== -->
-    <div class="card mt-4">
+    <!-- ======================== FILTROS ======================== -->
+    <div class="card mb-4">
       <div class="card-header">
-        <i class="bi bi-list-ul"></i> Lista de Projetos
+        <i class="bi bi-funnel"></i> Filtros e Busca Rápida
       </div>
       <div class="card-body">
-        <div id="divTabela">
-          <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Carregando...</span>
+        <div class="row">
+          <div class="col-md-6">
+            <label for="filtroStatus" class="form-label">Status</label>
+            <select id="filtroStatus" class="form-select">
+              <option value="todos">Todos</option>
+              <option value="pendente">Pendente</option>
+              <option value="andamento">Em Andamento</option>
+              <option value="concluido">Concluído</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="filtroResponsavel" class="form-label">Responsável</label>
+            <select id="filtroResponsavel" class="form-select">
+              <option value="todos">Todos</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-12">
+            <div class="search-info" id="infoBusca">
+              <!-- Informações da busca serão exibidas aqui -->
             </div>
-            <p class="mt-2">Carregando projetos...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== CONTROLES DE VISUALIZAÇÃO ======================== -->
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="fw-bold">Visualização:</span>
+            <div class="btn-group ms-2" role="group">
+              <input type="radio" class="btn-check" name="visualizacao" id="visualizacao-tabela" autocomplete="off" checked>
+              <label class="btn btn-outline-primary" for="visualizacao-tabela">
+                <i class="bi bi-table"></i> Tabela
+              </label>
+
+              <input type="radio" class="btn-check" name="visualizacao" id="visualizacao-cards" autocomplete="off">
+              <label class="btn btn-outline-primary" for="visualizacao-cards">
+                <i class="bi bi-grid-3x3-gap"></i> Cards
+              </label>
+
+              <input type="radio" class="btn-check" name="visualizacao" id="visualizacao-kanban" autocomplete="off">
+              <label class="btn btn-outline-primary" for="visualizacao-kanban">
+                <i class="bi bi-kanban"></i> Kanban
+              </label>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span id="contadorProjetos" class="badge bg-primary">0 projetos</span>
+            <div class="export-buttons">
+              <button class="btn btn-sm btn-atualizar me-2" id="btnAtualizar">
+                <i class="bi bi-arrow-clockwise"></i> Atualizar
+              </button>
+              <button class="btn btn-sm btn-csv me-2" id="btnExportCSV">
+                <i class="bi bi-download"></i> CSV
+              </button>
+              <button class="btn btn-sm btn-export-pdf" id="btnExportPDF">
+                <i class="bi bi-file-pdf"></i> PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== TABELA DE PROJETOS ======================== -->
+    <div id="visualizacao-tabela-container">
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-list-ul"></i> Lista de Projetos
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <div id="divTabela">
+              <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando projetos...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== VISUALIZAÇÃO EM CARDS ======================== -->
+    <div id="visualizacao-cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-grid-3x3-gap"></i> Visualização em Cards
+        </div>
+        <div class="card-body">
+          <div id="divCards" class="row g-3">
+            <div class="col-12 text-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+              <p class="mt-2">Carregando projetos...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== VISUALIZAÇÃO KANBAN ======================== -->
+    <div id="visualizacao-kanban-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-kanban"></i> Visualização Kanban
+          <small class="text-muted ms-2">Arraste os projetos entre as colunas para alterar o status</small>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <!-- Coluna Pendente -->
+            <div class="col-md-4">
+              <div class="kanban-column kanban-column-pendente">
+                <div class="kanban-column-header">
+                  <i class="bi bi-clock"></i> Pendente
+                  <span class="badge bg-warning ms-1" id="contador-pendente">0</span>
+                </div>
+                <div id="kanban-pendente" class="kanban-drop-zone" data-status="pendente">
+                  <!-- Projetos pendentes serão inseridos aqui -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Coluna Em Andamento -->
+            <div class="col-md-4">
+              <div class="kanban-column kanban-column-andamento">
+                <div class="kanban-column-header">
+                  <i class="bi bi-play-circle"></i> Em Andamento
+                  <span class="badge bg-info ms-1" id="contador-andamento">0</span>
+                </div>
+                <div id="kanban-andamento" class="kanban-drop-zone" data-status="andamento">
+                  <!-- Projetos em andamento serão inseridos aqui -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Coluna Concluído -->
+            <div class="col-md-4">
+              <div class="kanban-column kanban-column-concluido">
+                <div class="kanban-column-header">
+                  <i class="bi bi-check-circle"></i> Concluído
+                  <span class="badge bg-success ms-1" id="contador-concluido">0</span>
+                </div>
+                <div id="kanban-concluido" class="kanban-drop-zone" data-status="concluido">
+                  <!-- Projetos concluídos serão inseridos aqui -->
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -215,6 +681,13 @@
     </div>
   </div>
 
+  <!-- Importar o theme.js -->
+  <script src="js/theme.js"></script>
+  <!-- Importar o PDF Generator -->
+  <script src="js/pdfGenerator.js"></script>
+  <!-- Importar o CSV Generator -->
+  <script src="js/csvGenerator.js"></script>
+
   <script type="module">
     import ApiService from './ApiService.js';
 
@@ -239,6 +712,9 @@
 
     let API_DATA;
     let usuarios = [];
+    let projetosList = [];
+    let projetosFiltrados = [];
+    let projetoArrastado = null;
 
     // ======================== ELEMENTOS HTML ========================
     const txtId = document.getElementById("txtId");
@@ -248,9 +724,144 @@
     const selUsuario = document.getElementById("selUsuario");
     const txtDataInicio = document.getElementById("txtDataInicio");
     const txtDataFim = document.getElementById("txtDataFim");
+    const filtroStatus = document.getElementById("filtroStatus");
+    const filtroResponsavel = document.getElementById("filtroResponsavel");
     const divBotoes = document.getElementById("divBotoes");
     const divResposta = document.getElementById("divResposta");
     const btnLogout = document.getElementById("btnLogout");
+    const contadorProjetos = document.getElementById("contadorProjetos");
+    const infoBusca = document.getElementById("infoBusca");
+    const btnAtualizar = document.getElementById("btnAtualizar");
+    const btnExportPDF = document.getElementById("btnExportPDF");
+    const btnExportCSV = document.getElementById("btnExportCSV");
+
+    // ======================== CONTROLES DE VISUALIZAÇÃO ========================
+    document.getElementById('visualizacao-tabela').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('visualizacao-tabela-container').style.display = 'block';
+        document.getElementById('visualizacao-cards-container').style.display = 'none';
+        document.getElementById('visualizacao-kanban-container').style.display = 'none';
+        renderTable(projetosFiltrados);
+      }
+    });
+
+    document.getElementById('visualizacao-cards').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('visualizacao-tabela-container').style.display = 'none';
+        document.getElementById('visualizacao-cards-container').style.display = 'block';
+        document.getElementById('visualizacao-kanban-container').style.display = 'none';
+        renderCards(projetosFiltrados);
+      }
+    });
+
+    document.getElementById('visualizacao-kanban').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('visualizacao-tabela-container').style.display = 'none';
+        document.getElementById('visualizacao-cards-container').style.display = 'none';
+        document.getElementById('visualizacao-kanban-container').style.display = 'block';
+        renderKanban(projetosFiltrados);
+      }
+    });
+
+    // ✅ FUNÇÃO: Verificar perfil e configurar interface
+    function verificarPerfilEConfigurarInterface() {
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const usuario = userData?.usuario || userData?.data?.usuario;
+        
+        if (!usuario) {
+            console.log("❌ Usuário não encontrado no localStorage");
+            return;
+        }
+        
+        console.log("👤 Perfil do usuário detectado:", usuario.perfil_tipo, "Empresa:", usuario.empresa);
+        
+        if (usuario.perfil_tipo === 'pessoal') {
+            console.log("🏠 Configurando interface para perfil PESSOAL");
+            configurarInterfacePerfilPessoal(usuario);
+        } else {
+            console.log("👔 Configurando interface para perfil PROFISSIONAL");
+            configurarInterfacePerfilProfissional();
+        }
+    }
+
+    // ✅ CONFIGURAÇÃO PARA PERFIL PESSOAL
+    function configurarInterfacePerfilPessoal(usuario) {
+        // 1. Alterar título da página
+        const tituloPagina = document.getElementById('tituloPagina');
+        if (tituloPagina) {
+            tituloPagina.textContent = 'Meus Projetos Pessoais';
+        }
+        
+        // 2. ✅ CRÍTICO: OCULTAR CAMPO "RESPONSÁVEL" DO FORMULÁRIO
+        const linhaResponsavel = document.querySelector('.row:has(#selUsuario)');
+        if (linhaResponsavel) {
+            linhaResponsavel.style.display = 'none';
+        }
+        
+        // 3. ✅ CRÍTICO: OCULTAR FILTRO POR RESPONSÁVEL
+        const filtroResponsavelContainer = document.querySelector('.col-md-6:has(#filtroResponsavel)');
+        if (filtroResponsavelContainer) {
+            filtroResponsavelContainer.style.display = 'none';
+        }
+        
+        // 4. ✅ CRÍTICO: AUTO-SELECIONAR USUÁRIO ATUAL COMO RESPONSÁVEL
+        const selUsuario = document.getElementById('selUsuario');
+        if (selUsuario && usuario.id) {
+            selUsuario.value = usuario.id;
+            selUsuario.disabled = true; // Impede alteração
+        }
+        
+        // 5. Adicionar mensagem informativa
+        const formulario = document.querySelector('.card-body');
+        if (formulario) {
+            // Remover mensagens anteriores se existirem
+            const mensagensAntigas = formulario.querySelectorAll('.alert-info');
+            mensagensAntigas.forEach(msg => msg.remove());
+            
+            const infoMsg = document.createElement('div');
+            infoMsg.className = 'alert alert-info mb-3';
+            infoMsg.innerHTML = `
+                <i class="bi bi-person-check"></i> 
+                <strong>Modo Pessoal:</strong> Seus projetos são privados e apenas você pode visualizá-los e gerenciá-los.
+            `;
+            formulario.insertBefore(infoMsg, formulario.firstChild);
+        }
+        
+        // 6. Ajustar textos da tabela (executar após carregar dados)
+        setTimeout(() => {
+            const headers = document.querySelectorAll('th');
+            headers.forEach(header => {
+                if (header.textContent.includes('Responsável')) {
+                    header.textContent = 'Meu Projeto';
+                }
+            });
+            
+            // Nas células da tabela também
+            const cells = document.querySelectorAll('td');
+            cells.forEach(cell => {
+                if (cell.textContent === 'Não atribuído') {
+                    cell.textContent = 'Meu projeto';
+                }
+            });
+        }, 1000);
+    }
+
+    // ✅ CONFIGURAÇÃO PARA PERFIL PROFISSIONAL  
+    function configurarInterfacePerfilProfissional() {
+        console.log("👔 Interface profissional mantida padrão");
+        // Não precisa fazer alterações, manter interface completa
+    }
+
+    // ✅ MODIFICAR A CRIAÇÃO DE PROJETOS PARA PERFIL PESSOAL
+    function criarProjetoComPerfil(objetoBase, usuario) {
+        // Se for perfil pessoal, forçar usuario_id = usuario atual
+        if (usuario && usuario.perfil_tipo === 'pessoal') {
+            objetoBase.projeto.usuario_id = usuario.id;
+            console.log("🏠 Perfil pessoal: Auto-atribuindo projeto ao usuário", usuario.id);
+        }
+        
+        return objetoBase;
+    }
 
     // ======================== FUNÇÃO AUXILIAR PARA CRIAR BOTÕES ========================
     function createButton(text, className, icon = null) {
@@ -275,20 +886,24 @@
             return;
         }
 
-        // ✅ CORREÇÃO: Variáveis com nomes corretos
         const objetoCriar = {
             "projeto": {
                 "nome": txtNome.value.trim(),
                 "descricao": txtDescricao.value.trim(),
                 "data_inicio": txtDataInicio.value || null,
                 "data_fim": txtDataFim.value || null,
-                "status": selStatus.value,  // ✅ CORREÇÃO: selStatus
-                "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null  // ✅ CORREÇÃO: selUsuario
+                "status": selStatus.value,
+                "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null
             }
         };
 
+        // ✅ CORREÇÃO: APLICAR CONFIGURAÇÃO DE PERFIL
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const usuario = userData?.usuario || userData?.data?.usuario;
+        const objetoFinal = criarProjetoComPerfil(objetoCriar, usuario);
+
         try {
-            const resposta = await api.post("/api/projeto/", objetoCriar);
+            const resposta = await api.post("/api/projeto/", objetoFinal);
             
             if (resposta && resposta.success === false) {
                 showMessage(resposta.error?.message || "Erro ao criar projeto", "danger");
@@ -308,8 +923,8 @@
     };
     divBotoes.appendChild(btnCriar);
 
-    const btnAtualizar = createButton("Atualizar", "btn-warning", "bi-arrow-clockwise");
-    btnAtualizar.onclick = async () => {
+    const btnAtualizarForm = createButton("Atualizar", "btn-warning", "bi-arrow-clockwise");
+    btnAtualizarForm.onclick = async () => {
       const id = txtId.value.trim();
       if (!id) {
         showMessage("Selecione um projeto para atualizar", "warning");
@@ -328,7 +943,6 @@
         return;
       }
 
-      // ✅ CORREÇÃO: Formata as datas para o formato correto (yyyy-MM-dd)
       const dataInicio = txtDataInicio.value ? formatDateForInput(txtDataInicio.value) : null;
       const dataFim = txtDataFim.value ? formatDateForInput(txtDataFim.value) : null;
 
@@ -344,10 +958,8 @@
       };
 
       try {
-        // ✅ CORREÇÃO: Usa put com URL correta (sem barra extra)
         const resposta = await api.put("/api/projeto", id, objetoAtualizar);
         
-        // ✅ CORREÇÃO: Verificação completa da resposta
         if (resposta && resposta.success === false) {
           showMessage(resposta.error?.message || "Erro ao atualizar projeto", "danger");
           return;
@@ -364,7 +976,7 @@
         showMessage("Erro ao atualizar projeto: " + error.message, "danger");
       }
     };
-    divBotoes.appendChild(btnAtualizar);
+    divBotoes.appendChild(btnAtualizarForm);
 
     const btnExcluir = createButton("Excluir", "btn-danger", "bi-trash");
     btnExcluir.onclick = function () {
@@ -383,10 +995,8 @@
 
       newBtnConfirm.onclick = async function () {
         try {
-          // ✅ CORREÇÃO: Usa delete com URL correta (sem barra extra)
           const resposta = await api.delete("/api/projeto", id);
           
-          // ✅ CORREÇÃO: Verificação completa da resposta
           if (resposta && resposta.success === false) {
             showMessage(resposta.error?.message || "Erro ao excluir projeto", "danger");
             return;
@@ -425,21 +1035,17 @@
       }
     }
     
-    // ✅ CORREÇÃO: Função para formatar data para o formato yyyy-MM-dd
     function formatDateForInput(dateString) {
       if (!dateString) return null;
       
-      // Se já está no formato yyyy-MM-dd, retorna como está
       if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
         return dateString;
       }
       
-      // Se está no formato yyyy-MM-ddTHH:mm:ss, extrai apenas a parte da data
       if (dateString.includes('T')) {
         return dateString.split('T')[0];
       }
       
-      // Tenta converter de outros formatos
       try {
         const date = new Date(dateString);
         if (!isNaN(date.getTime())) {
@@ -452,21 +1058,17 @@
       return dateString;
     }
     
-    // ✅ CORREÇÃO: Função para converter data do backend para input date
     function formatDateFromBackend(dateString) {
       if (!dateString) return '';
       
-      // Se já está no formato yyyy-MM-dd, retorna como está
       if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
         return dateString;
       }
       
-      // Se está no formato yyyy-MM-ddTHH:mm:ss, extrai apenas a parte da data
       if (dateString.includes('T')) {
         return dateString.split('T')[0];
       }
       
-      // Tenta converter de outros formatos
       try {
         const date = new Date(dateString);
         if (!isNaN(date.getTime())) {
@@ -483,7 +1085,6 @@
       try {
         const resposta = await api.get("/api/usuario/");
         
-        // ✅ CORREÇÃO: Verificação de erro na resposta
         if (resposta && resposta.success === false) {
           console.error("Erro ao carregar usuários:", resposta.error?.message);
           return;
@@ -501,32 +1102,207 @@
           usuarios = resposta.usuarios;
         }
         
+        // Preencher select de responsáveis
         selUsuario.innerHTML = '<option value="">Responsável pelo projeto</option>';
+        filtroResponsavel.innerHTML = '<option value="todos">Todos</option>';
+        
         usuarios.forEach(usuario => {
           const option = document.createElement("option");
           option.value = usuario.id;
           option.textContent = usuario.nome;
           selUsuario.appendChild(option);
+          
+          const optionFiltro = option.cloneNode(true);
+          optionFiltro.value = usuario.id;
+          filtroResponsavel.appendChild(optionFiltro);
         });
       } catch (error) {
         console.error("Erro ao carregar usuários:", error);
       }
     }
 
-    async function listAll() {
+    window.listAll = async function() {
       try {
+        // Mostrar loading no botão
+        btnAtualizar.disabled = true;
+        btnAtualizar.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Carregando...';
+
         const resposta = await api.get("/api/projeto/");
         
-        // ✅ CORREÇÃO: Verificação de erro na resposta
         if (resposta && resposta.success === false) {
           showMessage("Erro ao carregar projetos: " + (resposta.error?.message || "Erro desconhecido"), "danger");
           return;
         }
         
-        renderTable(resposta);
+        projetosList = processarRespostaProjetos(resposta);
+        projetosFiltrados = [...projetosList];
+        aplicarFiltros();
+        showMessage(`Lista atualizada com ${projetosList.length} projetos`, "success");
       } catch (error) {
         showMessage("Erro ao carregar projetos: " + error.message, "danger");
+      } finally {
+        // Restaurar botão
+        btnAtualizar.disabled = false;
+        btnAtualizar.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Atualizar';
       }
+    };
+
+    window.exportarProjetos = function() {
+      try {
+        if (typeof CsvGenerator === 'undefined') {
+          console.error('CsvGenerator não está disponível');
+          showMessage('Erro: CsvGenerator não carregado', 'danger');
+          return;
+        }
+
+        const csvGenerator = new CsvGenerator();
+        
+        if (typeof csvGenerator.exportProjectsCSV === 'function') {
+          const sucesso = csvGenerator.exportProjectsCSV(
+            projetosFiltrados,
+            usuarios,
+            `projetos_${new Date().toISOString().split('T')[0]}.csv`
+          );
+
+          if (sucesso) {
+            showMessage('Arquivo CSV exportado com sucesso!', 'success');
+          } else {
+            showMessage('Erro ao exportar CSV', 'danger');
+          }
+        } else {
+          console.error('Método exportProjectsCSV não encontrado em CsvGenerator');
+          showMessage('Erro: Função de exportação CSV não disponível', 'danger');
+        }
+      } catch (error) {
+        console.error('Erro ao exportar CSV:', error);
+        showMessage('Erro ao exportar CSV: ' + error.message, 'danger');
+      }
+    };
+
+    window.exportarProjetosPDF = async function() {
+      try {
+        if (typeof PdfGenerator === 'undefined') {
+          console.error('PdfGenerator não está disponível');
+          showMessage('Erro: PdfGenerator não carregado', 'danger');
+          return;
+        }
+
+        // Mostrar loading no botão
+        btnExportPDF.disabled = true;
+        btnExportPDF.innerHTML = '<i class="bi bi-file-pdf"></i> Gerando PDF...';
+
+        const pdfGenerator = new PdfGenerator();
+        const filtrosTexto = getFiltrosAtivosTexto();
+        
+        if (typeof pdfGenerator.exportProjectsPDF === 'function') {
+          const sucesso = await pdfGenerator.exportProjectsPDF(
+            projetosFiltrados, 
+            usuarios,
+            `projetos_${new Date().toISOString().split('T')[0]}.pdf`,
+            filtrosTexto
+          );
+
+          if (sucesso) {
+            showMessage('PDF gerado e baixado com sucesso!', 'success');
+          } else {
+            showMessage('Erro ao gerar PDF', 'danger');
+          }
+        } else {
+          console.error('Método exportProjectsPDF não encontrado em PdfGenerator');
+          showMessage('Erro: Função de exportação PDF não disponível', 'danger');
+        }
+      } catch (error) {
+        console.error('Erro ao exportar PDF:', error);
+        showMessage('Erro ao gerar PDF: ' + error.message, 'danger');
+      } finally {
+        // Restaurar botão
+        btnExportPDF.disabled = false;
+        btnExportPDF.innerHTML = '<i class="bi bi-file-pdf"></i> PDF';
+      }
+    };
+
+    function processarRespostaProjetos(resposta) {
+      let projetos = [];
+      
+      if (resposta && Array.isArray(resposta)) {
+        projetos = resposta;
+      } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+        projetos = resposta.data;
+      } else if (resposta && resposta.success && Array.isArray(resposta.data?.projetos)) {
+        projetos = resposta.data.projetos;
+      } else if (resposta && resposta.projetos && Array.isArray(resposta.projetos)) {
+        projetos = resposta.projetos;
+      }
+      
+      // Ordenar por status: Pendente -> Andamento -> Concluído
+      return projetos.sort((a, b) => {
+        const statusOrder = { 'pendente': 1, 'andamento': 2, 'concluido': 3 };
+        const ordemA = statusOrder[a.status] || 4;
+        const ordemB = statusOrder[b.status] || 4;
+        return ordemA - ordemB;
+      });
+    }
+
+    function aplicarFiltros() {
+      projetosFiltrados = [...projetosList];
+      
+      const statusSelecionado = filtroStatus.value;
+      const responsavelSelecionado = filtroResponsavel.value;
+      
+      let filtrosAtivos = [];
+      
+      // Aplicar filtro de status
+      if (statusSelecionado !== 'todos') {
+        projetosFiltrados = projetosFiltrados.filter(projeto => 
+          projeto.status === statusSelecionado
+        );
+        filtrosAtivos.push(`status: "${formatarStatus(statusSelecionado)}"`);
+      }
+      
+      // Aplicar filtro de responsável
+      if (responsavelSelecionado !== 'todos') {
+        projetosFiltrados = projetosFiltrados.filter(projeto => 
+          projeto.usuario_id == responsavelSelecionado
+        );
+        
+        const usuario = usuarios.find(u => u.id == responsavelSelecionado);
+        if (usuario) {
+          filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+        }
+      }
+      
+      atualizarInfoBusca(filtrosAtivos);
+      
+      // Atualizar a visualização ativa
+      if (document.getElementById('visualizacao-tabela').checked) {
+        renderTable(projetosFiltrados);
+      } else if (document.getElementById('visualizacao-cards').checked) {
+        renderCards(projetosFiltrados);
+      } else if (document.getElementById('visualizacao-kanban').checked) {
+        renderKanban(projetosFiltrados);
+      }
+    }
+
+    function atualizarInfoBusca(filtrosAtivos = []) {
+      const totalProjetos = projetosList.length;
+      const projetosEncontrados = projetosFiltrados.length;
+      
+      if (filtrosAtivos.length > 0) {
+        infoBusca.innerHTML = `
+          <i class="bi bi-info-circle"></i> 
+          <strong>${projetosEncontrados}</strong> de <strong>${totalProjetos}</strong> projetos encontrados 
+          | Filtros: ${filtrosAtivos.join(', ')}
+        `;
+        infoBusca.style.display = 'block';
+      } else {
+        infoBusca.innerHTML = `
+          <i class="bi bi-info-circle"></i> 
+          Mostrando todos os <strong>${totalProjetos}</strong> projetos
+        `;
+        infoBusca.style.display = 'block';
+      }
+      
+      contadorProjetos.textContent = `${projetosEncontrados} projetos`;
     }
 
     function limparFormulario() {
@@ -540,27 +1316,41 @@
       divResposta.style.display = "none";
     }
 
+    // Função auxiliar para obter texto dos filtros ativos
+    function getFiltrosAtivosTexto() {
+      const filtrosAtivos = [];
+      const statusSelecionado = filtroStatus.value;
+      const responsavelSelecionado = filtroResponsavel.value;
+      
+      if (statusSelecionado !== 'todos') {
+        filtrosAtivos.push(`status: "${formatarStatus(statusSelecionado)}"`);
+      }
+      
+      if (responsavelSelecionado !== 'todos') {
+        const usuario = usuarios.find(u => u.id == responsavelSelecionado);
+        if (usuario) {
+          filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+        }
+      }
+      
+      return filtrosAtivos.join(', ');
+    }
+
+    // ======================== RENDERIZAÇÃO DA TABELA ========================
     function renderTable(dados) {
       const divTabela = document.getElementById("divTabela");
       divTabela.innerHTML = "";
 
-      let projetos = [];
-
-      // ✅ CORREÇÃO: Tratamento melhorado da estrutura de resposta
-      if (dados && dados.success && dados.data && Array.isArray(dados.data.projetos)) {
-        projetos = dados.data.projetos;
-      } else if (dados && Array.isArray(dados)) {
-        projetos = dados;
-      } else if (dados && dados.data && Array.isArray(dados.data)) {
-        projetos = dados.data;
-      } else if (dados && dados.success && Array.isArray(dados.data)) {
-        projetos = dados.data;
-      } else if (dados && dados.projetos && Array.isArray(dados.projetos)) {
-        projetos = dados.projetos;
-      }
+      let projetos = dados || [];
 
       if (!projetos || projetos.length === 0) {
-        divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhum Projeto encontrado!</div>';
+        divTabela.innerHTML = `
+          <div class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle"></i> 
+            Nenhum projeto encontrado com os filtros aplicados.
+            ${projetosList.length > 0 ? '<br><small>Tente ajustar os filtros.</small>' : ''}
+          </div>
+        `;
         return;
       }
 
@@ -571,7 +1361,7 @@
       thead.className = "table-light";
       const trHead = document.createElement("tr");
 
-      ["ID", "Nome", "Status", "Responsável", "Data Início", "Data Fim", "Ações"].forEach(text => {
+      ["ID", "Nome", "Status", "Responsável", "Data Início", "Data Limite", "Ações"].forEach(text => {
         const th = document.createElement("th");
         th.textContent = text;
         trHead.appendChild(th);
@@ -598,8 +1388,7 @@
         // Status
         const tdStatus = document.createElement("td");
         const statusClass = `status-${projeto.status}`;
-        tdStatus.className = statusClass;
-        tdStatus.textContent = formatarStatus(projeto.status);
+        tdStatus.innerHTML = `<span class="status-badge ${statusClass}">${formatarStatus(projeto.status)}</span>`;
         tr.appendChild(tdStatus);
 
         // Responsável
@@ -629,7 +1418,7 @@
         const divBotoes = document.createElement("div");
         divBotoes.className = "d-flex gap-2";
 
-        const btnSel = createButton("Selecionar", "btn-info btn-sm", "bi-pencil");
+        const btnSel = createButton("Editar", "btn-info btn-sm", "bi-pencil");
         btnSel.onclick = () => {
           txtId.value = projeto.id;
           txtNome.value = projeto.nome;
@@ -637,13 +1426,53 @@
           selStatus.value = projeto.status;
           selUsuario.value = projeto.usuario_id || "";
           
-          // ✅ CORREÇÃO: Formata as datas para o input type="date"
           txtDataInicio.value = formatDateFromBackend(projeto.data_inicio);
           txtDataFim.value = formatDateFromBackend(projeto.data_fim);
           
           showMessage("Projeto selecionado para edição", "info");
         };
         divBotoes.appendChild(btnSel);
+
+        // ✅ BOTÃO EXCLUIR ADICIONADO NA TABELA
+        const btnDel = createButton("Excluir", "btn-danger btn-sm", "bi-trash");
+        btnDel.onclick = function() {
+          const modal = new bootstrap.Modal(document.getElementById('modalConfirm'));
+          modal.show();
+
+          const btnConfirmDelete = document.getElementById("btnConfirmDelete");
+          btnConfirmDelete.replaceWith(btnConfirmDelete.cloneNode(true));
+          const newBtnConfirm = document.getElementById("btnConfirmDelete");
+
+          newBtnConfirm.onclick = async function() {
+              try {
+                  const resposta = await api.delete("/api/projeto", projeto.id);
+                  
+                  if (resposta && resposta.success === false) {
+                      showMessage(resposta.error?.message || "Erro ao excluir projeto", "danger");
+                      return;
+                  }
+                  
+                  if (resposta && resposta.success) {
+                      listAll();
+                      showMessage(`Projeto ID ${projeto.id} excluído com sucesso.`, "success");
+                      limparFormulario();
+                  } else {
+                      showMessage("Erro ao excluir projeto: resposta inválida", "danger");
+                  }
+              } catch (error) {
+                  showMessage(`Erro ao excluir projeto: ${error.message}`, "danger");
+              } finally {
+                  modal.hide();
+              }
+          };
+        };
+        divBotoes.appendChild(btnDel);
+
+        const btnTarefas = createButton("Tarefas", "btn-tarefas btn-sm", "bi-check-square");
+        btnTarefas.onclick = () => {
+          window.location.href = `tarefa.html?projeto_id=${projeto.id}&projeto_nome=${encodeURIComponent(projeto.nome)}`;
+        };
+        divBotoes.appendChild(btnTarefas);
 
         tdAcoes.appendChild(divBotoes);
         tr.appendChild(tdAcoes);
@@ -654,7 +1483,372 @@
       table.appendChild(tbody);
       divTabela.appendChild(table);
     }
-    
+
+    // ======================== RENDERIZAÇÃO EM CARDS ========================
+    function renderCards(dados) {
+      const divCards = document.getElementById("divCards");
+      divCards.innerHTML = "";
+
+      let projetos = dados || [];
+
+      if (!projetos || projetos.length === 0) {
+          divCards.innerHTML = `
+            <div class="col-12">
+              <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i> 
+                Nenhum projeto encontrado com os filtros aplicados.
+                ${projetosList.length > 0 ? '<br><small>Tente ajustar os filtros.</small>' : ''}
+              </div>
+            </div>
+          `;
+          return;
+      }
+
+      projetos.forEach(projeto => {
+          const responsavel = usuarios.find(u => u.id === projeto.usuario_id);
+          
+          const col = document.createElement("div");
+          col.className = "col-md-6 col-lg-4 col-xl-3";
+          
+          const cardClasses = [
+              'projeto-card-item',
+              'card',
+              'h-100',
+              projeto.status
+          ].join(' ');
+
+          // Calcular dias restantes
+          let diasRestantes = null;
+          let diasClass = '';
+          if (projeto.data_fim && projeto.status !== 'concluido') {
+              const hoje = new Date();
+              const dataFim = new Date(projeto.data_fim);
+              const diffTime = dataFim - hoje;
+              diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              
+              if (diasRestantes < 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `Atrasado ${Math.abs(diasRestantes)} dia(s)`;
+              } else if (diasRestantes === 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = 'Hoje!';
+              } else if (diasRestantes <= 3) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else if (diasRestantes <= 7) {
+                  diasClass = 'dias-atencao';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else {
+                  diasClass = 'dias-normal';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              }
+          } else if (projeto.status === 'concluido') {
+              diasClass = 'dias-concluido';
+              diasRestantes = 'Concluído';
+          }
+
+          col.innerHTML = `
+            <div class="${cardClasses}">
+              <div class="card-body d-flex flex-column">
+                <div class="projeto-card-header">
+                  <div class="projeto-card-titulo">${projeto.nome}</div>
+                </div>
+                
+                ${projeto.descricao ? `
+                  <div class="projeto-descricao mb-2">
+                    <small class="text-muted">${projeto.descricao}</small>
+                  </div>
+                ` : ''}
+                
+                <div class="projeto-card-metadata">
+                  <span class="status-badge status-${projeto.status}">${formatarStatus(projeto.status)}</span>
+                  ${diasRestantes ? `<span class="dias-restantes ${diasClass}">${diasRestantes}</span>` : ''}
+                </div>
+                
+                <div class="projeto-info mb-2">
+                  <div><strong>Responsável:</strong> ${responsavel ? responsavel.nome : 'Não atribuído'}</div>
+                  ${projeto.data_inicio ? `<div><strong>Início:</strong> ${new Date(projeto.data_inicio).toLocaleDateString('pt-BR')}</div>` : ''}
+                  ${projeto.data_fim ? `<div><strong>Término:</strong> ${new Date(projeto.data_fim).toLocaleDateString('pt-BR')}</div>` : ''}
+                </div>
+                
+                <div class="projeto-card-acoes mt-auto">
+                  <button class="btn btn-sm btn-info flex-fill" onclick="editarProjeto(${projeto.id})">
+                    <i class="bi bi-pencil"></i> Editar
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="excluirProjeto(${projeto.id})">
+                    <i class="bi bi-trash"></i> Excluir
+                  </button>
+                </div>
+                <div class="projeto-card-acoes mt-2">
+                  <button class="btn btn-sm btn-tarefas w-100" onclick="verTarefas(${projeto.id}, '${projeto.nome}')">
+                    <i class="bi bi-check-square"></i> Ver Tarefas
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          divCards.appendChild(col);
+      });
+    }
+
+    // ======================== RENDERIZAÇÃO KANBAN ========================
+    function renderKanban(dados) {
+      const kanbanPendente = document.getElementById("kanban-pendente");
+      const kanbanAndamento = document.getElementById("kanban-andamento");
+      const kanbanConcluido = document.getElementById("kanban-concluido");
+      
+      kanbanPendente.innerHTML = '';
+      kanbanAndamento.innerHTML = '';
+      kanbanConcluido.innerHTML = '';
+
+      let projetos = dados || [];
+
+      if (!projetos || projetos.length === 0) {
+          const mensagem = `
+            <div class="col-12 text-center py-4">
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> 
+                Nenhum projeto encontrado com os filtros aplicados.
+              </div>
+            </div>
+          `;
+          kanbanPendente.innerHTML = mensagem;
+          return;
+      }
+
+      // Contadores
+      const contadorPendente = document.getElementById("contador-pendente");
+      const contadorAndamento = document.getElementById("contador-andamento");
+      const contadorConcluido = document.getElementById("contador-concluido");
+      
+      let countPendente = 0;
+      let countAndamento = 0;
+      let countConcluido = 0;
+
+      projetos.forEach(projeto => {
+          const responsavel = usuarios.find(u => u.id === projeto.usuario_id);
+          
+          const card = document.createElement("div");
+          card.className = `card mb-2 projeto-card-item ${projeto.status}`;
+          card.draggable = true;
+          card.dataset.projetoId = projeto.id;
+          
+          // Calcular dias restantes
+          let diasRestantes = null;
+          let diasClass = '';
+          if (projeto.data_fim && projeto.status !== 'concluido') {
+              const hoje = new Date();
+              const dataFim = new Date(projeto.data_fim);
+              const diffTime = dataFim - hoje;
+              diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              
+              if (diasRestantes < 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `Atrasado ${Math.abs(diasRestantes)} dia(s)`;
+              } else if (diasRestantes === 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = 'Hoje!';
+              } else if (diasRestantes <= 3) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else if (diasRestantes <= 7) {
+                  diasClass = 'dias-atencao';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else {
+                  diasClass = 'dias-normal';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              }
+          } else if (projeto.status === 'concluido') {
+              diasClass = 'dias-concluido';
+              diasRestantes = 'Concluído';
+          }
+
+          card.innerHTML = `
+            <div class="card-body">
+              <div class="projeto-card-header">
+                <div class="projeto-card-titulo">${projeto.nome}</div>
+              </div>
+              
+              ${projeto.descricao ? `
+                <div class="projeto-descricao mb-2">
+                  <small class="text-muted">${projeto.descricao}</small>
+                </div>
+              ` : ''}
+              
+              <div class="projeto-card-metadata">
+                ${diasRestantes ? `<span class="dias-restantes ${diasClass}">${diasRestantes}</span>` : ''}
+              </div>
+              
+              <div class="projeto-info">
+                <div><small><strong>Responsável:</strong> ${responsavel ? responsavel.nome : 'Não atribuído'}</small></div>
+                ${projeto.data_fim ? `<div><small><strong>Término:</strong> ${new Date(projeto.data_fim).toLocaleDateString('pt-BR')}</small></div>` : ''}
+              </div>
+            </div>
+          `;
+
+          // Eventos de drag and drop
+          card.addEventListener('dragstart', handleDragStart);
+          card.addEventListener('dragend', handleDragEnd);
+
+          // Adicionar à coluna correta
+          if (projeto.status === 'pendente') {
+              kanbanPendente.appendChild(card);
+              countPendente++;
+          } else if (projeto.status === 'andamento') {
+              kanbanAndamento.appendChild(card);
+              countAndamento++;
+          } else if (projeto.status === 'concluido') {
+              kanbanConcluido.appendChild(card);
+              countConcluido++;
+          }
+      });
+
+      // Atualizar contadores
+      contadorPendente.textContent = countPendente;
+      contadorAndamento.textContent = countAndamento;
+      contadorConcluido.textContent = countConcluido;
+
+      // Configurar zonas de drop
+      configurarZonasDrop();
+    }
+
+    // ======================== DRAG AND DROP KANBAN ========================
+    function handleDragStart(e) {
+      projetoArrastado = this;
+      this.style.opacity = '0.4';
+      
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.innerHTML);
+    }
+
+    function handleDragEnd(e) {
+      this.style.opacity = '1';
+      
+      document.querySelectorAll('.kanban-drop-zone').forEach(zone => {
+          zone.classList.remove('drag-over');
+      });
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      return false;
+    }
+
+    function handleDragEnter(e) {
+      this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      
+      if (projetoArrastado != this) {
+          const novaColuna = this;
+          const novoStatus = novaColuna.dataset.status;
+          const projetoId = projetoArrastado.dataset.projetoId;
+          
+          // Atualizar status do projeto
+          atualizarStatusProjeto(projetoId, novoStatus);
+          
+          // Mover o card para a nova coluna
+          novaColuna.appendChild(projetoArrastado);
+      }
+      
+      this.classList.remove('drag-over');
+      return false;
+    }
+
+    function configurarZonasDrop() {
+      document.querySelectorAll('.kanban-drop-zone').forEach(zone => {
+          zone.addEventListener('dragover', handleDragOver);
+          zone.addEventListener('dragenter', handleDragEnter);
+          zone.addEventListener('dragleave', handleDragLeave);
+          zone.addEventListener('drop', handleDrop);
+      });
+    }
+
+    async function atualizarStatusProjeto(projetoId, novoStatus) {
+      try {
+          const objetoAtualizar = {
+              "projeto": {
+                  "status": novoStatus
+              }
+          };
+
+          const resposta = await api.put("/api/projeto", projetoId, objetoAtualizar);
+          
+          if (resposta && resposta.success) {
+              console.log(`✅ Status do projeto ${projetoId} atualizado para: ${novoStatus}`);
+              showMessage(`Projeto movido para ${formatarStatus(novoStatus)}`, "success");
+          } else {
+              showMessage("Erro ao atualizar status do projeto", "danger");
+          }
+      } catch (error) {
+          showMessage("Erro ao atualizar status: " + error.message, "danger");
+      }
+    }
+
+    // ======================== FUNÇÕES AUXILIARES GLOBAIS ========================
+    window.editarProjeto = function(projetoId) {
+      const projeto = projetosList.find(p => p.id == projetoId);
+      if (projeto) {
+          txtId.value = projeto.id;
+          txtNome.value = projeto.nome;
+          txtDescricao.value = projeto.descricao || "";
+          selStatus.value = projeto.status;
+          selUsuario.value = projeto.usuario_id || "";
+          
+          txtDataInicio.value = formatDateFromBackend(projeto.data_inicio);
+          txtDataFim.value = formatDateFromBackend(projeto.data_fim);
+          
+          showMessage("Projeto selecionado para edição", "info");
+          
+          // Scroll para o formulário
+          document.getElementById('txtNome').scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    window.excluirProjeto = function(projetoId) {
+      const modal = new bootstrap.Modal(document.getElementById('modalConfirm'));
+      modal.show();
+
+      const btnConfirmDelete = document.getElementById("btnConfirmDelete");
+      btnConfirmDelete.replaceWith(btnConfirmDelete.cloneNode(true));
+      const newBtnConfirm = document.getElementById("btnConfirmDelete");
+
+      newBtnConfirm.onclick = async function() {
+          try {
+              const resposta = await api.delete("/api/projeto", projetoId);
+              
+              if (resposta && resposta.success === false) {
+                  showMessage(resposta.error?.message || "Erro ao excluir projeto", "danger");
+                  return;
+              }
+              
+              if (resposta && resposta.success) {
+                  listAll();
+                  showMessage(`Projeto ID ${projetoId} excluído com sucesso.`, "success");
+                  limparFormulario();
+              } else {
+                  showMessage("Erro ao excluir projeto: resposta inválida", "danger");
+              }
+          } catch (error) {
+              showMessage(`Erro ao excluir projeto: ${error.message}`, "danger");
+          } finally {
+              modal.hide();
+          }
+      };
+    };
+
+    window.verTarefas = function(projetoId, projetoNome) {
+      window.location.href = `tarefa.html?projeto_id=${projetoId}&projeto_nome=${encodeURIComponent(projetoNome)}`;
+    };
+
     function formatarStatus(status) {
       const statusMap = {
         'pendente': 'Pendente',
@@ -663,6 +1857,11 @@
       };
       return statusMap[status] || status;
     }
+
+    // ======================== EVENT LISTENERS ========================
+    btnAtualizar.addEventListener('click', listAll);
+    btnExportCSV.addEventListener('click', exportarProjetos);
+    btnExportPDF.addEventListener('click', exportarProjetosPDF);
 
     // Logout
     btnLogout.addEventListener('click', function() {
@@ -673,12 +1872,25 @@
       }
     });
 
-    document.getElementById('btnAtualizarLista').addEventListener('click', listAll);
-    
-    // Carregar dados ao iniciar
-    carregarUsuarios();
-    listAll();
+    // Filtro automático em tempo real
+    filtroStatus.addEventListener('change', function() {
+      aplicarFiltros();
+    });
 
+    filtroResponsavel.addEventListener('change', function() {
+      aplicarFiltros();
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("🚀 Inicializando projeto.html...");
+      
+      // ✅ ADICIONE ESTA LINHA:
+      verificarPerfilEConfigurarInterface();
+        // Carregar dados ao iniciar
+        carregarUsuarios();
+        listAll();
+    });
+    
     console.log("🚀 Página de projetos carregada!");
   </script>
 

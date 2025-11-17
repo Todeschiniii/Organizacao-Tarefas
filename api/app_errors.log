@@ -13,3 +13,48 @@ Traceback (most recent call last):
 api.utils.error_response.ErrorResponse: [400] Erro na validação de dados | Detalhes: {'message': "O campo 'titulo' é obrigatório!"}
 
 INFO:werkzeug:127.0.0.1 - - [14/Nov/2025 00:27:42] "[35m[1mPUT /api/tarefa/16 HTTP/1.1[0m" 500 -
+ERROR:root:Erro global: 405 Method Not Allowed: The method is not allowed for the requested URL.
+Traceback (most recent call last):
+  File "c:\Users\mateu\AppData\Local\Programs\Python\Python310\lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\Users\mateu\AppData\Local\Programs\Python\Python310\lib\site-packages\flask\app.py", line 891, in dispatch_request
+    self.raise_routing_exception(req)
+  File "c:\Users\mateu\AppData\Local\Programs\Python\Python310\lib\site-packages\flask\app.py", line 500, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+  File "c:\Users\mateu\AppData\Local\Programs\Python\Python310\lib\site-packages\flask\ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "c:\Users\mateu\AppData\Local\Programs\Python\Python310\lib\site-packages\werkzeug\routing\map.py", line 624, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:02] "[35m[1mDELETE /api/projeto/ HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:07] "DELETE /api/projeto/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:09] "DELETE /api/projeto/3 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:11] "DELETE /api/projeto/3 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:13] "DELETE /api/projeto/4 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:15] "DELETE /api/projeto/5 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:17] "DELETE /api/projeto/6 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:19] "DELETE /api/projeto/7 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:50] "OPTIONS /api/usuario/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:29:50] "GET /api/usuario/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:12] "OPTIONS /api/usuario/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:12] "[35m[1mPOST /api/usuario/ HTTP/1.1[0m" 201 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:12] "OPTIONS /api/usuario/login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:13] "POST /api/usuario/login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:15] "OPTIONS /api/usuario/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:15] "GET /api/usuario/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:15] "OPTIONS /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:15] "GET /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:15] "OPTIONS /api/tarefa/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:16] "GET /api/tarefa/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:16] "GET /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:19] "GET /api/usuario/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:19] "GET /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:44] "OPTIONS /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:44] "[35m[1mPOST /api/projeto/ HTTP/1.1[0m" 201 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:44] "GET /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:48] "GET /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:50] "OPTIONS /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:50] "OPTIONS /api/usuario/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:50] "GET /api/projeto/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/Nov/2025 00:30:50] "GET /api/usuario/ HTTP/1.1" 200 -

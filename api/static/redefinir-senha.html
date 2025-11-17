@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redefinir Senha - Organização de Tarefas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2em;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border: none;
+      width: 100%;
+      max-width: 450px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header text-center">
+      <i class="bi bi-key"></i> Redefinir Senha
+    </div>
+    <div class="card-body p-4">
+      <div id="divRedefinir">
+        <p class="text-muted mb-4">Digite sua nova senha abaixo.</p>
+        
+        <div class="mb-3">
+          <label for="novaSenha" class="form-label">Nova Senha</label>
+          <input type="password" id="novaSenha" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+          <input type="password" id="confirmarSenha" class="form-control" placeholder="Digite novamente a senha" required>
+        </div>
+
+        <div id="mensagemRedefinicao" class="alert" style="display: none;"></div>
+
+        <div class="d-grid gap-2">
+          <button class="btn btn-primary" id="btnRedefinir">
+            <i class="bi bi-check-circle"></i> Redefinir Senha
+          </button>
+        </div>
+      </div>
+
+      <div id="divSucesso" style="display: none;">
+        <div class="alert alert-success text-center">
+          <i class="bi bi-check-circle-fill"></i><br>
+          Senha redefinida com sucesso!
+        </div>
+        <div class="d-grid gap-2">
+          <a href="login.html" class="btn btn-primary">
+            <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import ApiService from './ApiService.js';
+
+    const api = new ApiService(null, "http://localhost:5000");
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+      document.getElementById('divRedefinir').innerHTML = `
+        <div class="alert alert-danger text-center">
+          <i class="bi bi-exclamation-triangle"></i><br>
+          Token inválido ou expirado.
+        </div>
+        <div class="d-grid gap-2">
+          <a href="esqueci-senha.html" class="btn btn-primary">
+            <i class="bi bi-arrow-repeat"></i> Solicitar Novo Link
+          </a>
+        </div>
+      `;
+    }
+
+    document.getElementById('btnRedefinir').addEventListener('click', async function() {
+      const novaSenha = document.getElementById('novaSenha').value;
+      const confirmarSenha = document.getElementById('confirmarSenha').value;
+      const mensagem = document.getElementById('mensagemRedefinicao');
+
+      if (novaSenha.length < 6) {
+        mostrarMensagem('A senha deve ter no mínimo 6 caracteres.', 'warning');
+        return;
+      }
+
+      if (novaSenha !== confirmarSenha) {
+        mostrarMensagem('As senhas não coincidem.', 'warning');
+        return;
+      }
+
+      try {
+        const resposta = await api.post("/api/auth/redefinir-senha", {
+          token: token,
+          nova_senha: novaSenha
+        });
+
+        if (resposta.success) {
+          document.getElementById('divRedefinir').style.display = 'none';
+          document.getElementById('divSucesso').style.display = 'block';
+        } else {
+          mostrarMensagem(resposta.error?.message || 'Erro ao redefinir senha.', 'danger');
+        }
+      } catch (error) {
+        mostrarMensagem('Erro ao conectar com o servidor.', 'danger');
+      }
+    });
+
+    function mostrarMensagem(texto, tipo) {
+      const mensagem = document.getElementById('mensagemRedefinicao');
+      mensagem.textContent = texto;
+      mensagem.className = `alert alert-${tipo}`;
+      mensagem.style.display = 'block';
+    }
+  </script>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+</body>
+</html>

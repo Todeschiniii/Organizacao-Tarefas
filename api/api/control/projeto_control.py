@@ -469,3 +469,45 @@ class ProjetoControl:
                     "code": 500
                 }
             }), 500
+
+    # ✅ NOVO: Método para obter estatísticas do usuário
+    def get_estatisticas(self, usuario_id: int):
+        """Retorna estatísticas completas do usuário"""
+        print("🔵 ProjetoControl.get_estatisticas()")
+        try:
+            projetos = self.__projeto_service.findByUsuarioId(usuario_id)
+            
+            estatisticas = {
+                "total_projetos": len(projetos),
+                "projetos_por_status": {},
+                "projetos_recentes": projetos[:3]  # Últimos 3 projetos
+            }
+            
+            # Contar por status
+            for projeto in projetos:
+                status = projeto.get('status', 'pendente')
+                estatisticas["projetos_por_status"][status] = estatisticas["projetos_por_status"].get(status, 0) + 1
+            
+            return jsonify({
+                "success": True,
+                "message": "Estatísticas recuperadas com sucesso",
+                "data": estatisticas
+            }), 200
+        except ErrorResponse as e:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": e.message,
+                    "details": e.details,
+                    "code": e.status_code
+                }
+            }), e.status_code
+        except Exception as e:
+            print(f"❌ Erro inesperado em get_estatisticas: {traceback.format_exc()}")
+            return jsonify({
+                "success": False,
+                "error": {
+                    "message": "Erro interno no servidor",
+                    "code": 500
+                }
+            }), 500

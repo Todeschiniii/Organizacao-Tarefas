@@ -235,6 +235,16 @@ class Usuario:
         """
         return self.__data_atualizacao
 
+    @property
+    def perfil_tipo(self):
+        """
+        Determina automaticamente o tipo de perfil baseado no campo empresa
+        """
+        if not self.__empresa or self.__empresa.strip() == "":
+            return "pessoal"
+        else:
+            return "profissional"
+        
     @data_atualizacao.setter
     def data_atualizacao(self, value):
         """
@@ -261,6 +271,8 @@ class Usuario:
             'nome': self.__nome,
             'email': self.__email,
             'empresa': self.__empresa,
+            'perfil_tipo': self.perfil_tipo,  # ✅ NOVO CAMPO
             'data_criacao': self.__data_criacao.strftime('%Y-%m-%d %H:%M:%S') if self.__data_criacao else None,
             'data_atualizacao': self.__data_atualizacao.strftime('%Y-%m-%d %H:%M:%S') if self.__data_atualizacao else None
         }
+    

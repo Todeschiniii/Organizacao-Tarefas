@@ -135,13 +135,19 @@ class JwtMiddleware:
 
     def get_user_id(self):
         """
-        Retorna o ID do usuário a partir do token validado.
-        
-        :return: int ID do usuário ou None
+        ✅ CORREÇÃO: Método atualizado para extrair user_id corretamente
         """
         if not self.__jwt_instance.payload:
             return None
-        return self.__jwt_instance.payload.get("id")
+        
+        # Tenta diferentes possíveis chaves para o user_id
+        user_id = (self.__jwt_instance.payload.get("id") or 
+                  self.__jwt_instance.payload.get("idFuncionario") or 
+                  self.__jwt_instance.payload.get("user_id") or
+                  self.__jwt_instance.payload.get("usuario_id"))
+        
+        print(f"🔍 JwtMiddleware.get_user_id() - Extraído: {user_id}")
+        return user_id
 
     def get_user_email(self):
         """

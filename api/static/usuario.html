@@ -7,12 +7,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+  <link rel="stylesheet" href="css/theme.css">
   <style>
     body {
       padding: 2em;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] body {
+      background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
     }
 
     .card {
@@ -20,6 +25,12 @@
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       border: none;
       margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .card {
+      background: #2d3748;
+      color: #e2e8f0;
     }
 
     .card-header {
@@ -49,6 +60,21 @@
       border: none;
     }
 
+    [data-theme="dark"] .table {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    [data-theme="dark"] .table td {
+      background: #2d3748;
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+
+    [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #4a5568;
+    }
+
     .navbar-brand {
       font-weight: 700;
       color: #667eea !important;
@@ -67,15 +93,77 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
     }
+
+    [data-theme="dark"] .navbar-light {
+      background-color: #2d3748 !important;
+    }
+
+    [data-theme="dark"] .navbar-text {
+      color: #e2e8f0 !important;
+    }
+
+    [data-theme="dark"] .text-dark {
+      color: #e2e8f0 !important;
+    }
+
+    [data-theme="dark"] .text-muted {
+      color: #a0aec0 !important;
+    }
+
+    /* Modal no tema escuro */
+    [data-theme="dark"] .modal-content {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    [data-theme="dark"] .modal-header {
+      border-bottom-color: #4a5568;
+    }
+
+    [data-theme="dark"] .modal-footer {
+      border-top-color: #4a5568;
+    }
+
+    /* Destaque para resultados de busca */
+    .highlight {
+      background-color: #fff3cd !important;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .highlight {
+      background-color: #744210 !important;
+      color: #fed7aa !important;
+    }
+
+    .search-info {
+      font-size: 0.875rem;
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    [data-theme="dark"] .search-info {
+      color: #a0aec0;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
   </style>
 </head>
 
 <body>
+  <!-- Botão de Tema -->
+  <button id="themeToggle" class="theme-toggle">
+    <span class="sun">🌞</span>
+    <span class="moon">🌛</span>
+  </button>
+
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
     <div class="container">
       <a class="navbar-brand" href="dashboard.html">
-        <i class="bi bi-kanban"></i> Sistema de Projetos
+        <i class="bi bi-kanban"></i> Organização de Tarefas
       </a>
       <div class="d-flex align-items-center">
         <span class="navbar-text me-3" id="userWelcome"></span>
@@ -123,13 +211,50 @@
       <div id="divResposta" class="alert m-3" style="display: none;"></div>
     </div>
 
+    <!-- ======================== FILTROS ======================== -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-funnel"></i> Filtros e Busca Rápida
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <label for="filtroNome" class="form-label">Nome</label>
+            <input type="text" id="filtroNome" class="form-control" placeholder="Buscar por nome...">
+          </div>
+          <div class="col-md-6">
+            <label for="filtroEmail" class="form-label">Email</label>
+            <input type="text" id="filtroEmail" class="form-control" placeholder="Buscar por email...">
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-12">
+            <div class="search-info" id="infoBusca">
+              <!-- Informações da busca serão exibidas aqui -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ======================== TABELA DE USUÁRIOS ======================== -->
     <div class="card mt-4">
-      <div class="card-header">
-        <i class="bi bi-list-ul"></i> Lista de Usuários
-        <button class="btn btn-sm btn-outline-light float-end" onclick="listAll()">
-          <i class="bi bi-arrow-clockwise"></i> Atualizar
-        </button>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-list-ul"></i> Lista de Usuários
+          <span id="contadorUsuarios" class="badge bg-primary ms-2">0</span>
+        </div>
+        <div class="export-buttons">
+          <button class="btn btn-sm btn-atualizar me-2" id="btnAtualizar">
+            <i class="bi bi-arrow-clockwise"></i> Atualizar
+          </button>
+          <button class="btn btn-sm btn-csv me-2" id="btnExportCSV">
+            <i class="bi bi-download"></i> CSV
+          </button>
+          <button class="btn btn-sm btn-export-pdf" id="btnExportPDF">
+            <i class="bi bi-file-pdf"></i> PDF
+          </button>
+        </div>
       </div>
       <div class="card-body">
         <div id="divTabela">
@@ -167,6 +292,13 @@
     </div>
   </div>
 
+  <!-- Importar o theme.js -->
+  <script src="js/theme.js"></script>
+  <!-- Importar o PDF Generator -->
+  <script src="js/pdfGenerator.js"></script>
+  <!-- Importar o CSV Generator -->
+  <script src="js/csvGenerator.js"></script>
+
   <script type="module">
     import ApiService from './ApiService.js';
 
@@ -189,16 +321,26 @@
     const api = new ApiService(token, "http://localhost:5000");
 
     let API_DATA;
+    let usuariosList = [];
+    let usuariosFiltrados = [];
+    let filtrosAtivos = [];
 
     // ======================== ELEMENTOS HTML ========================
     const txtId = document.getElementById("txtId");
     const txtNome = document.getElementById("txtNome");
     const txtEmail = document.getElementById("txtEmail");
     const txtSenha = document.getElementById("txtSenha");
+    const filtroNome = document.getElementById("filtroNome");
+    const filtroEmail = document.getElementById("filtroEmail");
     const divBotoes = document.getElementById("divBotoes");
     const divResposta = document.getElementById("divResposta");
     const tituloPagina = document.getElementById("tituloPagina");
     const btnLogout = document.getElementById("btnLogout");
+    const contadorUsuarios = document.getElementById("contadorUsuarios");
+    const infoBusca = document.getElementById("infoBusca");
+    const btnAtualizar = document.getElementById("btnAtualizar");
+    const btnExportPDF = document.getElementById("btnExportPDF");
+    const btnExportCSV = document.getElementById("btnExportCSV");
 
     // ======================== FUNÇÃO AUXILIAR PARA CRIAR BOTÕES ========================
     function createButton(text, className, icon = null) {
@@ -248,8 +390,8 @@
     };
     divBotoes.appendChild(btnCriar);
 
-    const btnAtualizar = createButton("Atualizar", "btn-warning", "bi-arrow-clockwise");
-    btnAtualizar.onclick = async () => {
+    const btnAtualizarForm = createButton("Atualizar", "btn-warning", "bi-arrow-clockwise");
+    btnAtualizarForm.onclick = async () => {
       const id = txtId.value.trim();
       if (!id) {
         showMessage("Selecione um usuário para atualizar", "danger");
@@ -291,7 +433,7 @@
         showMessage(resposta?.error?.message || "Erro ao atualizar usuário", "danger");
       }
     };
-    divBotoes.appendChild(btnAtualizar);
+    divBotoes.appendChild(btnAtualizarForm);
 
     const btnExcluir = createButton("Excluir", "btn-danger", "bi-trash");
     btnExcluir.onclick = function () {
@@ -345,18 +487,147 @@
       }
     }
 
-    async function listAll() {
+    // ✅ CORREÇÃO: Funções movidas para escopo global
+    window.listAll = async function() {
       try {
+        // Mostrar loading no botão
+        btnAtualizar.disabled = true;
+        btnAtualizar.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Carregando...';
+
         API_DATA = await api.get("/api/usuario/");
         console.log("Dados carregados:", API_DATA);
         
         if (API_DATA && (API_DATA.success || Array.isArray(API_DATA))) {
-          renderTable(API_DATA);
+          usuariosList = processarRespostaUsuarios(API_DATA);
+          usuariosFiltrados = [...usuariosList];
+          aplicarFiltros(); // Aplica filtros automaticamente após carregar
+          showMessage(`Lista atualizada com ${usuariosList.length} usuários`, "success");
         } else {
           showMessage("Nenhum usuário encontrado", "info");
+          usuariosList = [];
+          usuariosFiltrados = [];
+          renderTable(usuariosFiltrados);
         }
       } catch (error) {
         showMessage("Erro ao carregar usuários: " + error.message, "danger");
+      } finally {
+        // Restaurar botão
+        btnAtualizar.disabled = false;
+        btnAtualizar.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Atualizar';
+      }
+    };
+
+    window.exportarUsuarios = function() {
+      try {
+          const csvGenerator = new CsvGenerator();
+          const sucesso = csvGenerator.exportUsersCSV(
+              usuariosFiltrados, 
+              `usuarios_${new Date().toISOString().split('T')[0]}.csv`
+          );
+
+          if (sucesso) {
+              showMessage('Arquivo CSV exportado com sucesso!', 'success');
+          } else {
+              showMessage('Erro ao exportar CSV', 'danger');
+          }
+      } catch (error) {
+          console.error('Erro ao exportar CSV:', error);
+          showMessage('Erro ao exportar CSV: ' + error.message, 'danger');
+      }
+    };
+
+    window.exportarUsuariosPDF = async function() {
+      try {
+        // Mostrar loading no botão
+        btnExportPDF.disabled = true;
+        btnExportPDF.innerHTML = '<i class="bi bi-file-pdf"></i> Gerando PDF...';
+
+        const pdfGenerator = new PdfGenerator();
+        const filtrosTexto = filtrosAtivos.join(', ');
+        
+        const sucesso = await pdfGenerator.exportUsersPDF(
+          usuariosFiltrados, 
+          `usuarios_${new Date().toISOString().split('T')[0]}.pdf`,
+          filtrosTexto
+        );
+
+        if (sucesso) {
+          showMessage('PDF gerado e baixado com sucesso!', 'success');
+        } else {
+          showMessage('Erro ao gerar PDF', 'danger');
+        }
+      } catch (error) {
+        console.error('Erro ao exportar PDF:', error);
+        showMessage('Erro ao gerar PDF: ' + error.message, 'danger');
+      } finally {
+        // Restaurar botão
+        btnExportPDF.disabled = false;
+        btnExportPDF.innerHTML = '<i class="bi bi-file-pdf"></i> PDF';
+      }
+    };
+
+    function processarRespostaUsuarios(resposta) {
+      let usuarios = [];
+
+      // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
+      if (resposta && Array.isArray(resposta)) {
+        usuarios = resposta;
+      } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+        usuarios = resposta.data;
+      } else if (resposta && resposta.success && Array.isArray(resposta.data?.usuarios)) {
+        usuarios = resposta.data.usuarios;
+      } else if (resposta && resposta.usuarios && Array.isArray(resposta.usuarios)) {
+        usuarios = resposta.usuarios;
+      }
+
+      return usuarios;
+    }
+
+    function aplicarFiltros() {
+      usuariosFiltrados = [...usuariosList];
+      
+      const termoNome = filtroNome.value.trim().toLowerCase();
+      const termoEmail = filtroEmail.value.trim().toLowerCase();
+      
+      filtrosAtivos = [];
+      
+      // Aplicar filtro de nome
+      if (termoNome !== "") {
+        usuariosFiltrados = usuariosFiltrados.filter(usuario => 
+          usuario.nome && usuario.nome.toLowerCase().includes(termoNome)
+        );
+        filtrosAtivos.push(`nome: "${termoNome}"`);
+      }
+      
+      // Aplicar filtro de email
+      if (termoEmail !== "") {
+        usuariosFiltrados = usuariosFiltrados.filter(usuario => 
+          usuario.email && usuario.email.toLowerCase().includes(termoEmail)
+        );
+        filtrosAtivos.push(`email: "${termoEmail}"`);
+      }
+      
+      atualizarInfoBusca(filtrosAtivos);
+      renderTable(usuariosFiltrados);
+    }
+
+    function atualizarInfoBusca(filtros = []) {
+      const totalUsuarios = usuariosList.length;
+      const usuariosEncontrados = usuariosFiltrados.length;
+      
+      if (filtros.length > 0) {
+        infoBusca.innerHTML = `
+          <i class="bi bi-info-circle"></i> 
+          <strong>${usuariosEncontrados}</strong> de <strong>${totalUsuarios}</strong> usuários encontrados 
+          | Filtros: ${filtros.join(', ')}
+        `;
+        infoBusca.style.display = 'block';
+      } else {
+        infoBusca.innerHTML = `
+          <i class="bi bi-info-circle"></i> 
+          Mostrando todos os <strong>${totalUsuarios}</strong> usuários
+        `;
+        infoBusca.style.display = 'block';
       }
     }
 
@@ -368,27 +639,39 @@
       divResposta.style.display = "none";
     }
 
+    function converterParaCSV(usuarios) {
+      const headers = ['ID', 'Nome', 'Email', 'Data de Criação'];
+      const rows = usuarios.map(usuario => {
+        return [
+          usuario.id,
+          `"${usuario.nome}"`,
+          `"${usuario.email}"`,
+          usuario.data_criacao ? new Date(usuario.data_criacao).toLocaleDateString('pt-BR') : 'N/A'
+        ];
+      });
+      
+      return [headers, ...rows].map(row => row.join(',')).join('\n');
+    }
+
     function renderTable(dados) {
       const divTabela = document.getElementById("divTabela");
       divTabela.innerHTML = "";
 
-      let usuarios = [];
-
-      // ✅ CORREÇÃO: Lida com diferentes estruturas de resposta
-      if (dados && Array.isArray(dados)) {
-        usuarios = dados;
-      } else if (dados && dados.data && Array.isArray(dados.data)) {
-        usuarios = dados.data;
-      } else if (dados && dados.success && Array.isArray(dados.data?.usuarios)) {
-        usuarios = dados.data.usuarios;
-      } else if (dados && dados.usuarios && Array.isArray(dados.usuarios)) {
-        usuarios = dados.usuarios;
-      }
+      let usuarios = dados || [];
 
       if (!usuarios || usuarios.length === 0) {
-        divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhum Usuário encontrado</div>';
+        divTabela.innerHTML = `
+          <div class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle"></i> 
+            Nenhum usuário encontrado com os filtros aplicados.
+            ${usuariosList.length > 0 ? '<br><small>Tente ajustar os termos de busca.</small>' : ''}
+          </div>
+        `;
+        contadorUsuarios.textContent = '0';
         return;
       }
+
+      contadorUsuarios.textContent = usuarios.length;
 
       const table = document.createElement("table");
       table.className = "table table-bordered table-striped table-hover";
@@ -408,22 +691,41 @@
 
       const tbody = document.createElement("tbody");
 
+      const termoNome = filtroNome.value.trim().toLowerCase();
+      const termoEmail = filtroEmail.value.trim().toLowerCase();
+
       usuarios.forEach(usuario => {
         const tr = document.createElement("tr");
+
+        // Verificar se deve destacar a linha
+        const deveDestacar = (termoNome && usuario.nome && usuario.nome.toLowerCase().includes(termoNome)) ||
+                           (termoEmail && usuario.email && usuario.email.toLowerCase().includes(termoEmail));
+        
+        if (deveDestacar) {
+          tr.classList.add('highlight');
+        }
 
         // ID
         const tdId = document.createElement("td");
         tdId.textContent = usuario.id;
         tr.appendChild(tdId);
 
-        // Nome
+        // Nome (com destaque se houver busca)
         const tdNome = document.createElement("td");
-        tdNome.textContent = usuario.nome || 'Sem nome';
+        if (termoNome && usuario.nome) {
+          tdNome.innerHTML = destacarTexto(usuario.nome, termoNome);
+        } else {
+          tdNome.textContent = usuario.nome || 'Sem nome';
+        }
         tr.appendChild(tdNome);
 
-        // Email
+        // Email (com destaque se houver busca)
         const tdEmail = document.createElement("td");
-        tdEmail.textContent = usuario.email || 'Sem email';
+        if (termoEmail && usuario.email) {
+          tdEmail.innerHTML = destacarTexto(usuario.email, termoEmail);
+        } else {
+          tdEmail.textContent = usuario.email || 'Sem email';
+        }
         tr.appendChild(tdEmail);
 
         // Data de Criação
@@ -460,13 +762,34 @@
       divTabela.appendChild(table);
     }
 
-    // Logout
+    function destacarTexto(texto, termo) {
+      if (!texto || !termo) return texto;
+      
+      const regex = new RegExp(`(${termo})`, 'gi');
+      return texto.replace(regex, '<mark>$1</mark>');
+    }
+
+    // ======================== EVENT LISTENERS ========================
+    // ✅ CORREÇÃO: Agora usando event listeners em vez de onclick no HTML
+    btnAtualizar.addEventListener('click', listAll);
+    btnExportCSV.addEventListener('click', exportarUsuarios);
+    btnExportPDF.addEventListener('click', exportarUsuariosPDF);
+
     btnLogout.addEventListener('click', function() {
       if (confirm('Tem certeza que deseja sair?')) {
         localStorage.removeItem('userData');
         localStorage.removeItem('token');
         window.location.href = 'login.html';
       }
+    });
+
+    // Filtro automático em tempo real
+    filtroNome.addEventListener('input', function() {
+      aplicarFiltros();
+    });
+
+    filtroEmail.addEventListener('input', function() {
+      aplicarFiltros();
     });
 
     // Carregar dados ao iniciar

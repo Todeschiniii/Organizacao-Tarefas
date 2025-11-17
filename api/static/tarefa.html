@@ -6,8 +6,8 @@
   <title>Gerenciamento de Tarefas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css">
   <style>
     .form-check-input {
       cursor: pointer;
@@ -23,10 +23,16 @@
       width: 50px;
       text-align: center;
     }
+    
     body {
       padding: 2em;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] body {
+      background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
     }
 
     .card {
@@ -34,6 +40,12 @@
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       border: none;
       margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .card {
+      background: #2d3748;
+      color: #e2e8f0;
     }
 
     .card-header {
@@ -63,10 +75,30 @@
       border: none;
     }
 
+    [data-theme="dark"] .table {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    [data-theme="dark"] .table td {
+      background: #2d3748;
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+
+    [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #4a5568;
+    }
+
     .concluida-true { 
       text-decoration: line-through; 
       color: #6c757d; 
       background-color: #d4edda;
+    }
+    
+    [data-theme="dark"] .concluida-true { 
+      background-color: #22543d;
+      color: #9ae6b4;
     }
     
     .concluida-false { 
@@ -94,6 +126,21 @@
       color: #004085;
     }
     
+    [data-theme="dark"] .status-pendente {
+      background-color: #744210;
+      color: #fed7aa;
+    }
+    
+    [data-theme="dark"] .status-concluida {
+      background-color: #22543d;
+      color: #9ae6b4;
+    }
+    
+    [data-theme="dark"] .status-andamento {
+      background-color: #1e3a5f;
+      color: #93c5fd;
+    }
+    
     .prioridade-badge {
       padding: 0.25rem 0.5rem;
       border-radius: 0.25rem;
@@ -115,6 +162,21 @@
       color: #0c5460;
     }
     
+    [data-theme="dark"] .prioridade-alta {
+      background-color: #742a2a;
+      color: #feb2b2;
+    }
+    
+    [data-theme="dark"] .prioridade-media {
+      background-color: #744210;
+      color: #faf089;
+    }
+    
+    [data-theme="dark"] .prioridade-baixa {
+      background-color: #1e3a5f;
+      color: #90cdf4;
+    }
+    
     .navbar-brand {
       font-weight: 700;
       color: #667eea !important;
@@ -133,7 +195,39 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
     }
+
+    .export-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-export-pdf {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+    }
+
+    .btn-export-pdf:hover {
+      background: linear-gradient(135deg, #c82333, #a71e2a);
+      color: white;
+    }
     
+    [data-theme="dark"] .navbar-light {
+      background-color: #2d3748 !important;
+    }
+
+    [data-theme="dark"] .navbar-text {
+      color: #e2e8f0 !important;
+    }
+
+    [data-theme="dark"] .text-dark {
+      color: #e2e8f0 !important;
+    }
+
+    [data-theme="dark"] .text-muted {
+      color: #a0aec0 !important;
+    }
+
     .user-badge {
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
@@ -141,15 +235,271 @@
       border-radius: 0.25rem;
       font-size: 0.75rem;
     }
+    
+    .table-responsive {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    .data-col {
+      min-width: 120px;
+    }
+    
+    .acoes-col {
+      min-width: 150px;
+    }
+
+    .info-text {
+      font-size: 0.875rem;
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    [data-theme="dark"] .info-text {
+      color: #a0aec0;
+    }
+
+    /* Estilos para visualização em cards */
+    .tarefa-card-item {
+      border-left: 4px solid #667eea;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    
+    .tarefa-card-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .tarefa-card-item.concluida {
+      border-left-color: #28a745;
+      opacity: 0.8;
+    }
+    
+    .tarefa-card-item.alta {
+      border-left-color: #dc3545;
+    }
+    
+    .tarefa-card-item.media {
+      border-left-color: #ffc107;
+    }
+    
+    .tarefa-card-item.baixa {
+      border-left-color: #17a2b8;
+    }
+    
+    .tarefa-info {
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+    
+    [data-theme="dark"] .tarefa-info {
+      color: #a0aec0;
+    }
+    
+    .tarefa-descricao {
+      max-height: 3em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .tarefa-card-header {
+      display: flex;
+      justify-content: between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .tarefa-card-titulo {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      flex: 1;
+    }
+
+    .tarefa-card-checkbox {
+      margin-left: 0.5rem;
+    }
+
+    .tarefa-card-metadata {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .tarefa-card-datas {
+      font-size: 0.8rem;
+      color: #6c757d;
+    }
+
+    .tarefa-card-acoes {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .progresso-tarefa {
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      background-color: #e9ecef;
+      margin: 0.5rem 0;
+    }
+
+    .progresso-tarefa .progress-bar {
+      transition: width 0.3s ease;
+    }
+
+    .dias-restantes {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+
+    .dias-urgente {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .dias-atencao {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .dias-normal {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .dias-concluida {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    /* Modal no tema escuro */
+    [data-theme="dark"] .modal-content {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    [data-theme="dark"] .modal-header {
+      border-bottom-color: #4a5568;
+    }
+
+    [data-theme="dark"] .modal-footer {
+      border-top-color: #4a5568;
+    }
+
+    /* Destaque para resultados de busca */
+    .highlight {
+      background-color: #fff3cd !important;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .highlight {
+      background-color: #744210 !important;
+      color: #fed7aa !important;
+    }
+
+    .search-info {
+      font-size: 0.875rem;
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    [data-theme="dark"] .search-info {
+      color: #a0aec0;
+    }
+
+    /* Estilos para o modo Kanban */
+    .kanban-column {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 1rem;
+      min-height: 600px;
+    }
+
+    [data-theme="dark"] .kanban-column {
+      background: #2d3748;
+    }
+
+    .kanban-column-header {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid;
+      text-align: center;
+    }
+
+    .kanban-column-pendente .kanban-column-header {
+      border-color: #ffc107;
+      color: #856404;
+    }
+
+    .kanban-column-andamento .kanban-column-header {
+      border-color: #17a2b8;
+      color: #0c5460;
+    }
+
+    .kanban-column-concluida .kanban-column-header {
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .kanban-drop-zone {
+      min-height: 100px;
+      border: 2px dashed #dee2e6;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .kanban-drop-zone.drag-over {
+      border-color: #667eea;
+      background-color: rgba(102, 126, 234, 0.1);
+    }
+
+    /* Botão Atualizar corrigido */
+    .btn-outline-light {
+      border-color: #6c757d;
+      color: #6c757d;
+    }
+
+    .btn-outline-light:hover {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      color: white;
+    }
+
+    [data-theme="dark"] .btn-outline-light {
+      border-color: #a0aec0;
+      color: #a0aec0;
+    }
+
+    [data-theme="dark"] .btn-outline-light:hover {
+      background-color: #a0aec0;
+      border-color: #a0aec0;
+      color: #2d3748;
+    }
   </style>
 </head>
 
 <body>
+  <!-- Botão de Tema -->
+  <button id="themeToggle" class="theme-toggle">
+    <span class="sun">🌞</span>
+    <span class="moon">🌛</span>
+  </button>
+
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
     <div class="container">
       <a class="navbar-brand" href="dashboard.html">
-        <i class="bi bi-kanban"></i> Sistema de Projetos
+        <i class="bi bi-kanban"></i> Organização de Tarefas
       </a>
       <div class="d-flex align-items-center">
         <span class="navbar-text me-3" id="userWelcome"></span>
@@ -191,38 +541,34 @@
       <div class="card-body">
         <div class="mb-3">
           <input type="number" id="txtId" class="form-control mb-2" disabled placeholder="ID" />
-          <input type="text" id="txtTitulo" class="form-control mb-2" placeholder="Título da tarefa" />
+          <input type="text" id="txtTitulo" class="form-control mb-2" placeholder="Título da tarefa *" />
           <textarea id="txtDescricao" class="form-control mb-2" placeholder="Descrição da tarefa" rows="2"></textarea>
           
           <div class="row mb-2">
-            <div class="col-md-4">
-              <label for="txtDataLimite" class="form-label">Data Limite</label>
-              <input type="date" id="txtDataLimite" class="form-control">
+            <div class="col-md-6">
+                <label for="txtDataLimite" class="form-label">Data Limite</label>
+                <input type="date" id="txtDataLimite" class="form-control">
             </div>
-            <div class="col-md-4">
-              <label for="cboProjeto" class="form-label">Projeto</label>
-              <select id="cboProjeto" class="form-select">
-                <option value="-1">Selecione um projeto</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label for="cboResponsavel" class="form-label">Responsável</label>
-              <select id="cboResponsavel" class="form-select">
-                <option value="-1">Selecione o responsável</option>
-              </select>
+            <div class="col-md-6">
+                <label for="cboProjeto" class="form-label">Projeto (Opcional)</label>
+                <select id="cboProjeto" class="form-select">
+                    <option value="-1">Nenhum projeto (Tarefa Solta)</option>
+                    <!-- Os projetos serão carregados aqui -->
+                </select>
+                <div class="form-text">
+                    <i class="bi bi-info-circle"></i> Deixe sem projeto para tarefas avulsas
+                </div>
             </div>
           </div>
 
           <div class="row mb-2">
-            <div class="col-md-4">
-              <label for="cboStatus" class="form-label">Status</label>
-              <select id="cboStatus" class="form-select">
-                <option value="pendente">Pendente</option>
-                <option value="andamento">Em Andamento</option>
-                <option value="concluida">Concluída</option>
+            <div class="col-md-6">
+              <label for="cboResponsavel" class="form-label">Responsável *</label>
+              <select id="cboResponsavel" class="form-select">
+                <option value="-1">Selecione o responsável</option>
               </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
               <label for="cboPrioridade" class="form-label">Prioridade</label>
               <select id="cboPrioridade" class="form-select">
                 <option value="baixa">Baixa</option>
@@ -230,10 +576,27 @@
                 <option value="alta">Alta</option>
               </select>
             </div>
-            <div class="col-md-4">
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-6">
+              <label for="cboStatus" class="form-label">Status</label>
+              <select id="cboStatus" class="form-select">
+                <option value="pendente">Pendente</option>
+                <option value="andamento">Em Andamento</option>
+                <option value="concluida">Concluída</option>
+              </select>
+              <div class="info-text mt-1">
+                <i class="bi bi-info-circle"></i> Ao salvar, a data de início será definida automaticamente
+              </div>
+            </div>
+            <div class="col-md-6">
               <div class="form-check mt-4">
                 <input type="checkbox" id="chkConcluida" class="form-check-input">
                 <label class="form-check-label" for="chkConcluida">Tarefa concluída</label>
+                <div class="info-text">
+                  <i class="bi bi-info-circle"></i> Ao marcar, a data de conclusão será definida
+                </div>
               </div>
             </div>
           </div>
@@ -248,39 +611,87 @@
     <!-- ======================== FILTROS ======================== -->
     <div class="card mb-4">
       <div class="card-header">
-        <i class="bi bi-funnel"></i> Filtros
+        <i class="bi bi-funnel"></i> Filtros e Busca Rápida
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-md-3">
-            <label for="filtroStatus" class="form-label">Status</label>
-            <select id="filtroStatus" class="form-select">
-              <option value="todos">Todos</option>
-              <option value="pendente">Pendente</option>
-              <option value="andamento">Em Andamento</option>
-              <option value="concluida">Concluída</option>
-            </select>
+            <div class="col-md-3">
+                <label for="filtroProjeto" class="form-label">Projeto</label>
+                <select id="filtroProjeto" class="form-select">
+                    <option value="todos">Todos os projetos</option>
+                    <option value="sem_projeto">Tarefas Soltas</option>
+                    <!-- Os projetos serão carregados via JavaScript -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filtroStatus" class="form-label">Status</label>
+                <select id="filtroStatus" class="form-select">
+                    <option value="todos">Todos</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="andamento">Em Andamento</option>
+                    <option value="concluida">Concluída</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filtroPrioridade" class="form-label">Prioridade</label>
+                <select id="filtroPrioridade" class="form-select">
+                    <option value="todos">Todos</option>
+                    <option value="alta">Alta</option>
+                    <option value="media">Média</option>
+                    <option value="baixa">Baixa</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filtroResponsavel" class="form-label">Responsável</label>
+                <select id="filtroResponsavel" class="form-select">
+                    <option value="todos">Todos</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-12">
+            <div class="search-info" id="infoBusca">
+              <!-- Informações da busca serão exibidas aqui -->
+            </div>
           </div>
-          <div class="col-md-3">
-            <label for="filtroPrioridade" class="form-label">Prioridade</label>
-            <select id="filtroPrioridade" class="form-select">
-              <option value="todos">Todos</option>
-              <option value="alta">Alta</option>
-              <option value="media">Média</option>
-              <option value="baixa">Baixa</option>
-            </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== CONTROLES DE VISUALIZAÇÃO ======================== -->
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="fw-bold">Visualização:</span>
+            <div class="btn-group ms-2" role="group">
+              <input type="radio" class="btn-check" name="visualizacao" id="visualizacao-tabela" autocomplete="off" checked>
+              <label class="btn btn-outline-primary" for="visualizacao-tabela">
+                <i class="bi bi-table"></i> Tabela
+              </label>
+
+              <input type="radio" class="btn-check" name="visualizacao" id="visualizacao-cards" autocomplete="off">
+              <label class="btn btn-outline-primary" for="visualizacao-cards">
+                <i class="bi bi-grid-3x3-gap"></i> Cards
+              </label>
+
+              <input type="radio" class="btn-check" name="visualizacao" id="visualizacao-kanban" autocomplete="off">
+              <label class="btn btn-outline-primary" for="visualizacao-kanban">
+                <i class="bi bi-kanban"></i> Kanban
+              </label>
+            </div>
           </div>
-          <div class="col-md-3">
-            <label for="filtroResponsavel" class="form-label">Responsável</label>
-            <select id="filtroResponsavel" class="form-select">
-              <option value="todos">Todos</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">&nbsp;</label>
-            <div class="d-grid">
-              <button class="btn btn-primary" onclick="aplicarFiltros()">
-                <i class="bi bi-funnel"></i> Aplicar Filtros
+          <div class="d-flex align-items-center gap-2">
+            <span id="contadorTarefas" class="badge bg-primary">0 tarefas</span>
+            <div class="export-buttons">
+              <button class="btn btn-sm btn-atualizar me-2" id="btnAtualizarTarefas">
+                <i class="bi bi-arrow-clockwise"></i> Atualizar
+              </button>
+              <button class="btn btn-sm btn-success me-2" id="btnExportCSVTarefas">
+                <i class="bi bi-download"></i> CSV
+              </button>
+              <button class="btn btn-sm btn-export-pdf" id="btnExportPDFTarefas">
+                <i class="bi bi-file-pdf"></i> PDF
               </button>
             </div>
           </div>
@@ -289,28 +700,92 @@
     </div>
 
     <!-- ======================== TABELA DE TAREFAS ======================== -->
-    <div class="card mt-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <div>
+    <div id="visualizacao-tabela-container">
+      <div class="card">
+        <div class="card-header">
           <i class="bi bi-list-ul"></i> Lista de Tarefas
-          <span id="contadorTarefas" class="badge bg-primary ms-2">0</span>
         </div>
-        <div>
-          <button class="btn btn-sm btn-outline-light me-2" onclick="listAll()">
-            <i class="bi bi-arrow-clockwise"></i> Atualizar
-          </button>
-          <button class="btn btn-sm btn-outline-light" onclick="exportarTarefas()">
-            <i class="bi bi-download"></i> Exportar
-          </button>
+        <div class="card-body">
+          <div class="table-responsive">
+            <div id="divTabela">
+              <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando tarefas...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="card-body">
-        <div id="divTabela">
-          <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Carregando...</span>
+    </div>
+
+    <!-- ======================== VISUALIZAÇÃO EM CARDS ======================== -->
+    <div id="visualizacao-cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-grid-3x3-gap"></i> Visualização em Cards
+        </div>
+        <div class="card-body">
+          <div id="divCards" class="row g-3">
+            <div class="col-12 text-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+              <p class="mt-2">Carregando tarefas...</p>
             </div>
-            <p class="mt-2">Carregando tarefas...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== VISUALIZAÇÃO KANBAN ======================== -->
+    <div id="visualizacao-kanban-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-kanban"></i> Visualização Kanban
+          <small class="text-muted ms-2">Arraste as tarefas entre as colunas para alterar o status</small>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <!-- Coluna Pendente -->
+            <div class="col-md-4">
+              <div class="kanban-column kanban-column-pendente">
+                <div class="kanban-column-header">
+                  <i class="bi bi-clock"></i> Pendente
+                  <span class="badge bg-warning ms-1" id="contador-pendente">0</span>
+                </div>
+                <div id="kanban-pendente" class="kanban-drop-zone" data-status="pendente">
+                  <!-- Tarefas pendentes serão inseridas aqui -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Coluna Em Andamento -->
+            <div class="col-md-4">
+              <div class="kanban-column kanban-column-andamento">
+                <div class="kanban-column-header">
+                  <i class="bi bi-play-circle"></i> Em Andamento
+                  <span class="badge bg-info ms-1" id="contador-andamento">0</span>
+                </div>
+                <div id="kanban-andamento" class="kanban-drop-zone" data-status="andamento">
+                  <!-- Tarefas em andamento serão inseridas aqui -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Coluna Concluída -->
+            <div class="col-md-4">
+              <div class="kanban-column kanban-column-concluida">
+                <div class="kanban-column-header">
+                  <i class="bi bi-check-circle"></i> Concluída
+                  <span class="badge bg-success ms-1" id="contador-concluida">0</span>
+                </div>
+                <div id="kanban-concluida" class="kanban-drop-zone" data-status="concluida">
+                  <!-- Tarefas concluídas serão inseridas aqui -->
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -340,22 +815,31 @@
     </div>
   </div>
 
+  <!-- Importar o theme.js -->
+  <script src="js/theme.js"></script>
+  <!-- Importar o PDF Generator -->
+  <script src="js/pdfGenerator.js"></script>
+  <!-- Importar o CSV Generator -->
+  <script src="js/csvGenerator.js"></script>
+
   <script type="module">
     import ApiService from './ApiService.js';
 
     // ======================== AUTENTICAÇÃO ========================
-    let userData = localStorage.getItem("userData");
+    const userData = localStorage.getItem("userData");
+    let usuarioLogado = null;
+
     if (userData) {
-      userData = JSON.parse(userData);
-      
-      // Configurar saudação do usuário
-      const userInfo = userData.usuario || userData.data?.usuario || userData.data?.user?.usuario;
-      if (userInfo) {
-        const userName = userInfo.nome || userInfo.name || 'Usuário';
-        document.getElementById('userWelcome').textContent = `Olá, ${userName}`;
-      }
+        usuarioLogado = JSON.parse(userData);
+        console.log("👤 Usuário logado:", usuarioLogado);
+        
+        // Atualizar interface com nome do usuário
+        const userInfo = usuarioLogado.usuario || usuarioLogado.data?.usuario;
+        if (userInfo) {
+            document.getElementById('userWelcome').textContent = `Olá, ${userInfo.nome}`;
+        }
     } else {
-      window.location.href = "login.html";
+        window.location.href = "login.html";
     }
 
     const token = localStorage.getItem("token") || userData.token || userData.data?.token;
@@ -368,6 +852,8 @@
     let usuariosList = [];
     let projetoSelecionado = null;
     let tarefasList = [];
+    let tarefasFiltradas = [];
+    let tarefaArrastada = null;
 
     // ======================== ELEMENTOS HTML ========================
     const txtId = document.getElementById("txtId");
@@ -390,6 +876,10 @@
     const tituloPagina = document.getElementById("tituloPagina");
     const btnLogout = document.getElementById("btnLogout");
     const contadorTarefas = document.getElementById("contadorTarefas");
+    const infoBusca = document.getElementById("infoBusca");
+    const btnAtualizarTarefas = document.getElementById("btnAtualizarTarefas");
+    const btnExportCSVTarefas = document.getElementById("btnExportCSVTarefas");
+    const btnExportPDFTarefas = document.getElementById("btnExportPDFTarefas");
 
     // ======================== VERIFICAR PARÂMETROS URL ========================
     const urlParams = new URLSearchParams(window.location.search);
@@ -402,8 +892,151 @@
         nome: decodeURIComponent(projetoNomeUrl)
       };
       cardProjetoInfo.style.display = 'block';
-      infoProjetoNome.textContent = projetoNomeUrl;
-      tituloPagina.textContent = `Tarefas do Projeto: ${projetoNomeUrl}`;
+      infoProjetoNome.textContent = projetoSelecionado.nome;
+      tituloPagina.textContent = `Tarefas do Projeto: ${projetoSelecionado.nome}`;
+      
+      console.log(`🎯 Projeto selecionado via URL: ${projetoSelecionado.nome} (ID: ${projetoSelecionado.id})`);
+    }
+
+    // ======================== CONTROLES DE VISUALIZAÇÃO ========================
+    document.getElementById('visualizacao-tabela').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('visualizacao-tabela-container').style.display = 'block';
+        document.getElementById('visualizacao-cards-container').style.display = 'none';
+        document.getElementById('visualizacao-kanban-container').style.display = 'none';
+        renderTable(tarefasFiltradas);
+      }
+    });
+
+    document.getElementById('visualizacao-cards').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('visualizacao-tabela-container').style.display = 'none';
+        document.getElementById('visualizacao-cards-container').style.display = 'block';
+        document.getElementById('visualizacao-kanban-container').style.display = 'none';
+        renderCards(tarefasFiltradas);
+      }
+    });
+
+    document.getElementById('visualizacao-kanban').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('visualizacao-tabela-container').style.display = 'none';
+        document.getElementById('visualizacao-cards-container').style.display = 'none';
+        document.getElementById('visualizacao-kanban-container').style.display = 'block';
+        renderKanban(tarefasFiltradas);
+      }
+    });
+
+    // ✅ FUNÇÃO: Verificar perfil e ajustar interface de tarefas
+    function verificarPerfilEConfigurarInterfaceTarefas() {
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const usuario = userData?.usuario || userData?.data?.usuario;
+        
+        if (!usuario) {
+            console.log("❌ Usuário não encontrado no localStorage");
+            return;
+        }
+        
+        console.log("👤 Perfil do usuário (Tarefas):", usuario.perfil_tipo);
+        
+        if (usuario.perfil_tipo === 'pessoal') {
+            console.log("🏠 Configurando tarefas para perfil PESSOAL");
+            configurarTarefasPerfilPessoal(usuario);
+        } else {
+            console.log("👔 Configurando tarefas para perfil PROFISSIONAL");
+            configurarTarefasPerfilProfissional();
+        }
+    }
+
+    // ✅ CONFIGURAÇÃO PARA PERFIL PESSOAL - TAREFAS
+    function configurarTarefasPerfilPessoal(usuario) {
+        // 1. Alterar título da página
+        const tituloPagina = document.getElementById('tituloPagina');
+        if (tituloPagina) {
+            tituloPagina.textContent = 'Minhas Tarefas Pessoais';
+        }
+        
+        // 2. ✅ CRÍTICO: OCULTAR CAMPO "RESPONSÁVEL" DO FORMULÁRIO
+        const secaoResponsavel = document.querySelector('.row.mb-2').children[1]; // Assume que responsável é o segundo campo
+        if (secaoResponsavel) {
+            secaoResponsavel.style.display = 'none';
+        }
+        
+        // 3. ✅ CRÍTICO: OCULTAR FILTRO POR RESPONSÁVEL
+        const filtroResponsavel = document.getElementById('filtroResponsavel');
+        if (filtroResponsavel) {
+            filtroResponsavel.closest('.col-md-4').style.display = 'none';
+        }
+        
+        // 4. ✅ CRÍTICO: AUTO-SELECIONAR USUÁRIO ATUAL COMO RESPONSÁVEL
+        const cboResponsavel = document.getElementById('cboResponsavel');
+        if (cboResponsavel && usuario.id) {
+            cboResponsavel.value = usuario.id;
+            cboResponsavel.disabled = true; // Impede alteração
+        }
+        
+        // 5. Adicionar mensagem informativa
+        const formulario = document.querySelector('.card-body');
+        if (formulario) {
+            const infoMsg = document.createElement('div');
+            infoMsg.className = 'alert alert-info mb-3';
+            infoMsg.innerHTML = `
+                <i class="bi bi-person-check"></i> 
+                <strong>Modo Pessoal:</strong> Todas as tarefas são automaticamente atribuídas a você.
+            `;
+            formulario.insertBefore(infoMsg, formulario.firstChild);
+        }
+        
+        // 6. Ajustar textos da tabela
+        setTimeout(() => {
+            const headers = document.querySelectorAll('th');
+            headers.forEach(header => {
+                if (header.textContent.includes('Responsável')) {
+                    header.textContent = 'Minha Tarefa';
+                }
+            });
+        }, 1000);
+    }
+
+    // ✅ CONFIGURAÇÃO PARA PERFIL PROFISSIONAL - TAREFAS
+    function configurarTarefasPerfilProfissional() {
+        console.log("👔 Interface profissional de tarefas mantida padrão");
+        // Manter todos os campos visíveis
+    }
+
+    // ✅ ATUALIZAR A CRIAÇÃO DE TAREFAS PARA PERFIL PESSOAL
+    function criarTarefaComPerfil(objetoBase) {
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const usuario = userData?.usuario || userData?.data?.usuario;
+        
+        // Se for perfil pessoal, forçar usuario_responsavel_id = usuario atual
+        if (usuario && usuario.perfil_tipo === 'pessoal') {
+            objetoBase.tarefa.usuario_responsavel_id = usuario.id;
+            objetoBase.tarefa.usuario_atribuidor_id = usuario.id;
+            console.log("🏠 Perfil pessoal: Auto-atribuindo tarefa ao usuário", usuario.id);
+        }
+        
+        return objetoBase;
+    }
+
+    // ✅ FUNÇÃO: Preparar objeto tarefa para criação/atualização
+    function prepararObjetoTarefa(objetoBase) {
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const usuario = userData?.usuario || userData?.data?.usuario;
+        
+        // Se for perfil pessoal, forçar usuario_responsavel_id = usuario atual
+        if (usuario && usuario.perfil_tipo === 'pessoal') {
+            objetoBase.tarefa.usuario_responsavel_id = usuario.id;
+            objetoBase.tarefa.usuario_atribuidor_id = usuario.id;
+            console.log("🏠 Perfil pessoal: Auto-atribuindo tarefa ao usuário", usuario.id);
+        }
+        
+        // ✅ CORREÇÃO: Se projeto_id é -1, definir como null (tarefa solta)
+        if (objetoBase.tarefa.projeto_id === -1) {
+            objetoBase.tarefa.projeto_id = null;
+            console.log("📋 Criando tarefa solta (sem projeto)");
+        }
+        
+        return objetoBase;
     }
 
     // ======================== FUNÇÃO AUXILIAR PARA CRIAR BOTÕES ========================
@@ -415,61 +1048,75 @@
     }
 
     // ======================== BOTÕES CRUD ========================
+    // ✅ MODIFICAR A FUNÇÃO btnCriar.onclick - ENCONTRE E SUBSTITUA
     const btnCriar = createButton("Criar", "btn-success", "bi-plus-circle");
     btnCriar.onclick = async () => {
-      if (txtTitulo.value.trim() === "") {
-        showMessage("Título da tarefa é obrigatório", "warning");
-        return;
-      }
+        if (txtTitulo.value.trim() === "") {
+            showMessage("Título da tarefa é obrigatório", "warning");
+            return;
+        }
 
-      if (cboProjeto.value === "-1") {
-        showMessage("Selecione um projeto", "warning");
-        return;
-      }
+        // ✅ CORREÇÃO: Remover validação obrigatória do projeto
+        // if (cboProjeto.value === "-1") {
+        //     showMessage("Selecione um projeto", "warning");
+        //     return;
+        // }
 
-      if (cboResponsavel.value === "-1") {
-        showMessage("Selecione um responsável", "warning");
-        return;
-      }
+        // ✅ CORREÇÃO: Remover validação obrigatória do responsável para perfil pessoal
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const usuario = userData?.usuario || userData?.data?.usuario;
+        
+        if ((!usuario || usuario.perfil_tipo !== 'pessoal') && cboResponsavel.value === "-1") {
+            showMessage("Selecione um responsável", "warning");
+            return;
+        }
 
-      const objetoCriar = {
-        "tarefa": {
-          "titulo": txtTitulo.value.trim(),
-          "descricao": txtDescricao.value.trim(),
-          "data_limite": txtDataLimite.value || null,
-          "status": cboStatus.value,
-          "prioridade": cboPrioridade.value,
-          "concluida": chkConcluida.checked,
-          "projeto_id": parseInt(cboProjeto.value),
-          "usuario_responsavel_id": parseInt(cboResponsavel.value)
-          // usuario_atribuidor_id será definido automaticamente pelo backend com base no token
+        const objetoCriar = {
+            "tarefa": {
+                "titulo": txtTitulo.value.trim(),
+                "descricao": txtDescricao.value.trim(),
+                "data_limite": txtDataLimite.value || null,
+                "data_inicio": new Date().toISOString().slice(0, 19).replace('T', ' '),
+                "data_fim": chkConcluida.checked ? new Date().toISOString().slice(0, 19).replace('T', ' ') : null,
+                "status": chkConcluida.checked ? "concluida" : cboStatus.value,
+                "prioridade": cboPrioridade.value,
+                "concluida": chkConcluida.checked,
+                "projeto_id": cboProjeto.value === "-1" ? -1 : parseInt(cboProjeto.value), // ✅ Pode ser -1 (será convertido para null)
+                "usuario_responsavel_id": usuario && usuario.perfil_tipo === 'pessoal' ? usuario.id : parseInt(cboResponsavel.value),
+                "usuario_atribuidor_id": usuarioLogado.usuario.id
+            }
+        };
+
+        // ✅ CORREÇÃO: APLICAR PREPARAÇÃO DO OBJETO
+        const objetoFinal = prepararObjetoTarefa(objetoCriar);
+
+        try {
+          const resposta = await api.post("/api/tarefa/", objetoCriar);
+          console.log("Resposta criar tarefa:", resposta);
+          
+          if (resposta && resposta.success === false) {
+            showMessage(resposta.error?.message || "Erro ao criar tarefa", "danger");
+            return;
+          }
+          
+          if (resposta && resposta.success) {
+            const mensagem = chkConcluida.checked ? 
+              "Tarefa criada e marcada como concluída!" : 
+              "Tarefa criada com sucesso!";
+            showMessage(mensagem, "success");
+            if (projetoSelecionado) {
+              listPorProjeto();
+            } else {
+              listAll();
+            }
+            limparFormulario();
+          } else {
+            showMessage("Erro ao criar tarefa: resposta inválida", "danger");
+          }
+        } catch (error) {
+          showMessage("Erro ao criar tarefa: " + error.message, "danger");
         }
       };
-
-      try {
-        const resposta = await api.post("/api/tarefa/", objetoCriar);
-        console.log("Resposta criar tarefa:", resposta);
-        
-        if (resposta && resposta.success === false) {
-          showMessage(resposta.error?.message || "Erro ao criar tarefa", "danger");
-          return;
-        }
-        
-        if (resposta && resposta.success) {
-          showMessage("Tarefa criada com sucesso!", "success");
-          if (projetoSelecionado) {
-            listPorProjeto();
-          } else {
-            listAll();
-          }
-          limparFormulario();
-        } else {
-          showMessage("Erro ao criar tarefa: resposta inválida", "danger");
-        }
-      } catch (error) {
-        showMessage("Erro ao criar tarefa: " + error.message, "danger");
-      }
-    };
     divBotoes.appendChild(btnCriar);
 
     const btnAtualizar = createButton("Atualizar", "btn-warning", "bi-arrow-clockwise");
@@ -485,12 +1132,29 @@
         return;
       }
 
+      // ✅ LÓGICA PARA DATAS AUTOMÁTICAS NA ATUALIZAÇÃO
+      const tarefaOriginal = tarefasList.find(t => t.id == id);
+      let dataInicio = tarefaOriginal.data_inicio;
+      let dataFim = tarefaOriginal.data_fim;
+
+      // Se estava pendente e agora está concluída, define data_fim
+      if (!tarefaOriginal.concluida && chkConcluida.checked) {
+        dataFim = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      }
+      
+      // Se estava concluída e agora não está, remove data_fim
+      if (tarefaOriginal.concluida && !chkConcluida.checked) {
+        dataFim = null;
+      }
+
       const objetoAtualizar = {
         "tarefa": {
           "titulo": txtTitulo.value.trim(),
           "descricao": txtDescricao.value.trim(),
           "data_limite": txtDataLimite.value || null,
-          "status": cboStatus.value,
+          "data_inicio": dataInicio,
+          "data_fim": dataFim,
+          "status": chkConcluida.checked ? "concluida" : cboStatus.value,
           "prioridade": cboPrioridade.value,
           "concluida": chkConcluida.checked,
           "projeto_id": parseInt(cboProjeto.value),
@@ -508,7 +1172,10 @@
         }
         
         if (resposta && resposta.success) {
-          showMessage("Tarefa atualizada com sucesso!", "success");
+          const mensagem = chkConcluida.checked && !tarefaOriginal.concluida ?
+            "Tarefa atualizada e marcada como concluída!" : 
+            "Tarefa atualizada com sucesso!";
+          showMessage(mensagem, "success");
           if (projetoSelecionado) {
             listPorProjeto();
           } else {
@@ -613,6 +1280,13 @@
           option.textContent = projeto.nome || projeto.titulo;
           cboProjeto.appendChild(option);
         });
+
+        // ✅ SELECIONA AUTOMATICAMENTE O PROJETO DA URL
+        if (projetoSelecionado && projetoSelecionado.id) {
+          cboProjeto.value = projetoSelecionado.id;
+          console.log(`✅ Projeto automaticamente selecionado: ${projetoSelecionado.nome} (ID: ${projetoSelecionado.id})`);
+        }
+
       } catch (error) {
         console.error("Erro ao carregar projetos:", error);
         showMessage("Erro ao carregar projetos: " + error.message, "danger");
@@ -656,45 +1330,41 @@
         });
       } catch (error) {
         console.error("Erro ao carregar usuários:", error);
-        // Se não conseguir carregar usuários, usa uma lista estática
-        usuariosList = [
-          { id: 1, nome: "Ana Silva" },
-          { id: 2, nome: "Bruno Costa" },
-          { id: 3, nome: "Carlos Oliveira" },
-          { id: 4, nome: "Davi Santos" }
-        ];
-        
-        cboResponsavel.innerHTML = '<option value="-1">Selecione o responsável</option>';
-        filtroResponsavel.innerHTML = '<option value="todos">Todos</option>';
-        
-        usuariosList.forEach(usuario => {
-          const option = document.createElement("option");
-          option.value = usuario.id;
-          option.textContent = usuario.nome;
-          cboResponsavel.appendChild(option);
-          
-          const optionFiltro = option.cloneNode(true);
-          optionFiltro.value = usuario.id;
-          filtroResponsavel.appendChild(optionFiltro);
-        });
+        showMessage("Erro ao carregar usuários: " + error.message, "danger");
       }
     }
 
-    async function listAll() {
-      try {
-        const resposta = await api.get("/api/tarefa/");
-        
-        if (resposta && resposta.success === false) {
-          showMessage("Erro ao carregar tarefas: " + (resposta.error?.message || "Erro desconhecido"), "danger");
-          return;
+    // Modificar a função listAll para buscar apenas tarefas do usuário
+    window.listAll = async function() {
+        try {
+            const btnAtualizar = document.getElementById("btnAtualizarTarefas");
+            if (btnAtualizar) {
+                btnAtualizar.disabled = true;
+                btnAtualizar.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Carregando...';
+            }
+
+            // ✅ BUSCAR APENAS TAREFAS DO USUÁRIO LOGADO
+            const resposta = await api.get("/api/tarefa/minhas-tarefas");
+            
+            if (resposta && resposta.success === false) {
+                showMessage("Erro ao carregar tarefas: " + (resposta.error?.message || "Erro desconhecido"), "danger");
+                return;
+            }
+            
+            console.log("📋 Tarefas do usuário carregadas:", resposta);
+            tarefasList = processarRespostaTarefas(resposta);
+            tarefasFiltradas = [...tarefasList];
+            aplicarFiltrosComTarefasSoltas();
+            showMessage(`Lista atualizada com ${tarefasList.length} tarefas`, "success");
+        } catch (error) {
+            showMessage("Erro ao carregar tarefas: " + error.message, "danger");
+        } finally {
+            const btnAtualizar = document.getElementById("btnAtualizarTarefas");
+            if (btnAtualizar) {
+                btnAtualizar.disabled = false;
+                btnAtualizar.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Atualizar';
+            }
         }
-        
-        console.log("Dados carregados:", resposta);
-        tarefasList = processarRespostaTarefas(resposta);
-        renderTable(tarefasList);
-      } catch (error) {
-        showMessage("Erro ao carregar tarefas: " + error.message, "danger");
-      }
     }
 
     function processarRespostaTarefas(resposta) {
@@ -710,7 +1380,30 @@
         tarefas = resposta.tarefas;
       }
       
-      return tarefas;
+      // ✅ DEBUG: Verifique se as tarefas têm campo prioridade
+      if (tarefas.length > 0) {
+        console.log("📋 Primeira tarefa:", tarefas[0]);
+        console.log("🎯 Campos disponíveis:", Object.keys(tarefas[0]));
+      }
+      
+      // ✅ ORDENAÇÃO PRIMÁRIA POR STATUS E SECUNDÁRIA POR PRIORIDADE
+      return tarefas.sort((a, b) => {
+        // Ordem primária: Status (Pendente -> Andamento -> Concluída)
+        const statusOrder = { 'pendente': 1, 'andamento': 2, 'concluida': 3 };
+        const ordemStatusA = statusOrder[a.status] || 4;
+        const ordemStatusB = statusOrder[b.status] || 4;
+        
+        if (ordemStatusA !== ordemStatusB) {
+          return ordemStatusA - ordemStatusB;
+        }
+        
+        // Ordem secundária: Prioridade (Alta -> Média -> Baixa)
+        const prioridadeOrder = { 'alta': 1, 'media': 2, 'baixa': 3 };
+        const ordemPrioridadeA = prioridadeOrder[a.prioridade] || 4;
+        const ordemPrioridadeB = prioridadeOrder[b.prioridade] || 4;
+        
+        return ordemPrioridadeA - ordemPrioridadeB;
+      });
     }
 
     async function listPorProjeto() {
@@ -732,37 +1425,195 @@
         );
         
         tarefasList = tarefasDoProjeto;
-        renderTable(tarefasDoProjeto);
+        tarefasFiltradas = [...tarefasDoProjeto];
+        aplicarFiltrosComTarefasSoltas();
       } catch (error) {
         showMessage("Erro ao carregar tarefas do projeto: " + error.message, "danger");
       }
     }
 
     function aplicarFiltros() {
-      let tarefasFiltradas = [...tarefasList];
+      tarefasFiltradas = [...tarefasList];
+      
+      const statusSelecionado = filtroStatus.value;
+      const prioridadeSelecionada = filtroPrioridade.value;
+      const responsavelSelecionado = filtroResponsavel.value;
+      
+      let filtrosAtivos = [];
       
       // Aplicar filtro de status
-      if (filtroStatus.value !== 'todos') {
+      if (statusSelecionado !== 'todos') {
         tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
-          tarefa.status === filtroStatus.value
+          tarefa.status === statusSelecionado
         );
+        filtrosAtivos.push(`status: "${formatarStatus(statusSelecionado)}"`);
       }
       
       // Aplicar filtro de prioridade
-      if (filtroPrioridade.value !== 'todos') {
+      if (prioridadeSelecionada !== 'todos') {
         tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
-          tarefa.prioridade === filtroPrioridade.value
+          tarefa.prioridade === prioridadeSelecionada
         );
+        filtrosAtivos.push(`prioridade: "${formatarPrioridade(prioridadeSelecionada)}"`);
       }
       
       // Aplicar filtro de responsável
-      if (filtroResponsavel.value !== 'todos') {
+      if (responsavelSelecionado !== 'todos') {
         tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
-          tarefa.usuario_responsavel_id == filtroResponsavel.value
+          tarefa.usuario_responsavel_id == responsavelSelecionado
         );
+        
+        const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
+        if (usuario) {
+          filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+        }
       }
       
-      renderTable(tarefasFiltradas);
+      atualizarInfoBusca(filtrosAtivos);
+      
+      // Atualizar a visualização ativa
+      if (document.getElementById('visualizacao-tabela').checked) {
+        renderTable(tarefasFiltradas);
+      } else if (document.getElementById('visualizacao-cards').checked) {
+        renderCards(tarefasFiltradas);
+      } else if (document.getElementById('visualizacao-kanban').checked) {
+        renderKanban(tarefasFiltradas);
+      }
+    }
+
+    async function carregarProjetosComOpcaoSolta() {
+      try {
+          const resposta = await api.get("/api/projeto/");
+          
+          if (resposta && resposta.success === false) {
+              console.error("Erro ao carregar projetos:", resposta.error?.message);
+              return;
+          }
+          
+          projetosList = [];
+          
+          if (resposta && Array.isArray(resposta)) {
+              projetosList = resposta;
+          } else if (resposta && resposta.data && Array.isArray(resposta.data)) {
+              projetosList = resposta.data;
+          } else if (resposta && resposta.success && Array.isArray(resposta.data?.projetos)) {
+              projetosList = resposta.data.projetos;
+          } else if (resposta && resposta.projetos && Array.isArray(resposta.projetos)) {
+              projetosList = resposta.projetos;
+          }
+          
+          // ✅ CORREÇÃO: Opção para tarefa sem projeto
+          cboProjeto.innerHTML = '<option value="-1">📋 Nenhum projeto (Tarefa Solta)</option>';
+          
+          projetosList.forEach(projeto => {
+              const option = document.createElement("option");
+              option.value = projeto.id;
+              option.textContent = `📁 ${projeto.nome || projeto.titulo}`;
+              cboProjeto.appendChild(option);
+          });
+
+          // ✅ SELECIONA AUTOMATICAMENTE O PROJETO DA URL (se existir)
+          if (projetoSelecionado && projetoSelecionado.id) {
+              cboProjeto.value = projetoSelecionado.id;
+              console.log(`✅ Projeto automaticamente selecionado: ${projetoSelecionado.nome}`);
+          }
+
+      } catch (error) {
+          console.error("Erro ao carregar projetos:", error);
+          showMessage("Erro ao carregar projetos: " + error.message, "danger");
+      }
+    }
+
+    // ✅ FUNÇÃO: Filtrar tarefas por projeto (incluindo sem projeto)
+    function aplicarFiltrosComTarefasSoltas() {
+        tarefasFiltradas = [...tarefasList];
+        
+        const statusSelecionado = filtroStatus.value;
+        const prioridadeSelecionada = filtroPrioridade.value;
+        const responsavelSelecionado = filtroResponsavel.value;
+        const projetoSelecionadoFiltro = filtroProjeto ? filtroProjeto.value : 'todos';
+        
+        let filtrosAtivos = [];
+        
+        // Aplicar filtro de status
+        if (statusSelecionado !== 'todos') {
+            tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+                tarefa.status === statusSelecionado
+            );
+            filtrosAtivos.push(`status: "${formatarStatus(statusSelecionado)}"`);
+        }
+        
+        // Aplicar filtro de prioridade
+        if (prioridadeSelecionada !== 'todos') {
+            tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+                tarefa.prioridade === prioridadeSelecionada
+            );
+            filtrosAtivos.push(`prioridade: "${formatarPrioridade(prioridadeSelecionada)}"`);
+        }
+        
+        // Aplicar filtro de responsável
+        if (responsavelSelecionado !== 'todos') {
+            tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+                tarefa.usuario_responsavel_id == responsavelSelecionado
+            );
+            
+            const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
+            if (usuario) {
+                filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+            }
+        }
+        
+        // ✅ NOVO: Aplicar filtro de projeto (incluindo "sem projeto")
+        if (projetoSelecionadoFiltro !== 'todos') {
+            if (projetoSelecionadoFiltro === 'sem_projeto') {
+                tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+                    !tarefa.projeto_id || tarefa.projeto_id === -1
+                );
+                filtrosAtivos.push(`projeto: "Tarefas Soltas"`);
+            } else {
+                tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+                    tarefa.projeto_id == projetoSelecionadoFiltro
+                );
+                
+                const projeto = projetosList.find(p => p.id == projetoSelecionadoFiltro);
+                if (projeto) {
+                    filtrosAtivos.push(`projeto: "${projeto.nome}"`);
+                }
+            }
+        }
+        
+        atualizarInfoBusca(filtrosAtivos);
+        
+        // Atualizar a visualização ativa
+        if (document.getElementById('visualizacao-tabela').checked) {
+            renderTable(tarefasFiltradas);
+        } else if (document.getElementById('visualizacao-cards').checked) {
+            renderCards(tarefasFiltradas);
+        } else if (document.getElementById('visualizacao-kanban').checked) {
+            renderKanban(tarefasFiltradas);
+        }
+    }
+
+    function atualizarInfoBusca(filtrosAtivos = []) {
+      const totalTarefas = tarefasList.length;
+      const tarefasEncontradas = tarefasFiltradas.length;
+      
+      if (filtrosAtivos.length > 0) {
+        infoBusca.innerHTML = `
+          <i class="bi bi-info-circle"></i> 
+          <strong>${tarefasEncontradas}</strong> de <strong>${totalTarefas}</strong> tarefas encontradas 
+          | Filtros: ${filtrosAtivos.join(', ')}
+        `;
+        infoBusca.style.display = 'block';
+      } else {
+        infoBusca.innerHTML = `
+          <i class="bi bi-info-circle"></i> 
+          Mostrando todas as <strong>${totalTarefas}</strong> tarefas
+        `;
+        infoBusca.style.display = 'block';
+      }
+      
+      contadorTarefas.textContent = `${tarefasEncontradas} tarefas`;
     }
 
     function limparFormulario() {
@@ -770,46 +1621,179 @@
       txtTitulo.value = "";
       txtDescricao.value = "";
       txtDataLimite.value = "";
-      cboProjeto.value = "-1";
+      
+      // ✅ NÃO LIMPA O PROJETO SE HOUVER UM SELECIONADO
+      if (!projetoSelecionado) {
+        cboProjeto.value = "-1";
+      }
+      
       cboResponsavel.value = "-1";
       cboStatus.value = "pendente";
       cboPrioridade.value = "media";
       chkConcluida.checked = false;
       divResposta.style.display = "none";
-    }
-
-    function exportarTarefas() {
-      const csv = converterParaCSV(tarefasList);
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'tarefas.csv';
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-
-    function converterParaCSV(tarefas) {
-      const headers = ['ID', 'Título', 'Descrição', 'Projeto', 'Responsável', 'Status', 'Prioridade', 'Data Limite', 'Concluída'];
-      const rows = tarefas.map(tarefa => {
-        const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
-        const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
-        return [
-          tarefa.id,
-          `"${tarefa.titulo}"`,
-          `"${tarefa.descricao || ''}"`,
-          `"${projeto ? (projeto.nome || projeto.titulo) : 'N/A'}"`,
-          `"${responsavel ? responsavel.nome : 'N/A'}"`,
-          tarefa.status,
-          tarefa.prioridade,
-          tarefa.data_limite ? new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A',
-          tarefa.concluida ? 'Sim' : 'Não'
-        ];
-      });
       
-      return [headers, ...rows].map(row => row.join(',')).join('\n');
+      console.log("🧹 Formulário limpo, mas projeto mantido");
     }
 
+    // ======================== FUNÇÕES DE EXPORTAÇÃO ========================
+    // ======================== FUNÇÕES DE EXPORTAÇÃO ========================
+    window.exportarTarefas = function() {
+      try {
+        // Fallback se os geradores não estiverem disponíveis
+        if (typeof CsvGenerator === 'undefined' || typeof csvGenerator === 'undefined') {
+          console.warn('CsvGenerator não disponível, usando fallback');
+          exportarTarefasCSVFallback();
+          return;
+        }
+
+        const csvGenerator = new CsvGenerator();
+        
+        // Tenta usar o método específico, depois fallback genérico
+        if (typeof csvGenerator.exportTarefasCSV === 'function') {
+          const sucesso = csvGenerator.exportTarefasCSV(
+            tarefasFiltradas,
+            projetosList,
+            usuariosList,
+            `tarefas_${new Date().toISOString().split('T')[0]}.csv`
+          );
+          if (sucesso) {
+            showMessage('Arquivo CSV exportado com sucesso!', 'success');
+          }
+        } else if (typeof csvGenerator.exportToCSV === 'function') {
+          // Método genérico
+          const sucesso = csvGenerator.exportToCSV(
+            tarefasFiltradas,
+            `tarefas_${new Date().toISOString().split('T')[0]}.csv`
+          );
+          if (sucesso) {
+            showMessage('Arquivo CSV exportado com sucesso!', 'success');
+          }
+        } else {
+          exportarTarefasCSVFallback();
+        }
+      } catch (error) {
+        console.error('Erro ao exportar CSV:', error);
+        exportarTarefasCSVFallback();
+      }
+    };
+
+    // Fallback para exportação CSV
+    function exportarTarefasCSVFallback() {
+      try {
+        const headers = ['ID', 'Título', 'Descrição', 'Projeto', 'Responsável', 'Status', 'Prioridade', 'Data Limite', 'Concluída'];
+        const rows = tarefasFiltradas.map(tarefa => {
+          const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
+          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          
+          return [
+            tarefa.id,
+            `"${tarefa.titulo}"`,
+            `"${tarefa.descricao || ''}"`,
+            `"${projeto ? (projeto.nome || projeto.titulo) : 'N/A'}"`,
+            `"${responsavel ? responsavel.nome : 'N/A'}"`,
+            formatarStatus(tarefa.status),
+            formatarPrioridade(tarefa.prioridade),
+            tarefa.data_limite ? new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A',
+            tarefa.concluida ? 'Sim' : 'Não'
+          ];
+        });
+        
+        const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `tarefas_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showMessage('Arquivo CSV exportado com sucesso!', 'success');
+      } catch (error) {
+        console.error('Erro no fallback CSV:', error);
+        showMessage('Erro ao exportar CSV: ' + error.message, 'danger');
+      }
+    }
+
+    window.exportarTarefasPDF = async function() {
+      try {
+        // Fallback se os geradores não estiverem disponíveis
+        if (typeof PdfGenerator === 'undefined' || typeof pdfGenerator === 'undefined') {
+          showMessage('PDF Generator não disponível no momento', 'warning');
+          return;
+        }
+
+        // Mostrar loading no botão
+        btnExportPDFTarefas.disabled = true;
+        btnExportPDFTarefas.innerHTML = '<i class="bi bi-file-pdf"></i> Gerando PDF...';
+
+        const pdfGenerator = new PdfGenerator();
+        const filtrosTexto = getFiltrosAtivosTexto();
+        
+        // Tenta usar métodos específicos ou genéricos
+        let sucesso = false;
+        
+        if (typeof pdfGenerator.exportTarefasPDF === 'function') {
+          sucesso = await pdfGenerator.exportTarefasPDF(
+            tarefasFiltradas, 
+            projetosList,
+            usuariosList,
+            `tarefas_${new Date().toISOString().split('T')[0]}.pdf`,
+            filtrosTexto,
+            projetoSelecionado
+          );
+        } else if (typeof pdfGenerator.exportToPDF === 'function') {
+          sucesso = await pdfGenerator.exportToPDF(
+            tarefasFiltradas,
+            `tarefas_${new Date().toISOString().split('T')[0]}.pdf`,
+            'Relatório de Tarefas'
+          );
+        }
+        
+        if (sucesso) {
+          showMessage('PDF gerado e baixado com sucesso!', 'success');
+        } else {
+          showMessage('Funcionalidade PDF não disponível no momento', 'warning');
+        }
+      } catch (error) {
+        console.error('Erro ao exportar PDF:', error);
+        showMessage('Erro ao gerar PDF: ' + error.message, 'danger');
+      } finally {
+        // Restaurar botão
+        btnExportPDFTarefas.disabled = false;
+        btnExportPDFTarefas.innerHTML = '<i class="bi bi-file-pdf"></i> PDF';
+      }
+    };
+
+    // Função auxiliar para obter texto dos filtros ativos
+    function getFiltrosAtivosTexto() {
+      const filtrosAtivos = [];
+      const statusSelecionado = filtroStatus.value;
+      const prioridadeSelecionada = filtroPrioridade.value;
+      const responsavelSelecionado = filtroResponsavel.value;
+      
+      if (statusSelecionado !== 'todos') {
+        filtrosAtivos.push(`status: "${formatarStatus(statusSelecionado)}"`);
+      }
+      
+      if (prioridadeSelecionada !== 'todos') {
+        filtrosAtivos.push(`prioridade: "${formatarPrioridade(prioridadeSelecionada)}"`);
+      }
+      
+      if (responsavelSelecionado !== 'todos') {
+        const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
+        if (usuario) {
+          filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+        }
+      }
+      
+      return filtrosAtivos.join(', ');
+    }
+
+    // ======================== RENDERIZAÇÃO DA TABELA (SEM DATA_INICIO E DATA_FIM) ========================
     function renderTable(dados) {
       const divTabela = document.getElementById("divTabela");
       divTabela.innerHTML = "";
@@ -817,12 +1801,15 @@
       let tarefas = dados || [];
 
       if (!tarefas || tarefas.length === 0) {
-          divTabela.innerHTML = '<div class="alert alert-info text-center">Nenhuma Tarefa encontrada</div>';
-          contadorTarefas.textContent = '0';
+          divTabela.innerHTML = `
+              <div class="alert alert-warning text-center">
+                  <i class="bi bi-exclamation-triangle"></i> 
+                  Nenhuma tarefa encontrada com os filtros aplicados.
+                  ${tarefasList.length > 0 ? '<br><small>Tente ajustar os filtros.</small>' : ''}
+              </div>
+          `;
           return;
       }
-
-      contadorTarefas.textContent = tarefas.length;
 
       const table = document.createElement("table");
       table.className = "table table-bordered table-striped table-hover";
@@ -831,9 +1818,16 @@
       thead.className = "table-light";
       const trHead = document.createElement("tr");
 
-      ["", "ID", "Título", "Projeto", "Responsável", "Status", "Prioridade", "Data Limite", "Ações"].forEach(text => {
+      // ✅ REMOVIDOS: Data Início e Data Fim da visualização
+      ["", "ID", "Título", "Projeto", "Responsável", "Atribuidor", "Status", "Prioridade", "Data Limite", "Ações"].forEach(text => {
           const th = document.createElement("th");
           th.textContent = text;
+          if (text.includes("Data")) {
+              th.className = "data-col";
+          }
+          if (text === "Ações") {
+              th.className = "acoes-col";
+          }
           trHead.appendChild(th);
       });
 
@@ -853,35 +1847,35 @@
           checkbox.className = "form-check-input";
           checkbox.checked = tarefa.concluida;
           checkbox.onchange = async function() {
-            try {
-                const objetoAtualizar = {
-                    "tarefa": {
-                        "concluida": checkbox.checked,
-                        "status": checkbox.checked ? "concluida" : "pendente"
-                    }
-                };
+              try {
+                  const objetoAtualizar = {
+                      "tarefa": {
+                          "concluida": checkbox.checked,
+                          "status": checkbox.checked ? "concluida" : "pendente"
+                      }
+                  };
 
-                console.log(`🔄 Marcando tarefa ${tarefa.id} como concluída: ${checkbox.checked}`);
-                
-                const resposta = await api.put("/api/tarefa", tarefa.id, objetoAtualizar);
-                
-                if (resposta && resposta.success) {
-                    showMessage(`Tarefa ${checkbox.checked ? 'concluída' : 'reaberta'} com sucesso!`, "success");
-                    tr.className = `concluida-${checkbox.checked}`;
-                    
-                    const statusBadge = tr.querySelector('.status-badge');
-                    if (statusBadge) {
-                        statusBadge.className = `status-badge ${checkbox.checked ? 'status-concluida' : 'status-pendente'}`;
-                        statusBadge.textContent = checkbox.checked ? "Concluída" : "Pendente";
-                    }
-                } else {
-                    showMessage("Erro ao atualizar tarefa", "danger");
-                    checkbox.checked = !checkbox.checked;
-                }
-            } catch (error) {
-                showMessage("Erro ao atualizar tarefa: " + error.message, "danger");
-                checkbox.checked = !checkbox.checked;
-            }
+                  console.log(`🔄 Marcando tarefa ${tarefa.id} como concluída: ${checkbox.checked}`);
+                  
+                  const resposta = await api.put("/api/tarefa", tarefa.id, objetoAtualizar);
+                  
+                  if (resposta && resposta.success) {
+                      showMessage(`Tarefa ${checkbox.checked ? 'concluída' : 'reaberta'} com sucesso!`, "success");
+                      tr.className = `concluida-${checkbox.checked}`;
+                      
+                      const statusBadge = tr.querySelector('.status-badge');
+                      if (statusBadge) {
+                          statusBadge.className = `status-badge ${checkbox.checked ? 'status-concluida' : 'status-pendente'}`;
+                          statusBadge.textContent = checkbox.checked ? "Concluída" : "Pendente";
+                      }
+                  } else {
+                      showMessage("Erro ao atualizar tarefa", "danger");
+                      checkbox.checked = !checkbox.checked;
+                  }
+              } catch (error) {
+                  showMessage("Erro ao atualizar tarefa: " + error.message, "danger");
+                  checkbox.checked = !checkbox.checked;
+              }
           };
           tdCheckbox.appendChild(checkbox);
           tr.appendChild(tdCheckbox);
@@ -894,25 +1888,63 @@
           // Título
           const tdTitulo = document.createElement("td");
           tdTitulo.textContent = tarefa.titulo;
+          tr.appendChild(tdTitulo);
 
-          // Projeto
+          // ✅ CORREÇÃO: Projeto - Mostrar "Tarefa Solta" quando não tem projeto
           const tdProjeto = document.createElement("td");
-          const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
-          tdProjeto.textContent = projeto ? (projeto.nome || projeto.titulo) : 'N/A';
+          if (tarefa.projeto_id) {
+              const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
+              tdProjeto.textContent = projeto ? (projeto.nome || projeto.titulo) : 'N/A';
+          } else {
+              tdProjeto.innerHTML = '<span class="badge bg-secondary">📋 Tarefa Solta</span>';
+          }
           tr.appendChild(tdProjeto);
 
-          // Data Limite
-          const tdDataLimite = document.createElement("td");
-          tdDataLimite.textContent = tarefa.data_limite ? 
-              new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A';
-          tr.appendChild(tdDataLimite);
+          // Responsável
+          const tdResponsavel = document.createElement("td");
+          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          tdResponsavel.textContent = responsavel ? responsavel.nome : 'N/A';
+          tr.appendChild(tdResponsavel);
+
+          // ✅ ADICIONADO: Atribuidor
+          const tdAtribuidor = document.createElement("td");
+          const atribuidor = usuariosList.find(u => u.id === tarefa.usuario_atribuidor_id);
+          tdAtribuidor.textContent = atribuidor ? atribuidor.nome : 'N/A';
+          tr.appendChild(tdAtribuidor);
 
           // Status
           const tdStatus = document.createElement("td");
-          const statusClass = tarefa.concluida ? "status-concluida" : "status-pendente";
-          const statusText = tarefa.concluida ? "Concluída" : "Pendente";
-          tdStatus.innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+          const statusClass = `status-${tarefa.status}`;
+          tdStatus.innerHTML = `<span class="status-badge ${statusClass}">${formatarStatus(tarefa.status)}</span>`;
           tr.appendChild(tdStatus);
+
+          // Prioridade
+          const tdPrioridade = document.createElement("td");
+          const prioridadeClass = `prioridade-${tarefa.prioridade}`;
+          tdPrioridade.innerHTML = `<span class="prioridade-badge ${prioridadeClass}">${formatarPrioridade(tarefa.prioridade)}</span>`;
+          tr.appendChild(tdPrioridade);
+
+          // Data Limite
+          const tdDataLimite = document.createElement("td");
+          tdDataLimite.className = "data-col";
+          
+          if (tarefa.data_limite) {
+              const dataLimite = new Date(tarefa.data_limite);
+              const hoje = new Date();
+              hoje.setHours(0, 0, 0, 0);
+              
+              // ✅ ADICIONADO: Destaque para tarefas atrasadas
+              if (dataLimite < hoje && !tarefa.concluida) {
+                  tdDataLimite.innerHTML = `<span class="text-danger fw-bold">${dataLimite.toLocaleDateString('pt-BR')} ⚠️ Atrasada</span>`;
+              } else {
+                  tdDataLimite.textContent = dataLimite.toLocaleDateString('pt-BR');
+              }
+          } else {
+              tdDataLimite.textContent = 'N/A';
+          }
+          tr.appendChild(tdDataLimite);
+
+          // ✅ REMOVIDOS: Data Início e Data Fim
 
           // Ações
           const tdAcoes = document.createElement("td");
@@ -923,6 +1955,7 @@
           btnSel.onclick = () => {
               txtId.value = tarefa.id;
               txtTitulo.value = tarefa.titulo;
+              txtDescricao.value = tarefa.descricao || "";
               
               if (tarefa.data_limite) {
                   const dateObj = new Date(tarefa.data_limite);
@@ -932,11 +1965,90 @@
                   txtDataLimite.value = "";
               }
               
-              cboProjeto.value = tarefa.projeto_id;
+              cboProjeto.value = tarefa.projeto_id || "";
+              cboResponsavel.value = tarefa.usuario_responsavel_id;
+              cboAtribuidor.value = tarefa.usuario_atribuidor_id;
+              cboStatus.value = tarefa.status;
+              cboPrioridade.value = tarefa.prioridade;
               chkConcluida.checked = tarefa.concluida;
+              
               showMessage("Tarefa selecionada para edição", "info");
           };
           divBotoes.appendChild(btnSel);
+
+          // ✅ BOTÃO EXCLUIR ADICIONADO NA TABELA
+          const btnDel = createButton("Excluir", "btn-danger btn-sm", "bi-trash");
+          btnDel.onclick = function() {
+              // Verifica se Bootstrap está disponível
+              if (typeof bootstrap === 'undefined') {
+                  if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                      excluirTarefaDireto(tarefa.id);
+                  }
+                  return;
+              }
+
+              const modalElement = document.getElementById('modalConfirm');
+              if (modalElement) {
+                  const modal = new bootstrap.Modal(modalElement);
+                  modal.show();
+
+                  const btnConfirmDelete = document.getElementById("btnConfirmDelete");
+                  // Remove event listeners anteriores
+                  const newBtnConfirm = btnConfirmDelete.cloneNode(true);
+                  btnConfirmDelete.parentNode.replaceChild(newBtnConfirm, btnConfirmDelete);
+
+                  document.getElementById("btnConfirmDelete").onclick = async function() {
+                      try {
+                          await excluirTarefaDireto(tarefa.id);
+                          modal.hide();
+                      } catch (error) {
+                          console.error('Erro ao excluir:', error);
+                      }
+                  };
+              } else {
+                  // Fallback se o modal não existir
+                  if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                      excluirTarefaDireto(tarefa.id);
+                  }
+              }
+          };
+          divBotoes.appendChild(btnDel);
+
+          // ✅ ADICIONADO: Botão para visualizar detalhes
+          const btnView = createButton("Ver", "btn-secondary btn-sm", "bi-eye");
+          btnView.onclick = () => {
+              // Preenche os campos para visualização (sem edição)
+              txtId.value = tarefa.id;
+              txtTitulo.value = tarefa.titulo;
+              txtDescricao.value = tarefa.descricao || "";
+              
+              if (tarefa.data_limite) {
+                  const dateObj = new Date(tarefa.data_limite);
+                  const formattedDate = dateObj.toISOString().split('T')[0];
+                  txtDataLimite.value = formattedDate;
+              } else {
+                  txtDataLimite.value = "";
+              }
+              
+              cboProjeto.value = tarefa.projeto_id || "";
+              cboResponsavel.value = tarefa.usuario_responsavel_id;
+              cboAtribuidor.value = tarefa.usuario_atribuidor_id;
+              cboStatus.value = tarefa.status;
+              cboPrioridade.value = tarefa.prioridade;
+              chkConcluida.checked = tarefa.concluida;
+              
+              // Desabilita os campos para visualização apenas
+              const campos = [txtTitulo, txtDescricao, txtDataLimite, cboProjeto, cboResponsavel, cboAtribuidor, cboStatus, cboPrioridade, chkConcluida];
+              campos.forEach(campo => campo.disabled = true);
+              
+              showMessage("Visualizando tarefa - campos desabilitados", "info");
+              
+              // Reabilita os campos após 5 segundos
+              setTimeout(() => {
+                  campos.forEach(campo => campo.disabled = false);
+              }, 5000);
+          };
+          divBotoes.appendChild(btnView);
 
           tdAcoes.appendChild(divBotoes);
           tr.appendChild(tdAcoes);
@@ -946,6 +2058,546 @@
 
       table.appendChild(tbody);
       divTabela.appendChild(table);
+    }
+
+    // ======================== RENDERIZAÇÃO EM CARDS ========================
+    function renderCards(dados) {
+      const divCards = document.getElementById("divCards");
+      divCards.innerHTML = "";
+
+      let tarefas = dados || [];
+
+      if (!tarefas || tarefas.length === 0) {
+          divCards.innerHTML = `
+            <div class="col-12">
+              <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i> 
+                Nenhuma tarefa encontrada com os filtros aplicados.
+                ${tarefasList.length > 0 ? '<br><small>Tente ajustar os filtros.</small>' : ''}
+              </div>
+            </div>
+          `;
+          return;
+      }
+
+      tarefas.forEach(tarefa => {
+          const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
+          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          
+          const col = document.createElement("div");
+          col.className = "col-md-6 col-lg-4 col-xl-3";
+          
+          const cardClasses = [
+              'tarefa-card-item',
+              'card',
+              'h-100',
+              tarefa.concluida ? 'concluida' : '',
+              tarefa.prioridade
+          ].join(' ');
+
+          // Calcular dias restantes
+          let diasRestantes = null;
+          let diasClass = '';
+          if (tarefa.data_limite && !tarefa.concluida) {
+              const hoje = new Date();
+              const dataLimite = new Date(tarefa.data_limite);
+              const diffTime = dataLimite - hoje;
+              diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              
+              if (diasRestantes < 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `Atrasada ${Math.abs(diasRestantes)} dia(s)`;
+              } else if (diasRestantes === 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = 'Hoje!';
+              } else if (diasRestantes <= 3) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else if (diasRestantes <= 7) {
+                  diasClass = 'dias-atencao';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else {
+                  diasClass = 'dias-normal';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              }
+          } else if (tarefa.concluida) {
+              diasClass = 'dias-concluida';
+              diasRestantes = 'Concluída';
+          }
+
+          col.innerHTML = `
+            <div class="${cardClasses}">
+              <div class="card-body d-flex flex-column">
+                <div class="tarefa-card-header">
+                  <div class="tarefa-card-titulo">${tarefa.titulo}</div>
+                  <div class="tarefa-card-checkbox">
+                    <input type="checkbox" class="form-check-input" ${tarefa.concluida ? 'checked' : ''} 
+                           onchange="marcarConcluidaCard(${tarefa.id}, this.checked, this)">
+                  </div>
+                </div>
+                
+                ${tarefa.descricao ? `
+                  <div class="tarefa-descricao mb-2">
+                    <small class="text-muted">${tarefa.descricao}</small>
+                  </div>
+                ` : ''}
+                
+                <div class="tarefa-card-metadata">
+                  <span class="status-badge status-${tarefa.status}">${formatarStatus(tarefa.status)}</span>
+                  <span class="prioridade-badge prioridade-${tarefa.prioridade}">${formatarPrioridade(tarefa.prioridade)}</span>
+                  ${diasRestantes ? `<span class="dias-restantes ${diasClass}">${diasRestantes}</span>` : ''}
+                </div>
+                
+                <div class="tarefa-info mb-2">
+                  <div><strong>Projeto:</strong> ${projeto ? projeto.nome : 'N/A'}</div>
+                  <div><strong>Responsável:</strong> ${responsavel ? responsavel.nome : 'N/A'}</div>
+                  ${tarefa.data_limite ? `<div><strong>Data Limite:</strong> ${new Date(tarefa.data_limite).toLocaleDateString('pt-BR')}</div>` : ''}
+                </div>
+                
+                <div class="tarefa-card-acoes mt-auto">
+                  <button class="btn btn-sm btn-info flex-fill" onclick="editarTarefa(${tarefa.id})">
+                    <i class="bi bi-pencil"></i> Editar
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="excluirTarefa(${tarefa.id})">
+                    <i class="bi bi-trash"></i> Excluir
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          divCards.appendChild(col);
+      });
+    }
+
+    // ======================== RENDERIZAÇÃO KANBAN ========================
+    function renderKanban(dados) {
+      const kanbanPendente = document.getElementById("kanban-pendente");
+      const kanbanAndamento = document.getElementById("kanban-andamento");
+      const kanbanConcluida = document.getElementById("kanban-concluida");
+      
+      kanbanPendente.innerHTML = '';
+      kanbanAndamento.innerHTML = '';
+      kanbanConcluida.innerHTML = '';
+
+      let tarefas = dados || [];
+
+      if (!tarefas || tarefas.length === 0) {
+          const mensagem = `
+            <div class="col-12 text-center py-4">
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> 
+                Nenhuma tarefa encontrada com os filtros aplicados.
+              </div>
+            </div>
+          `;
+          kanbanPendente.innerHTML = mensagem;
+          return;
+      }
+
+      // Contadores
+      const contadorPendente = document.getElementById("contador-pendente");
+      const contadorAndamento = document.getElementById("contador-andamento");
+      const contadorConcluida = document.getElementById("contador-concluida");
+      
+      let countPendente = 0;
+      let countAndamento = 0;
+      let countConcluida = 0;
+
+      tarefas.forEach(tarefa => {
+          const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
+          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          
+          const card = document.createElement("div");
+          card.className = `card mb-2 tarefa-card-item ${tarefa.prioridade} ${tarefa.concluida ? 'concluida' : ''}`;
+          card.draggable = true;
+          card.dataset.tarefaId = tarefa.id;
+          
+          // Calcular dias restantes (mesma lógica dos cards)
+          let diasRestantes = null;
+          let diasClass = '';
+          if (tarefa.data_limite && !tarefa.concluida) {
+              const hoje = new Date();
+              const dataLimite = new Date(tarefa.data_limite);
+              const diffTime = dataLimite - hoje;
+              diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              
+              if (diasRestantes < 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `Atrasada ${Math.abs(diasRestantes)} dia(s)`;
+              } else if (diasRestantes === 0) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = 'Hoje!';
+              } else if (diasRestantes <= 3) {
+                  diasClass = 'dias-urgente';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else if (diasRestantes <= 7) {
+                  diasClass = 'dias-atencao';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              } else {
+                  diasClass = 'dias-normal';
+                  diasRestantes = `${diasRestantes} dia(s)`;
+              }
+          } else if (tarefa.concluida) {
+              diasClass = 'dias-concluida';
+              diasRestantes = 'Concluída';
+          }
+
+          card.innerHTML = `
+            <div class="card-body">
+              <div class="tarefa-card-header">
+                <div class="tarefa-card-titulo">${tarefa.titulo}</div>
+                <div class="tarefa-card-checkbox">
+                  <input type="checkbox" class="form-check-input" ${tarefa.concluida ? 'checked' : ''} 
+                         onchange="marcarConcluidaCard(${tarefa.id}, this.checked, this)">
+                </div>
+              </div>
+              
+              ${tarefa.descricao ? `
+                <div class="tarefa-descricao mb-2">
+                  <small class="text-muted">${tarefa.descricao}</small>
+                </div>
+              ` : ''}
+              
+              <div class="tarefa-card-metadata">
+                <span class="prioridade-badge prioridade-${tarefa.prioridade}">${formatarPrioridade(tarefa.prioridade)}</span>
+                ${diasRestantes ? `<span class="dias-restantes ${diasClass}">${diasRestantes}</span>` : ''}
+              </div>
+              
+              <div class="tarefa-info">
+                <div><small><strong>Projeto:</strong> ${projeto ? projeto.nome : 'N/A'}</small></div>
+                <div><small><strong>Responsável:</strong> ${responsavel ? responsavel.nome : 'N/A'}</small></div>
+              </div>
+            </div>
+          `;
+
+          // Eventos de drag and drop
+          card.addEventListener('dragstart', handleDragStart);
+          card.addEventListener('dragend', handleDragEnd);
+
+          // Adicionar à coluna correta
+          if (tarefa.status === 'pendente') {
+              kanbanPendente.appendChild(card);
+              countPendente++;
+          } else if (tarefa.status === 'andamento') {
+              kanbanAndamento.appendChild(card);
+              countAndamento++;
+          } else if (tarefa.status === 'concluida') {
+              kanbanConcluida.appendChild(card);
+              countConcluida++;
+          }
+      });
+
+      // Atualizar contadores
+      contadorPendente.textContent = countPendente;
+      contadorAndamento.textContent = countAndamento;
+      contadorConcluida.textContent = countConcluida;
+
+      // Configurar zonas de drop
+      configurarZonasDrop();
+    }
+
+    // ======================== DRAG AND DROP KANBAN ========================
+    function handleDragStart(e) {
+      tarefaArrastada = this;
+      this.style.opacity = '0.4';
+      
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.innerHTML);
+    }
+
+    function handleDragEnd(e) {
+      this.style.opacity = '1';
+      
+      document.querySelectorAll('.kanban-drop-zone').forEach(zone => {
+          zone.classList.remove('drag-over');
+      });
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      return false;
+    }
+
+    function handleDragEnter(e) {
+      this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      
+      if (tarefaArrastada != this) {
+          const novaColuna = this;
+          const novoStatus = novaColuna.dataset.status;
+          const tarefaId = tarefaArrastada.dataset.tarefaId;
+          
+          // Atualizar status da tarefa
+          atualizarStatusTarefa(tarefaId, novoStatus);
+          
+          // Mover o card para a nova coluna
+          novaColuna.appendChild(tarefaArrastada);
+      }
+      
+      this.classList.remove('drag-over');
+      return false;
+    }
+
+    // ======================== EVENT LISTENERS PARA BOTÕES ========================
+// ======================== EVENT LISTENERS CORRIGIDOS ========================
+
+    // Aguarda o DOM carregar completamente antes de adicionar event listeners
+   document.addEventListener('DOMContentLoaded', function() {
+        console.log("🚀 Inicializando tarefa.html...");
+        verificarPerfilEConfigurarInterfaceTarefas(); // ✅ NOVA LINHA
+        
+        // Função auxiliar para adicionar event listeners com segurança
+        function safeAddEventListener(elementId, event, callback) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.addEventListener(event, callback);
+                console.log(`✅ Event listener adicionado para: ${elementId}`);
+                return true;
+            } else {
+                console.error(`❌ Elemento não encontrado: ${elementId}`);
+                return false;
+            }
+        }
+
+        // Botão Atualizar
+        safeAddEventListener('btnAtualizarTarefas', 'click', function() {
+            if (projetoSelecionado) {
+                listPorProjeto();
+            } else {
+                listAll();
+            }
+        });
+
+        // Botões de Exportação
+        safeAddEventListener('btnExportCSVTarefas', 'click', exportarTarefas);
+        safeAddEventListener('btnExportPDFTarefas', 'click', exportarTarefasPDF);
+
+        // Logout
+        safeAddEventListener('btnLogout', 'click', function() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                localStorage.removeItem('userData');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Filtros
+        safeAddEventListener('filtroStatus', 'change', aplicarFiltrosComTarefasSoltas());
+        safeAddEventListener('filtroPrioridade', 'change', aplicarFiltrosComTarefasSoltas());
+        safeAddEventListener('filtroResponsavel', 'change', aplicarFiltrosComTarefasSoltas());
+
+        // Botão Voltar para Projetos
+        safeAddEventListener('btnVoltarProjetos', 'click', function() {
+            window.location.href = "projeto.html";
+        });
+
+        // Controles de Visualização
+        safeAddEventListener('visualizacao-tabela', 'change', function() {
+            if (this.checked) {
+                document.getElementById('visualizacao-tabela-container').style.display = 'block';
+                document.getElementById('visualizacao-cards-container').style.display = 'none';
+                document.getElementById('visualizacao-kanban-container').style.display = 'none';
+                renderTable(tarefasFiltradas);
+            }
+        });
+
+        safeAddEventListener('visualizacao-cards', 'change', function() {
+            if (this.checked) {
+                document.getElementById('visualizacao-tabela-container').style.display = 'none';
+                document.getElementById('visualizacao-cards-container').style.display = 'block';
+                document.getElementById('visualizacao-kanban-container').style.display = 'none';
+                renderCards(tarefasFiltradas);
+            }
+        });
+
+        safeAddEventListener('visualizacao-kanban', 'change', function() {
+            if (this.checked) {
+                document.getElementById('visualizacao-tabela-container').style.display = 'none';
+                document.getElementById('visualizacao-cards-container').style.display = 'none';
+                document.getElementById('visualizacao-kanban-container').style.display = 'block';
+                renderKanban(tarefasFiltradas);
+            }
+        });
+
+        console.log("✅ Todos os event listeners inicializados!");
+
+        // Carregar dados após os event listeners estarem configurados
+        carregarProjetosComOpcaoSolta();
+        carregarUsuarios();
+        if (projetoSelecionado) {
+            listPorProjeto();
+        } else {
+            listAll();
+        }
+        
+        console.log("🚀 Página de tarefas completamente carregada!");
+    });
+
+    btnExportCSVTarefas.addEventListener('click', exportarTarefas);
+    btnExportPDFTarefas.addEventListener('click', exportarTarefasPDF);
+
+    function configurarZonasDrop() {
+      document.querySelectorAll('.kanban-drop-zone').forEach(zone => {
+          zone.addEventListener('dragover', handleDragOver);
+          zone.addEventListener('dragenter', handleDragEnter);
+          zone.addEventListener('dragleave', handleDragLeave);
+          zone.addEventListener('drop', handleDrop);
+      });
+    }
+
+    async function atualizarStatusTarefa(tarefaId, novoStatus) {
+      try {
+          const objetoAtualizar = {
+              "tarefa": {
+                  "status": novoStatus,
+                  "concluida": novoStatus === 'concluida'
+              }
+          };
+
+          const resposta = await api.put("/api/tarefa", tarefaId, objetoAtualizar);
+          
+          if (resposta && resposta.success) {
+              console.log(`✅ Status da tarefa ${tarefaId} atualizado para: ${novoStatus}`);
+              showMessage(`Tarefa movida para ${formatarStatus(novoStatus)}`, "success");
+          } else {
+              showMessage("Erro ao atualizar status da tarefa", "danger");
+          }
+      } catch (error) {
+          showMessage("Erro ao atualizar status: " + error.message, "danger");
+      }
+    }
+
+    // ======================== FUNÇÕES AUXILIARES GLOBAIS ========================
+    window.marcarConcluidaCard = async function(tarefaId, concluida, elemento) {
+      try {
+          const objetoAtualizar = {
+              "tarefa": {
+                  "concluida": concluida,
+                  "status": concluida ? "concluida" : "pendente"
+              }
+          };
+
+          const resposta = await api.put("/api/tarefa", tarefaId, objetoAtualizar);
+          
+          if (resposta && resposta.success) {
+              showMessage(`Tarefa ${concluida ? 'concluída' : 'reaberta'} com sucesso!`, "success");
+              
+              // Atualizar visualização
+              const card = elemento.closest('.tarefa-card-item');
+              if (card) {
+                  card.classList.toggle('concluida', concluida);
+                  
+                  const statusBadge = card.querySelector('.status-badge');
+                  if (statusBadge) {
+                      statusBadge.className = `status-badge ${concluida ? 'status-concluida' : 'status-pendente'}`;
+                      statusBadge.textContent = concluida ? "Concluída" : "Pendente";
+                  }
+                  
+                  const diasElement = card.querySelector('.dias-restantes');
+                  if (diasElement) {
+                      diasElement.className = `dias-restantes ${concluida ? 'dias-concluida' : 'dias-normal'}`;
+                      diasElement.textContent = concluida ? 'Concluída' : diasElement.textContent;
+                  }
+              }
+          } else {
+              showMessage("Erro ao atualizar tarefa", "danger");
+              elemento.checked = !concluida;
+          }
+      } catch (error) {
+          showMessage("Erro ao atualizar tarefa: " + error.message, "danger");
+          elemento.checked = !concluida;
+      }
+    };
+
+    window.editarTarefa = function(tarefaId) {
+      const tarefa = tarefasList.find(t => t.id == tarefaId);
+      if (tarefa) {
+          txtId.value = tarefa.id;
+          txtTitulo.value = tarefa.titulo;
+          txtDescricao.value = tarefa.descricao || "";
+          
+          if (tarefa.data_limite) {
+              const dateObj = new Date(tarefa.data_limite);
+              const formattedDate = dateObj.toISOString().split('T')[0];
+              txtDataLimite.value = formattedDate;
+          } else {
+              txtDataLimite.value = "";
+          }
+          
+          cboProjeto.value = tarefa.projeto_id;
+          cboResponsavel.value = tarefa.usuario_responsavel_id;
+          cboStatus.value = tarefa.status;
+          cboPrioridade.value = tarefa.prioridade;
+          chkConcluida.checked = tarefa.concluida;
+          
+          showMessage("Tarefa selecionada para edição", "info");
+          
+          // Scroll para o formulário
+          document.getElementById('txtTitulo').scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    window.excluirTarefaDireto = function(tarefaId) {
+      const modal = new bootstrap.Modal(document.getElementById('modalConfirm'));
+      modal.show();
+
+      const btnConfirmDelete = document.getElementById("btnConfirmDelete");
+      btnConfirmDelete.replaceWith(btnConfirmDelete.cloneNode(true));
+      const newBtnConfirm = document.getElementById("btnConfirmDelete");
+
+      newBtnConfirm.onclick = async function() {
+          try {
+              const resposta = await api.delete("/api/tarefa", tarefaId);
+              
+              if (resposta && resposta.success === false) {
+                  showMessage(resposta.error?.message || "Erro ao excluir tarefa", "danger");
+                  return;
+              }
+              
+              if (resposta && resposta.success) {
+                  if (projetoSelecionado) {
+                      listPorProjeto();
+                  } else {
+                      listAll();
+                  }
+                  showMessage(`Tarefa ID ${tarefaId} excluída com sucesso.`, "success");
+                  limparFormulario();
+              } else {
+                  showMessage("Erro ao excluir tarefa: resposta inválida", "danger");
+              }
+          } catch (error) {
+              showMessage(`Erro ao excluir tarefa: ${error.message}`, "danger");
+          } finally {
+              modal.hide();
+          }
+      };
+    };
+
+    function formatarStatus(status) {
+      const statusMap = {
+        'pendente': 'Pendente',
+        'andamento': 'Em Andamento',
+        'concluida': 'Concluída'
+      };
+      return statusMap[status] || status;
+    }
+
+    function formatarPrioridade(prioridade) {
+      const prioridadeMap = {
+        'alta': 'Alta',
+        'media': 'Média',
+        'baixa': 'Baixa'
+      };
+      return prioridadeMap[prioridade] || prioridade;
     }
 
     // Botão Voltar para Projetos
@@ -962,6 +2614,19 @@
       }
     });
 
+    // Filtro automático em tempo real
+    filtroStatus.addEventListener('change', function() {
+      aplicarFiltrosComTarefasSoltas();
+    });
+
+    filtroPrioridade.addEventListener('change', function() {
+      aplicarFiltrosComTarefasSoltas();
+    });
+
+    filtroResponsavel.addEventListener('change', function() {
+      aplicarFiltrosComTarefasSoltas();
+    });
+
     // Carregar dados ao iniciar
     carregarProjetos();
     carregarUsuarios(); 
@@ -972,15 +2637,12 @@
     }
 
     console.log("🚀 Página de tarefas carregada!");
-    console.log("💡 URLs no formato SINGULAR:");
-    console.log("   - GET /api/tarefa/");
-    console.log("   - POST /api/tarefa/");
-    console.log("   - PUT /api/tarefa/{id}");
-    console.log("   - DELETE /api/tarefa/{id}");
-    console.log("   - GET /api/projeto/");
   </script>
 
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Adicionar ANTES do fechamento do body -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
 </body>
 </html>

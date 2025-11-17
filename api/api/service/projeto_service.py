@@ -21,8 +21,16 @@ class ProjetoService:
         print(f"📝 Dados recebidos para criar projeto: {jsonProjeto}")
 
         try:
+            # Validações iniciais
+            if not jsonProjeto:
+                raise ErrorResponse("Dados do projeto não fornecidos", 400)
+                
+            nome = jsonProjeto.get('nome')
+            if not nome:
+                raise ErrorResponse("Nome do projeto é obrigatório", 400)
+
             objProjeto = Projeto()
-            objProjeto.nome = jsonProjeto["nome"]
+            objProjeto.nome = nome
             objProjeto.descricao = jsonProjeto.get("descricao")
             objProjeto.data_inicio = jsonProjeto.get("data_inicio")
             objProjeto.data_fim = jsonProjeto.get("data_fim")
@@ -35,11 +43,14 @@ class ProjetoService:
                 objProjeto.usuario_id = jsonProjeto.get("usuario_id")
 
             # Verifica se usuário existe
+            if not objProjeto.usuario_id:
+                raise ErrorResponse("ID do usuário é obrigatório", 400)
+
             usuarioExiste = self.__usuarioDAO.find_by_id(objProjeto.usuario_id)
             if not usuarioExiste:
                 raise ErrorResponse(
-                    400,
                     "Usuário não encontrado",
+                    400,
                     {"message": f"O usuário com ID {objProjeto.usuario_id} não existe"}
                 )
 
@@ -78,14 +89,14 @@ class ProjetoService:
             if not projeto:
                 if usuario_id:
                     raise ErrorResponse(
-                        404,
                         "Projeto não encontrado",
+                        404,
                         {"message": f"Não existe projeto com id {id} para o usuário {usuario_id}"}
                     )
                 else:
                     raise ErrorResponse(
+                        "Projeto não encontrado", 
                         404,
-                        "Projeto não encontrado",
                         {"message": f"Não existe projeto com id {id}"}
                     )
             return projeto
@@ -105,6 +116,9 @@ class ProjetoService:
         print(f"📝 Dados recebidos para atualizar projeto {id}: {requestBody}")
 
         try:
+            if not requestBody or 'projeto' not in requestBody:
+                raise ErrorResponse("Dados do projeto não fornecidos", 400)
+
             jsonProjeto = requestBody["projeto"]
 
             objProjeto = Projeto()
@@ -126,8 +140,8 @@ class ProjetoService:
                 usuarioExiste = self.__usuarioDAO.find_by_id(objProjeto.usuario_id)
                 if not usuarioExiste:
                     raise ErrorResponse(
-                        400,
                         "Usuário não encontrado",
+                        400,
                         {"message": f"O usuário com ID {objProjeto.usuario_id} não existe"}
                     )
 

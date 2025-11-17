@@ -74,7 +74,52 @@ class UsuarioDAO:
                 raise ValueError("Email já cadastrado")
             print(f"❌ Erro em UsuarioDAO.create(): {e}")
             raise
+    
+    def buscar_por_email(self, email):
+        """
+        Busca um usuário pelo email
+        """
+        try:
+            query = "SELECT * FROM usuarios WHERE email = %s"
+            result = self.__database.execute_query(query, (email,), fetch=True)
+            
+            if result and len(result) > 0:
+                return result[0]
+            return None
+            
+        except Exception as e:
+            print(f"❌ Erro ao buscar usuário por email: {e}")
+            return None
 
+    def buscar_por_id(self, usuario_id):
+        """
+        Busca um usuário pelo ID
+        """
+        try:
+            query = "SELECT * FROM usuarios WHERE id = %s"
+            result = self.__database.execute_query(query, (usuario_id,), fetch=True)
+            
+            if result and len(result) > 0:
+                return result[0]
+            return None
+            
+        except Exception as e:
+            print(f"❌ Erro ao buscar usuário por ID: {e}")
+            return None
+
+    def atualizar_senha(self, usuario_id, senha_hash):
+        """
+        Atualiza a senha de um usuário
+        """
+        try:
+            query = "UPDATE usuarios SET senha_hash = %s WHERE id = %s"
+            result = self.__database.execute_query(query, (senha_hash, usuario_id))
+            return result > 0
+            
+        except Exception as e:
+            print(f"❌ Erro ao atualizar senha: {e}")
+            return False
+    
     def find_by_id(self, usuario_id: int) -> Usuario | None:
         """
         Busca usuário por ID
@@ -98,7 +143,9 @@ class UsuarioDAO:
             usuario.nome = row["nome"]
             usuario.email = row["email"]
             usuario.senha_hash = row["senha_hash"]
-            usuario.empresa = row["empresa"]
+            
+            # ✅ CORREÇÃO: Verifica se a coluna empresa existe antes de acessar
+            usuario.empresa = row.get("empresa")  # Usa get() para evitar KeyError
             
             # Tratamento para datas
             if row["data_criacao"]:
@@ -148,7 +195,9 @@ class UsuarioDAO:
             usuario.nome = row["nome"]
             usuario.email = row["email"]
             usuario.senha_hash = row["senha_hash"]
-            usuario.empresa = row["empresa"]
+            
+            # ✅ CORREÇÃO: Verifica se a coluna empresa existe antes de acessar
+            usuario.empresa = row.get("empresa")  # Usa get() para evitar KeyError
             
             # Tratamento para datas
             if row["data_criacao"]:
@@ -195,7 +244,9 @@ class UsuarioDAO:
                 usuario.nome = row["nome"]
                 usuario.email = row["email"]
                 usuario.senha_hash = row["senha_hash"]
-                usuario.empresa = row["empresa"]
+                
+                # ✅ CORREÇÃO PRINCIPAL: Usa get() para evitar KeyError
+                usuario.empresa = row.get("empresa")  # Isso evita o erro se a coluna não existir
                 
                 # Tratamento para datas
                 if row["data_criacao"]:
@@ -218,6 +269,7 @@ class UsuarioDAO:
                 
                 usuarios.append(usuario)
 
+            print(f"✅ UsuarioDAO.find_all() encontrou {len(usuarios)} usuários")
             return usuarios
 
         except Exception as e:

@@ -381,9 +381,11 @@ class Tarefa:
     @projeto_id.setter
     def projeto_id(self, value):
         """
+        ✅ CORREÇÃO: projeto_id agora pode ser None
+
         Define o ID do projeto ao qual a tarefa pertence.
 
-        🔹 Regra de domínio: garante que o ID do projeto seja sempre um número inteiro positivo.
+        🔹 Regra de domínio: garante que o ID do projeto seja sempre um número inteiro positivo ou None.
 
         :param value: int - Número inteiro positivo representando o ID do projeto.
         :raises ValueError: Lança erro se o valor não for número, não for inteiro ou for menor/igual a zero.
@@ -403,51 +405,12 @@ class Tarefa:
         try:
             parsed = int(value)
         except (ValueError, TypeError):
-            raise ValueError("projeto_id deve ser um número inteiro.")
+            raise ValueError("projeto_id deve ser um número inteiro ou None.")
 
         if parsed <= 0:
-            raise ValueError("projeto_id deve ser maior que zero.")
+            raise ValueError("projeto_id deve ser maior que zero ou None.")
 
         self.__projeto_id = parsed
-
-    @property
-    def usuario_id(self):
-        """
-        ✅ ATUALIZADO: Getter para usuario_id - AGORA OBRIGATÓRIO
-        :return: int - ID do usuário ao qual a tarefa pertence
-        """
-        return self.__usuario_id
-
-    @usuario_id.setter
-    def usuario_id(self, value):
-        """
-        ✅ ATUALIZADO: Define o ID do usuário ao qual a tarefa pertence.
-
-        🔹 NOVA REGRA DE DOMÍNIO: usuario_id é agora obrigatório para tarefas personalizadas.
-
-        :param value: int - Número inteiro positivo representando o ID do usuário.
-        :raises ValueError: Lança erro se o valor não for número, não for inteiro ou for menor/igual a zero.
-
-        Exemplo:
-        >>> tarefa = Tarefa()
-        >>> tarefa.usuario_id = 1   # ✅ válido
-        >>> tarefa.usuario_id = -5  # ❌ lança erro
-        >>> tarefa.usuario_id = 0   # ❌ lança erro
-        >>> tarefa.usuario_id = 3.14  # ❌ lança erro
-        >>> tarefa.usuario_id = None  # ❌ lança erro (AGORA OBRIGATÓRIO)
-        """
-        if value is None:
-            raise ValueError("usuario_id é obrigatório para tarefas personalizadas.")
-
-        try:
-            parsed = int(value)
-        except (ValueError, TypeError):
-            raise ValueError("usuario_id deve ser um número inteiro.")
-
-        if parsed <= 0:
-            raise ValueError("usuario_id deve ser maior que zero.")
-
-        self.__usuario_id = parsed
 
     def to_dict(self):
         """

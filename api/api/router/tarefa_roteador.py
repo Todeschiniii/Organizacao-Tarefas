@@ -255,6 +255,38 @@ class TarefaRoteador:
             # ✅ CORREÇÃO: Busca todas as tarefas sem filtro (para admin/desenvolvimento)
             return self.__tarefa_control.index(None)
 
+        # GET /minhas-tarefas -> tarefas do usuário logado
+        @self.__blueprint.route('/minhas-tarefas', methods=['GET'])
+        @self.__jwt_middleware.validate_token
+        def minhas_tarefas():
+            """
+            Retorna apenas as tarefas do usuário logado
+            """
+            user_id = self.__jwt_middleware.get_user_id()
+            if not user_id:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Usuário não autenticado", "code": 401}
+                }), 401
+            
+            return self.__tarefa_control.minhas_tarefas(user_id)
+
+        # GET /projeto/<projeto_id>/tarefas -> tarefas de um projeto específico do usuário
+        @self.__blueprint.route('/projeto/<int:projeto_id>/tarefas', methods=['GET'])
+        @self.__jwt_middleware.validate_token
+        def tarefas_por_projeto(projeto_id):
+            """
+            Retorna tarefas de um projeto específico do usuário logado
+            """
+            user_id = self.__jwt_middleware.get_user_id()
+            if not user_id:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Usuário não autenticado", "code": 401}
+                }), 401
+            
+            return self.__tarefa_control.tarefas_por_projeto(projeto_id, user_id)
+
         # ✅ NOVA ROTA: GET /usuarios-disponiveis (para seleção de responsáveis)
         @self.__blueprint.route('/usuarios-disponiveis', methods=['GET'])
         @self.__jwt_middleware.validate_token

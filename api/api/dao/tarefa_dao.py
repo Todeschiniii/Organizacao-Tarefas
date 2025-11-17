@@ -43,6 +43,9 @@ class TarefaDAO:
                 else:
                     data_fim_value = str(objTarefa.data_fim)
 
+            # ✅ CORREÇÃO: projeto_id pode ser None
+            projeto_id_value = objTarefa.projeto_id if hasattr(objTarefa, 'projeto_id') else None
+
             params = (
                 objTarefa.titulo,
                 objTarefa.descricao if hasattr(objTarefa, 'descricao') else "",
@@ -52,7 +55,7 @@ class TarefaDAO:
                 data_limite_value,
                 data_inicio_value,
                 data_fim_value,
-                objTarefa.projeto_id,
+                projeto_id_value,   # ✅ AGORA PODE SER None
                 objTarefa.usuario_responsavel_id,
                 objTarefa.usuario_atribuidor_id
             )
@@ -103,7 +106,7 @@ class TarefaDAO:
             if usuario_id:
                 SQL += " AND usuario_responsavel_id = %s"
 
-            # ✅ CORREÇÃO: Tratamento seguro para datas (FALTANDO NO SEU CÓDIGO)
+            # ✅ CORREÇÃO: Tratamento seguro para datas
             data_limite_value = None
             if objTarefa.data_limite:
                 if hasattr(objTarefa.data_limite, 'isoformat'):
@@ -135,7 +138,7 @@ class TarefaDAO:
                 data_limite_value,
                 data_inicio_value,
                 data_fim_value,
-                objTarefa.projeto_id,
+                objTarefa.projeto_id,  # ✅ AGORA PODE SER None
                 objTarefa.usuario_responsavel_id,
                 objTarefa.usuario_atribuidor_id,
                 objTarefa.id,
@@ -223,7 +226,15 @@ class TarefaDAO:
                     LEFT JOIN usuarios ur ON t.usuario_responsavel_id = ur.id
                     LEFT JOIN usuarios ua ON t.usuario_atribuidor_id = ua.id
                     WHERE t.usuario_responsavel_id = %s
-                    ORDER BY t.id DESC
+                    ORDER BY 
+                        CASE 
+                            WHEN t.concluida = TRUE THEN 3
+                            WHEN t.status = 'andamento' THEN 1
+                            WHEN t.status = 'pendente' THEN 2
+                            ELSE 4
+                        END,
+                        t.prioridade DESC,
+                        t.data_limite ASC
                 """
                 params = (usuario_id,)
             else:
@@ -249,7 +260,15 @@ class TarefaDAO:
                     LEFT JOIN projetos p ON t.projeto_id = p.id
                     LEFT JOIN usuarios ur ON t.usuario_responsavel_id = ur.id
                     LEFT JOIN usuarios ua ON t.usuario_atribuidor_id = ua.id
-                    ORDER BY t.id DESC
+                    ORDER BY 
+                        CASE 
+                            WHEN t.concluida = TRUE THEN 3
+                            WHEN t.status = 'andamento' THEN 1
+                            WHEN t.status = 'pendente' THEN 2
+                            ELSE 4
+                        END,
+                        t.prioridade DESC,
+                        t.data_limite ASC
                 """
                 params = None
 
@@ -416,6 +435,15 @@ class TarefaDAO:
                     LEFT JOIN projetos p ON t.projeto_id = p.id
                     LEFT JOIN usuarios ur ON t.usuario_responsavel_id = ur.id
                     WHERE t.projeto_id = %s AND t.usuario_responsavel_id = %s
+                    ORDER BY 
+                        CASE 
+                            WHEN t.concluida = TRUE THEN 3
+                            WHEN t.status = 'andamento' THEN 1
+                            WHEN t.status = 'pendente' THEN 2
+                            ELSE 4
+                        END,
+                        t.prioridade DESC,
+                        t.data_limite ASC
                 """
                 params = (projeto_id, usuario_id)
             else:
@@ -439,6 +467,15 @@ class TarefaDAO:
                     LEFT JOIN projetos p ON t.projeto_id = p.id
                     LEFT JOIN usuarios ur ON t.usuario_responsavel_id = ur.id
                     WHERE t.projeto_id = %s
+                    ORDER BY 
+                        CASE 
+                            WHEN t.concluida = TRUE THEN 3
+                            WHEN t.status = 'andamento' THEN 1
+                            WHEN t.status = 'pendente' THEN 2
+                            ELSE 4
+                        END,
+                        t.prioridade DESC,
+                        t.data_limite ASC
                 """
                 params = (projeto_id,)
 
@@ -524,8 +561,10 @@ class TarefaDAO:
                     COUNT(*) as total,
                     SUM(CASE WHEN concluida = TRUE THEN 1 ELSE 0 END) as concluidas,
                     SUM(CASE WHEN concluida = FALSE THEN 1 ELSE 0 END) as pendentes,
-                    SUM(CASE WHEN status = 'urgente' THEN 1 ELSE 0 END) as urgentes,
-                    SUM(CASE WHEN prioridade = 'alta' THEN 1 ELSE 0 END) as prioridade_alta
+                    SUM(CASE WHEN status = 'andamento' THEN 1 ELSE 0 END) as em_andamento,
+                    SUM(CASE WHEN prioridade = 'alta' THEN 1 ELSE 0 END) as prioridade_alta,
+                    SUM(CASE WHEN prioridade = 'media' THEN 1 ELSE 0 END) as prioridade_media,
+                    SUM(CASE WHEN prioridade = 'baixa' THEN 1 ELSE 0 END) as prioridade_baixa
                 FROM tarefas 
                 WHERE usuario_responsavel_id = %s
             """
@@ -536,8 +575,10 @@ class TarefaDAO:
                     "total": 0,
                     "concluidas": 0,
                     "pendentes": 0,
-                    "urgentes": 0,
-                    "prioridade_alta": 0
+                    "em_andamento": 0,
+                    "prioridade_alta": 0,
+                    "prioridade_media": 0,
+                    "prioridade_baixa": 0
                 }
                 
             row = rows[0]
@@ -545,8 +586,10 @@ class TarefaDAO:
                 "total": row["total"] or 0,
                 "concluidas": row["concluidas"] or 0,
                 "pendentes": row["pendentes"] or 0,
-                "urgentes": row["urgentes"] or 0,
-                "prioridade_alta": row["prioridade_alta"] or 0
+                "em_andamento": row["em_andamento"] or 0,
+                "prioridade_alta": row["prioridade_alta"] or 0,
+                "prioridade_media": row["prioridade_media"] or 0,
+                "prioridade_baixa": row["prioridade_baixa"] or 0
             }
             
         except Exception as e:
@@ -555,6 +598,19 @@ class TarefaDAO:
                 "total": 0,
                 "concluidas": 0,
                 "pendentes": 0,
-                "urgentes": 0,
-                "prioridade_alta": 0
+                "em_andamento": 0,
+                "prioridade_alta": 0,
+                "prioridade_media": 0,
+                "prioridade_baixa": 0
             }
+
+    def count_by_projeto_id(self, projeto_id: int) -> int:
+        """
+        ✅ NOVO: Conta tarefas de um projeto
+        """
+        try:
+            SQL = "SELECT COUNT(*) as total FROM tarefas WHERE projeto_id = %s"
+            result = self.__database.execute_query(SQL, (projeto_id,), fetch=True)
+            return result[0]["total"] if result else 0
+        except:
+            return 0

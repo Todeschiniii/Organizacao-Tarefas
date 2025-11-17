@@ -3,9 +3,11 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Cadastro - Sistema de Projetos</title>
+    <title>Cadastro - Organização de Tarefas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/theme.css">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -41,11 +43,6 @@
             margin-bottom: 0;
         }
 
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
         .btn-register {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
@@ -75,11 +72,6 @@
             transform: translateY(-2px);
         }
 
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-
         .password-strength {
             height: 5px;
             border-radius: 5px;
@@ -102,10 +94,6 @@
             width: 100%;
         }
 
-        .form-text {
-            font-size: 0.85em;
-        }
-
         .login-link {
             text-align: center;
             margin-top: 1.5em;
@@ -113,17 +101,52 @@
             border-top: 1px solid #dee2e6;
         }
 
-        .terms-text {
-            font-size: 0.85em;
-            color: #6c757d;
+        .success-animation {
+            animation: successPulse 2s ease-in-out;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-input-container .form-control {
+            padding-right: 50px;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 
 <body>
+    <button id="themeToggle" class="theme-toggle">
+        <span class="sun">🌞</span>
+        <span class="moon">🌛</span>
+    </button>
+
     <div class="register-container">
         <div class="logo">
-            <h1>📊 Sistema de Projetos</h1>
+            <h1>📊 Organização de Tarefas</h1>
             <p>Crie sua conta para começar</p>
         </div>
 
@@ -151,14 +174,20 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="txtSenha" class="form-label">Senha *</label>
-                <input type="password" id="txtSenha" class="form-control" placeholder="Crie uma senha" />
+                <div class="password-input-container">
+                    <input type="password" id="txtSenha" class="form-control" placeholder="Crie uma senha" />
+                    <button type="button" class="password-toggle" id="toggleSenha">🙈</button>
+                </div>
                 <div id="passwordStrength" class="password-strength"></div>
                 <div class="form-text">Mínimo 6 caracteres</div>
             </div>
 
             <div class="col-md-6 mb-3">
                 <label for="txtConfirmarSenha" class="form-label">Confirmar Senha *</label>
-                <input type="password" id="txtConfirmarSenha" class="form-control" placeholder="Repita a senha" />
+                <div class="password-input-container">
+                    <input type="password" id="txtConfirmarSenha" class="form-control" placeholder="Repita a senha" />
+                    <button type="button" class="password-toggle" id="toggleConfirmarSenha">🙈</button>
+                </div>
                 <div class="form-text">As senhas devem ser iguais</div>
             </div>
         </div>
@@ -192,6 +221,9 @@
         </div>
     </div>
 
+    <!-- Importar o theme.js -->
+    <script src="js/theme.js"></script>
+
     <script type="module">
         import ApiService from './ApiService.js';
 
@@ -201,45 +233,27 @@
         const txtEmpresa = document.getElementById("txtEmpresa");
         const txtSenha = document.getElementById("txtSenha");
         const txtConfirmarSenha = document.getElementById("txtConfirmarSenha");
+        const toggleSenha = document.getElementById("toggleSenha");
+        const toggleConfirmarSenha = document.getElementById("toggleConfirmarSenha");
         const checkTermos = document.getElementById("checkTermos");
         const btnRegister = document.getElementById("btnRegister");
         const btnGoToLogin = document.getElementById("btnGoToLogin");
         const divResposta = document.getElementById("divResposta");
         const passwordStrength = document.getElementById("passwordStrength");
 
-        // Verificar se já está logado
-        const userData = localStorage.getItem("userData");
-        if (userData) {
-            window.location.href = "dashboard.html";
-        }
-
-        // ApiService instance
-        const api = new ApiService(null, "http://localhost:5000");
-
-        /**
-         * Exibe mensagem na tela
-         * @param {string} message - Mensagem a ser exibida
-         * @param {string} type - Tipo da mensagem (success, danger, warning, info)
-         */
-        function showMessage(message, type) {
-            divResposta.textContent = message;
-            divResposta.className = `alert alert-${type}`;
-            divResposta.style.display = 'block';
-            
-            // Auto-esconder mensagens de sucesso após 5 segundos
-            if (type === 'success') {
-                setTimeout(() => {
-                    divResposta.style.display = 'none';
-                }, 5000);
+        // ======================== TOGGLE DE SENHA ========================
+        function toggleVisibilidadeSenha(input, botao) {
+            const tipoAtual = input.type;
+            if (tipoAtual === 'password') {
+                input.type = 'text';
+                botao.textContent = '🐵';
+            } else {
+                input.type = 'password';
+                botao.textContent = '🙈';
             }
-
-            // Scroll para a mensagem
-            divResposta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        /**
-         * Avalia a força da senha
-         */
+        // ======================== VERIFICAÇÃO DE SENHA ========================
         function avaliarForcaSenha(senha) {
             if (!senha) {
                 passwordStrength.className = 'password-strength';
@@ -262,19 +276,66 @@
             // Atualizar visual
             if (forca < 50) {
                 passwordStrength.className = 'password-strength strength-weak';
+                passwordStrength.style.width = '25%';
             } else if (forca < 75) {
                 passwordStrength.className = 'password-strength strength-medium';
+                passwordStrength.style.width = '50%';
             } else {
                 passwordStrength.className = 'password-strength strength-strong';
+                passwordStrength.style.width = '100%';
             }
         }
 
-        /**
-         * Valida os campos do formulário
-         * @returns {boolean} True se válido, False se inválido
-         */
+        // ✅ CORREÇÃO: Avaliar força da senha em tempo real
+        txtSenha.addEventListener("input", function() {
+            avaliarForcaSenha(this.value);
+        });
+
+        // Também avaliar quando o campo de confirmação for modificado
+        txtConfirmarSenha.addEventListener("input", function() {
+            if (this.value === txtSenha.value && this.value.length > 0) {
+                avaliarForcaSenha(this.value);
+            }
+        });
+
+        // ======================== FUNÇÕES PRINCIPAIS ========================
+        function showMessage(message, type) {
+            divResposta.textContent = message;
+            divResposta.className = `alert alert-${type}`;
+            divResposta.style.display = 'block';
+            
+            if (type === 'success') {
+                divResposta.classList.add('success-animation');
+            }
+
+            divResposta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function fazerLoginAutomatico(dadosUsuario) {
+            console.log("🔐 Fazendo login automático...", dadosUsuario);
+            
+            // ✅ CORREÇÃO MELHORADA: Salvar dados de forma consistente
+            if (dadosUsuario.token) {
+                localStorage.setItem("token", dadosUsuario.token);
+            }
+            
+            // Salvar userData de forma padronizada
+            const userData = {
+                usuario: dadosUsuario.usuario || dadosUsuario,
+                token: dadosUsuario.token
+            };
+            
+            localStorage.setItem("userData", JSON.stringify(userData));
+            
+            console.log("✅ Login automático realizado com sucesso!", userData);
+            
+            // Redirecionar para dashboard
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1500);
+        }
+
         function validarFormulario() {
-            // Validar nome
             if (txtNome.value.trim() === "") {
                 showMessage("Nome completo é obrigatório", "warning");
                 txtNome.focus();
@@ -287,7 +348,6 @@
                 return false;
             }
 
-            // Validar email
             if (txtEmail.value.trim() === "") {
                 showMessage("Email é obrigatório", "warning");
                 txtEmail.focus();
@@ -301,7 +361,6 @@
                 return false;
             }
 
-            // Validar senha
             if (txtSenha.value.trim() === "") {
                 showMessage("Senha é obrigatória", "warning");
                 txtSenha.focus();
@@ -314,7 +373,6 @@
                 return false;
             }
 
-            // Validar confirmação de senha
             if (txtConfirmarSenha.value.trim() === "") {
                 showMessage("Confirmação de senha é obrigatória", "warning");
                 txtConfirmarSenha.focus();
@@ -328,7 +386,6 @@
                 return false;
             }
 
-            // Validar termos
             if (!checkTermos.checked) {
                 showMessage("Você deve aceitar os termos de uso para continuar", "warning");
                 checkTermos.focus();
@@ -338,16 +395,11 @@
             return true;
         }
 
-        /**
-         * Realiza o cadastro do usuário
-         */
         async function realizarCadastro() {
-            // Validar formulário
             if (!validarFormulario()) {
                 return;
             }
 
-            // Mostrar loading no botão
             btnRegister.disabled = true;
             btnRegister.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Criando conta...';
 
@@ -364,27 +416,59 @@
                 console.log("📝 Enviando requisição de cadastro...", dadosCadastro);
 
                 const resposta = await api.post("/api/usuario/", dadosCadastro);
-                console.log("📨 Resposta da API:", resposta);
+                console.log("📨 Resposta completa da API:", resposta);
 
                 if (resposta && resposta.success) {
                     console.log('✅ Cadastro realizado com sucesso:', resposta);
                     
-                    showMessage("Conta criada com sucesso! Redirecionando para login...", "success");
+                    // ✅ CORREÇÃO: Verificação mais robusta do token
+                    const temToken = resposta.data?.token || resposta.token;
+                    const temUsuario = resposta.data?.usuario || resposta.usuario;
                     
-                    // Limpar formulário
-                    txtNome.value = '';
-                    txtEmail.value = '';
-                    txtEmpresa.value = '';
-                    txtSenha.value = '';
-                    txtConfirmarSenha.value = '';
-                    checkTermos.checked = false;
-                    
-                    // Redirecionar para login após 3 segundos
-                    setTimeout(() => {
-                        window.location.href = "login.html";
-                    }, 3000);
+                    if (temToken && temUsuario) {
+                        showMessage("🎉 Conta criada com sucesso! Fazendo login automático...", "success");
+                        fazerLoginAutomatico(resposta.data || resposta);
+                    } else {
+                        // Se não veio token, tentar fazer login automaticamente
+                        showMessage("✅ Conta criada! Tentando login automático...", "success");
+                        
+                        try {
+                            const dadosLogin = {
+                                "usuario": {
+                                    "email": txtEmail.value.trim(),
+                                    "senha": txtSenha.value.trim()
+                                }
+                            };
+                            
+                            const loginResposta = await api.post("/api/usuario/login", dadosLogin);
+                            
+                            if (loginResposta && loginResposta.success && loginResposta.data?.token) {
+                                showMessage("🎉 Login automático realizado! Redirecionando...", "success");
+                                fazerLoginAutomatico(loginResposta.data);
+                            } else {
+                                throw new Error("Login automático falhou");
+                            }
+                            
+                        } catch (loginError) {
+                            console.log("⚠️ Login automático falhou, redirecionando para login manual", loginError);
+                            showMessage("✅ Conta criada! Faça login para continuar.", "success");
+                            
+                            // Limpar formulário
+                            txtNome.value = '';
+                            txtEmail.value = '';
+                            txtEmpresa.value = '';
+                            txtSenha.value = '';
+                            txtConfirmarSenha.value = '';
+                            checkTermos.checked = false;
+                            
+                            // Redirecionar para login
+                            setTimeout(() => {
+                                window.location.href = "login.html";
+                            }, 3000);
+                        }
+                    }
+
                 } else {
-                    // Tratar erros específicos da API
                     const errorMessage = resposta.error?.message || "Erro ao criar conta. Tente novamente.";
                     showMessage(errorMessage, "danger");
                 }
@@ -392,40 +476,49 @@
             } catch (error) {
                 console.error("❌ Erro no cadastro:", error);
                 
-                // Mensagem mais amigável para o usuário
                 if (error.message?.includes('Failed to fetch')) {
                     showMessage("Erro de conexão. Verifique se o servidor Flask está rodando.", "danger");
-                } else if (error.message?.includes('409')) {
+                } else if (error.message?.includes('409') || error.message?.includes('Email já cadastrado')) {
                     showMessage("Este email já está cadastrado no sistema.", "warning");
+                    txtEmail.focus();
+                    txtEmail.select();
                 } else {
                     showMessage("Erro ao criar conta. Tente novamente.", "danger");
                 }
             } finally {
-                // Restaurar botão
                 btnRegister.disabled = false;
                 btnRegister.textContent = "Criar Conta";
             }
         }
 
-        // Event Listeners
+        // ======================== EVENT LISTENERS ========================
         btnRegister.addEventListener("click", realizarCadastro);
         btnGoToLogin.addEventListener("click", () => {
             window.location.href = "login.html";
         });
 
-        // Avaliar força da senha em tempo real
-        txtSenha.addEventListener("input", function() {
-            avaliarForcaSenha(this.value);
+        toggleSenha.addEventListener("click", () => {
+            toggleVisibilidadeSenha(txtSenha, toggleSenha);
         });
 
-        // Permitir cadastro com Enter
+        toggleConfirmarSenha.addEventListener("click", () => {
+            toggleVisibilidadeSenha(txtConfirmarSenha, toggleConfirmarSenha);
+        });
+
         txtConfirmarSenha.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 realizarCadastro();
             }
         });
 
-        // Focar no campo de nome ao carregar a página
+        // ======================== INICIALIZAÇÃO ========================
+        // Verificar se já está logado
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+            window.location.href = "dashboard.html";
+        }
+
+        const api = new ApiService(null, "http://localhost:5000");
         txtNome.focus();
 
         console.log("🚀 Página de cadastro carregada!");

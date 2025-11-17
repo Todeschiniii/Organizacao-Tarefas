@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recuperar Senha - Organização de Tarefas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2em;
+    }
+
+    [data-theme="dark"] body {
+      background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    }
+
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border: none;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    [data-theme="dark"] .card {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .back-link {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Botão de Tema -->
+  <button id="themeToggle" class="theme-toggle" style="position: fixed; top: 20px; right: 20px;">
+    <span class="sun">🌞</span>
+    <span class="moon">🌛</span>
+  </button>
+
+  <div class="card">
+    <div class="card-header">
+      <i class="bi bi-key"></i> Recuperar Senha
+    </div>
+    <div class="card-body p-4">
+      <p class="text-muted mb-4">
+        Digite seu email abaixo e enviaremos um link para redefinir sua senha.
+      </p>
+
+      <div class="mb-3">
+        <label for="emailRecuperacao" class="form-label">Email</label>
+        <input type="email" id="emailRecuperacao" class="form-control" placeholder="seu@email.com" required>
+      </div>
+
+      <div id="mensagemRecuperacao" class="alert" style="display: none;"></div>
+
+      <div class="d-grid gap-2 mb-3">
+        <button class="btn btn-primary" id="btnEnviarRecuperacao">
+          <i class="bi bi-send"></i> Enviar Link de Recuperação
+        </button>
+      </div>
+
+      <div class="text-center">
+        <a href="login.html" class="back-link">
+          <i class="bi bi-arrow-left"></i> Voltar para o Login
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Importar o theme.js -->
+  <script src="js/theme.js"></script>
+
+  <script type="module">
+    import ApiService from './ApiService.js';
+
+    const emailRecuperacao = document.getElementById('emailRecuperacao');
+    const btnEnviarRecuperacao = document.getElementById('btnEnviarRecuperacao');
+    const mensagemRecuperacao = document.getElementById('mensagemRecuperacao');
+
+    // Inicializar ApiService sem token (usuário não está logado)
+    const api = new ApiService(null, "http://localhost:5000");
+
+    function mostrarMensagem(mensagem, tipo) {
+      mensagemRecuperacao.textContent = mensagem;
+      mensagemRecuperacao.className = `alert alert-${tipo}`;
+      mensagemRecuperacao.style.display = 'block';
+    }
+
+    btnEnviarRecuperacao.addEventListener('click', async function() {
+      const email = emailRecuperacao.value.trim();
+
+      if (!email) {
+        mostrarMensagem('Por favor, digite seu email.', 'warning');
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        mostrarMensagem('Por favor, digite um email válido.', 'warning');
+        return;
+      }
+
+      // Mostrar loading
+      btnEnviarRecuperacao.disabled = true;
+      btnEnviarRecuperacao.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+
+      try {
+        const resposta = await api.post("/api/auth/recuperar-senha", { email });
+
+        if (resposta.success) {
+          mostrarMensagem('Email de recuperação enviado com sucesso! Verifique sua caixa de entrada.', 'success');
+          emailRecuperacao.value = '';
+        } else {
+          mostrarMensagem(resposta.error?.message || 'Erro ao enviar email de recuperação.', 'danger');
+        }
+      } catch (error) {
+        mostrarMensagem('Erro ao conectar com o servidor. Tente novamente.', 'danger');
+        console.error('Erro:', error);
+      } finally {
+        // Restaurar botão
+        btnEnviarRecuperacao.disabled = false;
+        btnEnviarRecuperacao.innerHTML = '<i class="bi bi-send"></i> Enviar Link de Recuperação';
+      }
+    });
+
+    // Permitir enviar com Enter
+    emailRecuperacao.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        btnEnviarRecuperacao.click();
+      }
+    });
+  </script>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+</body>
+</html>
