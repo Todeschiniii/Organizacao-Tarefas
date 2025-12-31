@@ -28,18 +28,18 @@ class TarefaService:
         objTarefa.data_limite = jsonTarefa.get("data_limite")
         objTarefa.projeto_id = jsonTarefa["projeto_id"]
 
-        if "usuario_responsavel_id" not in jsonTarefa:
-            raise ErrorResponse(400, "Responsável obrigatório", 
-                              {"message": "O campo usuario_responsavel_id é obrigatório"})
+        #if "usuario_responsavel_id" not in jsonTarefa:
+        #    raise ErrorResponse(400, "Responsável obrigatório", 
+        #                      {"message": "O campo usuario_responsavel_id é obrigatório"})
         
-        objTarefa.usuario_responsavel_id = jsonTarefa["usuario_responsavel_id"]
+        #objTarefa.usuario_responsavel_id = jsonTarefa["usuario_responsavel_id"]
         
         if usuario_atribuidor_id:
             objTarefa.usuario_atribuidor_id = usuario_atribuidor_id
         elif "usuario_atribuidor_id" in jsonTarefa:
             objTarefa.usuario_atribuidor_id = jsonTarefa["usuario_atribuidor_id"]
-        else:
-            objTarefa.usuario_atribuidor_id = jsonTarefa["usuario_responsavel_id"]
+        #else:
+            #objTarefa.usuario_atribuidor_id = jsonTarefa["usuario_responsavel_id"]
 
         if self.__usuarioDAO:
             try:
@@ -72,9 +72,9 @@ class TarefaService:
                 print(f"📊 Resultado validação responsável: {responsavel_existe}")
                 print(f"📊 Resultado validação atribuidor: {atribuidor_existe}")
                 
-                if not responsavel_existe:
-                    raise ErrorResponse(400, "Responsável não encontrado",
-                                      {"message": f"Usuário responsável com ID {objTarefa.usuario_responsavel_id} não existe"})
+                #if not responsavel_existe:
+                    #raise ErrorResponse(400, "Responsável não encontrado",
+                                      #{"message": f"Usuário responsável com ID {objTarefa.usuario_responsavel_id} não existe"})
                 
                 if not atribuidor_existe:
                     raise ErrorResponse(400, "Atribuidor não encontrado",

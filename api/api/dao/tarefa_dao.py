@@ -46,6 +46,24 @@ class TarefaDAO:
             # ✅ CORREÇÃO: projeto_id pode ser None
             projeto_id_value = objTarefa.projeto_id if hasattr(objTarefa, 'projeto_id') else None
 
+            # ✅✅✅ CORREÇÃO CRÍTICA: Tratamento para usuario_responsavel_id
+            # Se usuario_responsavel_id for None (que é o caso do seu erro), 
+            # vamos usar o usuario_atribuidor_id como fallback
+            usuario_responsavel_id_value = objTarefa.usuario_responsavel_id
+            usuario_atribuidor_id_value = objTarefa.usuario_atribuidor_id
+            
+            # Se responsável for None, tentamos usar o atribuidor
+            if usuario_responsavel_id_value is None and usuario_atribuidor_id_value is not None:
+                print(f"⚠️  usuario_responsavel_id está None, usando usuario_atribuidor_id: {usuario_atribuidor_id_value}")
+                usuario_responsavel_id_value = usuario_atribuidor_id_value
+            # Se ambos forem None, lançamos um erro mais específico
+            elif usuario_responsavel_id_value is None and usuario_atribuidor_id_value is None:
+                raise ValueError("❌ Tanto usuario_responsavel_id quanto usuario_atribuidor_id são None. Pelo menos um deve ter valor.")
+            
+            # ✅ CORREÇÃO: Verifica se temos um valor válido para usuario_responsavel_id
+            if usuario_responsavel_id_value is None:
+                raise ValueError("❌ usuario_responsavel_id não pode ser None após tratamento")
+
             params = (
                 objTarefa.titulo,
                 objTarefa.descricao if hasattr(objTarefa, 'descricao') else "",
@@ -56,10 +74,11 @@ class TarefaDAO:
                 data_inicio_value,
                 data_fim_value,
                 projeto_id_value,   # ✅ AGORA PODE SER None
-                objTarefa.usuario_responsavel_id,
-                objTarefa.usuario_atribuidor_id
+                usuario_responsavel_id_value,  # ✅ AGORA COM VALOR GARANTIDO
+                usuario_atribuidor_id_value  # ✅ PODE SER None (mas não será no seu caso)
             )
 
+            print(f"📝 Parâmetros da inserção: {params}")
             insert_id = self.__database.execute_query(SQL, params)
             
             if not insert_id:
@@ -128,6 +147,14 @@ class TarefaDAO:
                 else:
                     data_fim_value = str(objTarefa.data_fim)
 
+            # ✅✅✅ CORREÇÃO: Garantir que usuario_responsavel_id não seja None
+            usuario_responsavel_id_value = objTarefa.usuario_responsavel_id
+            if usuario_responsavel_id_value is None:
+                # Se for None, tentamos usar usuario_atribuidor_id como fallback
+                usuario_responsavel_id_value = objTarefa.usuario_atribuidor_id
+                if usuario_responsavel_id_value is None:
+                    raise ValueError("❌ usuario_responsavel_id não pode ser None na atualização")
+
             # ✅ CORREÇÃO: Parâmetros completos
             params = [
                 objTarefa.titulo,
@@ -139,7 +166,7 @@ class TarefaDAO:
                 data_inicio_value,
                 data_fim_value,
                 objTarefa.projeto_id,  # ✅ AGORA PODE SER None
-                objTarefa.usuario_responsavel_id,
+                usuario_responsavel_id_value,  # ✅ AGORA COM VALOR GARANTIDO
                 objTarefa.usuario_atribuidor_id,
                 objTarefa.id,
             ]

@@ -562,11 +562,24 @@
           </div>
 
           <div class="row mb-2">
+            <!--
             <div class="col-md-6">
               <label for="cboResponsavel" class="form-label">Responsável *</label>
               <select id="cboResponsavel" class="form-select">
                 <option value="-1">Selecione o responsável</option>
               </select>
+            </div>
+            -->
+            <div class="col-md-6">
+              <label for="cboStatus" class="form-label">Status</label>
+              <select id="cboStatus" class="form-select">
+                <option value="pendente">Pendente</option>
+                <option value="andamento">Em Andamento</option>
+                <option value="concluida">Concluída</option>
+              </select>
+              <div class="info-text mt-1">
+                <i class="bi bi-info-circle"></i> Ao salvar, a data de início será definida automaticamente
+              </div>
             </div>
             <div class="col-md-6">
               <label for="cboPrioridade" class="form-label">Prioridade</label>
@@ -579,17 +592,6 @@
           </div>
 
           <div class="row mb-2">
-            <div class="col-md-6">
-              <label for="cboStatus" class="form-label">Status</label>
-              <select id="cboStatus" class="form-select">
-                <option value="pendente">Pendente</option>
-                <option value="andamento">Em Andamento</option>
-                <option value="concluida">Concluída</option>
-              </select>
-              <div class="info-text mt-1">
-                <i class="bi bi-info-circle"></i> Ao salvar, a data de início será definida automaticamente
-              </div>
-            </div>
             <div class="col-md-6">
               <div class="form-check mt-4">
                 <input type="checkbox" id="chkConcluida" class="form-check-input">
@@ -641,12 +643,14 @@
                     <option value="baixa">Baixa</option>
                 </select>
             </div>
+            <!--
             <div class="col-md-3">
                 <label for="filtroResponsavel" class="form-label">Responsável</label>
                 <select id="filtroResponsavel" class="form-select">
                     <option value="todos">Todos</option>
                 </select>
             </div>
+            -->
         </div>
         <div class="row mt-2">
           <div class="col-12">
@@ -861,13 +865,13 @@
     const txtDescricao = document.getElementById("txtDescricao");
     const txtDataLimite = document.getElementById("txtDataLimite");
     const cboProjeto = document.getElementById("cboProjeto");
-    const cboResponsavel = document.getElementById("cboResponsavel");
+    //const cboResponsavel = document.getElementById("cboResponsavel");
     const cboStatus = document.getElementById("cboStatus");
     const cboPrioridade = document.getElementById("cboPrioridade");
     const chkConcluida = document.getElementById("chkConcluida");
     const filtroStatus = document.getElementById("filtroStatus");
     const filtroPrioridade = document.getElementById("filtroPrioridade");
-    const filtroResponsavel = document.getElementById("filtroResponsavel");
+    //const filtroResponsavel = document.getElementById("filtroResponsavel");
     const divBotoes = document.getElementById("divBotoes");
     const divResposta = document.getElementById("divResposta");
     const cardProjetoInfo = document.getElementById("cardProjetoInfo");
@@ -956,23 +960,23 @@
         }
         
         // 2. ✅ CRÍTICO: OCULTAR CAMPO "RESPONSÁVEL" DO FORMULÁRIO
-        const secaoResponsavel = document.querySelector('.row.mb-2').children[1]; // Assume que responsável é o segundo campo
-        if (secaoResponsavel) {
-            secaoResponsavel.style.display = 'none';
-        }
+        //const secaoResponsavel = document.querySelector('.row.mb-2').children[1]; // Assume que responsável é o segundo campo
+        //if (secaoResponsavel) {
+        //    secaoResponsavel.style.display = 'none';
+        //}
         
         // 3. ✅ CRÍTICO: OCULTAR FILTRO POR RESPONSÁVEL
-        const filtroResponsavel = document.getElementById('filtroResponsavel');
-        if (filtroResponsavel) {
-            filtroResponsavel.closest('.col-md-4').style.display = 'none';
-        }
+        //const filtroResponsavel = document.getElementById('filtroResponsavel');
+        //if (filtroResponsavel) {
+        //    filtroResponsavel.closest('.col-md-4').style.display = 'none';
+        //}
         
         // 4. ✅ CRÍTICO: AUTO-SELECIONAR USUÁRIO ATUAL COMO RESPONSÁVEL
-        const cboResponsavel = document.getElementById('cboResponsavel');
-        if (cboResponsavel && usuario.id) {
-            cboResponsavel.value = usuario.id;
-            cboResponsavel.disabled = true; // Impede alteração
-        }
+        //const cboResponsavel = document.getElementById('cboResponsavel');
+        //if (cboResponsavel && usuario.id) {
+        //    cboResponsavel.value = usuario.id;
+        //    cboResponsavel.disabled = true; // Impede alteração
+        //}
         
         // 5. Adicionar mensagem informativa
         const formulario = document.querySelector('.card-body');
@@ -1009,11 +1013,11 @@
         const usuario = userData?.usuario || userData?.data?.usuario;
         
         // Se for perfil pessoal, forçar usuario_responsavel_id = usuario atual
-        if (usuario && usuario.perfil_tipo === 'pessoal') {
-            objetoBase.tarefa.usuario_responsavel_id = usuario.id;
-            objetoBase.tarefa.usuario_atribuidor_id = usuario.id;
-            console.log("🏠 Perfil pessoal: Auto-atribuindo tarefa ao usuário", usuario.id);
-        }
+        //if (usuario && usuario.perfil_tipo === 'pessoal') {
+        //    objetoBase.tarefa.usuario_responsavel_id = usuario.id;
+        //    objetoBase.tarefa.usuario_atribuidor_id = usuario.id;
+        //    console.log("🏠 Perfil pessoal: Auto-atribuindo tarefa ao usuário", usuario.id);
+        //}
         
         return objetoBase;
     }
@@ -1024,11 +1028,11 @@
         const usuario = userData?.usuario || userData?.data?.usuario;
         
         // Se for perfil pessoal, forçar usuario_responsavel_id = usuario atual
-        if (usuario && usuario.perfil_tipo === 'pessoal') {
-            objetoBase.tarefa.usuario_responsavel_id = usuario.id;
-            objetoBase.tarefa.usuario_atribuidor_id = usuario.id;
-            console.log("🏠 Perfil pessoal: Auto-atribuindo tarefa ao usuário", usuario.id);
-        }
+        //if (usuario && usuario.perfil_tipo === 'pessoal') {
+        //    objetoBase.tarefa.usuario_responsavel_id = usuario.id;
+        //    objetoBase.tarefa.usuario_atribuidor_id = usuario.id;
+        //    console.log("🏠 Perfil pessoal: Auto-atribuindo tarefa ao usuário", usuario.id);
+        //}
         
         // ✅ CORREÇÃO: Se projeto_id é -1, definir como null (tarefa solta)
         if (objetoBase.tarefa.projeto_id === -1) {
@@ -1066,10 +1070,10 @@
         const userData = JSON.parse(localStorage.getItem("userData"));
         const usuario = userData?.usuario || userData?.data?.usuario;
         
-        if ((!usuario || usuario.perfil_tipo !== 'pessoal') && cboResponsavel.value === "-1") {
-            showMessage("Selecione um responsável", "warning");
-            return;
-        }
+        //if ((!usuario || usuario.perfil_tipo !== 'pessoal') && cboResponsavel.value === "-1") {
+            //showMessage("Selecione um responsável", "warning");
+            //return;
+        //}
 
         const objetoCriar = {
             "tarefa": {
@@ -1082,7 +1086,7 @@
                 "prioridade": cboPrioridade.value,
                 "concluida": chkConcluida.checked,
                 "projeto_id": cboProjeto.value === "-1" ? -1 : parseInt(cboProjeto.value), // ✅ Pode ser -1 (será convertido para null)
-                "usuario_responsavel_id": usuario && usuario.perfil_tipo === 'pessoal' ? usuario.id : parseInt(cboResponsavel.value),
+                //"usuario_responsavel_id": usuario && usuario.perfil_tipo === 'pessoal' ? usuario.id : parseInt(cboResponsavel.value),
                 "usuario_atribuidor_id": usuarioLogado.usuario.id
             }
         };
@@ -1158,7 +1162,7 @@
           "prioridade": cboPrioridade.value,
           "concluida": chkConcluida.checked,
           "projeto_id": parseInt(cboProjeto.value),
-          "usuario_responsavel_id": parseInt(cboResponsavel.value)
+          //"usuario_responsavel_id": parseInt(cboResponsavel.value)
         }
       };
 
@@ -1315,18 +1319,18 @@
         }
         
         // Preencher select de responsáveis
-        cboResponsavel.innerHTML = '<option value="-1">Selecione o responsável</option>';
-        filtroResponsavel.innerHTML = '<option value="todos">Todos</option>';
+        //cboResponsavel.innerHTML = '<option value="-1">Selecione o responsável</option>';
+        //filtroResponsavel.innerHTML = '<option value="todos">Todos</option>';
         
         usuariosList.forEach(usuario => {
           const option = document.createElement("option");
           option.value = usuario.id;
           option.textContent = usuario.nome || usuario.name;
-          cboResponsavel.appendChild(option);
+          //cboResponsavel.appendChild(option);
           
           const optionFiltro = option.cloneNode(true);
           optionFiltro.value = usuario.id;
-          filtroResponsavel.appendChild(optionFiltro);
+          //filtroResponsavel.appendChild(optionFiltro);
         });
       } catch (error) {
         console.error("Erro ao carregar usuários:", error);
@@ -1437,7 +1441,7 @@
       
       const statusSelecionado = filtroStatus.value;
       const prioridadeSelecionada = filtroPrioridade.value;
-      const responsavelSelecionado = filtroResponsavel.value;
+      //const responsavelSelecionado = filtroResponsavel.value;
       
       let filtrosAtivos = [];
       
@@ -1458,16 +1462,16 @@
       }
       
       // Aplicar filtro de responsável
-      if (responsavelSelecionado !== 'todos') {
-        tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
-          tarefa.usuario_responsavel_id == responsavelSelecionado
-        );
+      //if (responsavelSelecionado !== 'todos') {
+        //tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+        //  tarefa.usuario_responsavel_id == responsavelSelecionado
+        //);
         
-        const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
-        if (usuario) {
-          filtrosAtivos.push(`responsável: "${usuario.nome}"`);
-        }
-      }
+        //const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
+        //if (usuario) {
+        //  filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+        //}
+      //}
       
       atualizarInfoBusca(filtrosAtivos);
       
@@ -1530,7 +1534,7 @@
         
         const statusSelecionado = filtroStatus.value;
         const prioridadeSelecionada = filtroPrioridade.value;
-        const responsavelSelecionado = filtroResponsavel.value;
+        //const responsavelSelecionado = filtroResponsavel.value;
         const projetoSelecionadoFiltro = filtroProjeto ? filtroProjeto.value : 'todos';
         
         let filtrosAtivos = [];
@@ -1552,16 +1556,16 @@
         }
         
         // Aplicar filtro de responsável
-        if (responsavelSelecionado !== 'todos') {
-            tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
-                tarefa.usuario_responsavel_id == responsavelSelecionado
-            );
+        //if (responsavelSelecionado !== 'todos') {
+            //tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+            //    tarefa.usuario_responsavel_id == responsavelSelecionado
+            //);
             
-            const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
-            if (usuario) {
-                filtrosAtivos.push(`responsável: "${usuario.nome}"`);
-            }
-        }
+            //const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
+            //if (usuario) {
+            //    filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+            //}
+        //}
         
         // ✅ NOVO: Aplicar filtro de projeto (incluindo "sem projeto")
         if (projetoSelecionadoFiltro !== 'todos') {
@@ -1627,7 +1631,7 @@
         cboProjeto.value = "-1";
       }
       
-      cboResponsavel.value = "-1";
+      //cboResponsavel.value = "-1";
       cboStatus.value = "pendente";
       cboPrioridade.value = "media";
       chkConcluida.checked = false;
@@ -1684,14 +1688,14 @@
         const headers = ['ID', 'Título', 'Descrição', 'Projeto', 'Responsável', 'Status', 'Prioridade', 'Data Limite', 'Concluída'];
         const rows = tarefasFiltradas.map(tarefa => {
           const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
-          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          //const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
           
           return [
             tarefa.id,
             `"${tarefa.titulo}"`,
             `"${tarefa.descricao || ''}"`,
             `"${projeto ? (projeto.nome || projeto.titulo) : 'N/A'}"`,
-            `"${responsavel ? responsavel.nome : 'N/A'}"`,
+            //`"${responsavel ? responsavel.nome : 'N/A'}"`,
             formatarStatus(tarefa.status),
             formatarPrioridade(tarefa.prioridade),
             tarefa.data_limite ? new Date(tarefa.data_limite).toLocaleDateString('pt-BR') : 'N/A',
@@ -1773,7 +1777,7 @@
       const filtrosAtivos = [];
       const statusSelecionado = filtroStatus.value;
       const prioridadeSelecionada = filtroPrioridade.value;
-      const responsavelSelecionado = filtroResponsavel.value;
+      //const responsavelSelecionado = filtroResponsavel.value;
       
       if (statusSelecionado !== 'todos') {
         filtrosAtivos.push(`status: "${formatarStatus(statusSelecionado)}"`);
@@ -1783,12 +1787,12 @@
         filtrosAtivos.push(`prioridade: "${formatarPrioridade(prioridadeSelecionada)}"`);
       }
       
-      if (responsavelSelecionado !== 'todos') {
-        const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
-        if (usuario) {
-          filtrosAtivos.push(`responsável: "${usuario.nome}"`);
-        }
-      }
+      //if (responsavelSelecionado !== 'todos') {
+        //const usuario = usuariosList.find(u => u.id == responsavelSelecionado);
+        //if (usuario) {
+          //filtrosAtivos.push(`responsável: "${usuario.nome}"`);
+        //}
+      //}
       
       return filtrosAtivos.join(', ');
     }
@@ -1901,10 +1905,10 @@
           tr.appendChild(tdProjeto);
 
           // Responsável
-          const tdResponsavel = document.createElement("td");
-          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
-          tdResponsavel.textContent = responsavel ? responsavel.nome : 'N/A';
-          tr.appendChild(tdResponsavel);
+          //const tdResponsavel = document.createElement("td");
+          //const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          //tdResponsavel.textContent = responsavel ? responsavel.nome : 'N/A';
+          //tr.appendChild(tdResponsavel);
 
           // ✅ ADICIONADO: Atribuidor
           const tdAtribuidor = document.createElement("td");
@@ -1966,7 +1970,7 @@
               }
               
               cboProjeto.value = tarefa.projeto_id || "";
-              cboResponsavel.value = tarefa.usuario_responsavel_id;
+              //cboResponsavel.value = tarefa.usuario_responsavel_id;
               cboAtribuidor.value = tarefa.usuario_atribuidor_id;
               cboStatus.value = tarefa.status;
               cboPrioridade.value = tarefa.prioridade;
@@ -2031,7 +2035,7 @@
               }
               
               cboProjeto.value = tarefa.projeto_id || "";
-              cboResponsavel.value = tarefa.usuario_responsavel_id;
+              //cboResponsavel.value = tarefa.usuario_responsavel_id;
               cboAtribuidor.value = tarefa.usuario_atribuidor_id;
               cboStatus.value = tarefa.status;
               cboPrioridade.value = tarefa.prioridade;
@@ -2082,7 +2086,7 @@
 
       tarefas.forEach(tarefa => {
           const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
-          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          //const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
           
           const col = document.createElement("div");
           col.className = "col-md-6 col-lg-4 col-xl-3";
@@ -2206,7 +2210,7 @@
 
       tarefas.forEach(tarefa => {
           const projeto = projetosList.find(p => p.id === tarefa.projeto_id);
-          const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
+          //const responsavel = usuariosList.find(u => u.id === tarefa.usuario_responsavel_id);
           
           const card = document.createElement("div");
           card.className = `card mb-2 tarefa-card-item ${tarefa.prioridade} ${tarefa.concluida ? 'concluida' : ''}`;
@@ -2393,7 +2397,7 @@
         // Filtros
         safeAddEventListener('filtroStatus', 'change', aplicarFiltrosComTarefasSoltas());
         safeAddEventListener('filtroPrioridade', 'change', aplicarFiltrosComTarefasSoltas());
-        safeAddEventListener('filtroResponsavel', 'change', aplicarFiltrosComTarefasSoltas());
+        //safeAddEventListener('filtroResponsavel', 'change', aplicarFiltrosComTarefasSoltas());
 
         // Botão Voltar para Projetos
         safeAddEventListener('btnVoltarProjetos', 'click', function() {
@@ -2534,7 +2538,7 @@
           }
           
           cboProjeto.value = tarefa.projeto_id;
-          cboResponsavel.value = tarefa.usuario_responsavel_id;
+          //cboResponsavel.value = tarefa.usuario_responsavel_id;
           cboStatus.value = tarefa.status;
           cboPrioridade.value = tarefa.prioridade;
           chkConcluida.checked = tarefa.concluida;
@@ -2623,9 +2627,9 @@
       aplicarFiltrosComTarefasSoltas();
     });
 
-    filtroResponsavel.addEventListener('change', function() {
-      aplicarFiltrosComTarefasSoltas();
-    });
+    //filtroResponsavel.addEventListener('change', function() {
+      //aplicarFiltrosComTarefasSoltas();
+    //});
 
     // Carregar dados ao iniciar
     carregarProjetos();

@@ -461,7 +461,8 @@
             </select>
           </div>
         </div>
-        
+
+        <!--
         <div class="row">
           <div class="col-md-6">
             <select id="selUsuario" class="form-select mb-3">
@@ -469,11 +470,13 @@
             </select>
           </div>
         </div>
+        -->
         
         <div class="mb-3">
           <textarea id="txtDescricao" class="form-control" rows="3" placeholder="Descrição do Projeto"></textarea>
         </div>
         
+        <!--
         <div class="row">
           <div class="col-md-6">
             <label for="txtDataInicio" class="form-label">Data de Início</label>
@@ -482,6 +485,13 @@
           <div class="col-md-6">
             <label for="txtDataFim" class="form-label">Data de Término</label>
             <input type="date" id="txtDataFim" class="form-control mb-3" />
+          </div>
+        </div>
+        -->
+        <div class="row">
+          <div class="col-md-6">
+            <label for="txtDataLimite" class="form-label">Data Limite</label>
+            <input type="date" id="txtDataLimite" class="form-control mb-3" />
           </div>
         </div>
 
@@ -721,7 +731,8 @@
     const txtNome = document.getElementById("txtNome");
     const txtDescricao = document.getElementById("txtDescricao");
     const selStatus = document.getElementById("selStatus");
-    const selUsuario = document.getElementById("selUsuario");
+    // const selUsuario = document.getElementById("selUsuario");
+    const txtDataLimite = document.getElementById("txtDataLimite");
     const txtDataInicio = document.getElementById("txtDataInicio");
     const txtDataFim = document.getElementById("txtDataFim");
     const filtroStatus = document.getElementById("filtroStatus");
@@ -793,7 +804,7 @@
         }
         
         // 2. ✅ CRÍTICO: OCULTAR CAMPO "RESPONSÁVEL" DO FORMULÁRIO
-        const linhaResponsavel = document.querySelector('.row:has(#selUsuario)');
+        //const linhaResponsavel = document.querySelector('.row:has(#selUsuario)');
         if (linhaResponsavel) {
             linhaResponsavel.style.display = 'none';
         }
@@ -805,11 +816,11 @@
         }
         
         // 4. ✅ CRÍTICO: AUTO-SELECIONAR USUÁRIO ATUAL COMO RESPONSÁVEL
-        const selUsuario = document.getElementById('selUsuario');
-        if (selUsuario && usuario.id) {
-            selUsuario.value = usuario.id;
-            selUsuario.disabled = true; // Impede alteração
-        }
+        //const selUsuario = document.getElementById('selUsuario');
+        //if (selUsuario && usuario.id) {
+        //    selUsuario.value = usuario.id;
+        //    selUsuario.disabled = true; // Impede alteração
+        //}
         
         // 5. Adicionar mensagem informativa
         const formulario = document.querySelector('.card-body');
@@ -890,10 +901,10 @@
             "projeto": {
                 "nome": txtNome.value.trim(),
                 "descricao": txtDescricao.value.trim(),
-                "data_inicio": txtDataInicio.value || null,
-                "data_fim": txtDataFim.value || null,
+                //"data_inicio": txtDataInicio.value || null,
+                //"data_fim": txtDataFim.value || null,
                 "status": selStatus.value,
-                "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null
+                //"usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null
             }
         };
 
@@ -943,17 +954,17 @@
         return;
       }
 
-      const dataInicio = txtDataInicio.value ? formatDateForInput(txtDataInicio.value) : null;
-      const dataFim = txtDataFim.value ? formatDateForInput(txtDataFim.value) : null;
+      //const dataInicio = txtDataInicio.value ? formatDateForInput(txtDataInicio.value) : null;
+      //const dataFim = txtDataFim.value ? formatDateForInput(txtDataFim.value) : null;
 
       const objetoAtualizar = {
         "projeto": {
           "nome": txtNome.value.trim(),
           "descricao": txtDescricao.value.trim(),
           "status": selStatus.value,
-          "usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null,
-          "data_inicio": dataInicio,
-          "data_fim": dataFim
+          //"usuario_id": selUsuario.value ? parseInt(selUsuario.value) : null,
+          //"data_inicio": dataInicio,
+          //"data_fim": dataFim
         }
       };
 
@@ -1103,14 +1114,14 @@
         }
         
         // Preencher select de responsáveis
-        selUsuario.innerHTML = '<option value="">Responsável pelo projeto</option>';
+        //selUsuario.innerHTML = '<option value="">Responsável pelo projeto</option>';
         filtroResponsavel.innerHTML = '<option value="todos">Todos</option>';
         
         usuarios.forEach(usuario => {
           const option = document.createElement("option");
           option.value = usuario.id;
           option.textContent = usuario.nome;
-          selUsuario.appendChild(option);
+          //selUsuario.appendChild(option);
           
           const optionFiltro = option.cloneNode(true);
           optionFiltro.value = usuario.id;
@@ -1310,9 +1321,9 @@
       txtNome.value = "";
       txtDescricao.value = "";
       selStatus.value = "";
-      selUsuario.value = "";
-      txtDataInicio.value = "";
-      txtDataFim.value = "";
+      //selUsuario.value = "";
+      //txtDataInicio.value = "";
+      //txtDataFim.value = "";
       divResposta.style.display = "none";
     }
 
@@ -1361,7 +1372,7 @@
       thead.className = "table-light";
       const trHead = document.createElement("tr");
 
-      ["ID", "Nome", "Status", "Responsável", "Data Início", "Data Limite", "Ações"].forEach(text => {
+      ["ID", "Nome", "Status", "Responsável", "Data Limite", "Ações"].forEach(text => {
         const th = document.createElement("th");
         th.textContent = text;
         trHead.appendChild(th);
@@ -1402,16 +1413,16 @@
         tr.appendChild(tdResponsavel);
 
         // Data Início
-        const tdDataInicio = document.createElement("td");
-        tdDataInicio.textContent = projeto.data_inicio ? 
-          new Date(projeto.data_inicio).toLocaleDateString('pt-BR') : 'N/A';
-        tr.appendChild(tdDataInicio);
+        //const tdDataInicio = document.createElement("td");
+        //tdDataInicio.textContent = projeto.data_inicio ? 
+        //  new Date(projeto.data_inicio).toLocaleDateString('pt-BR') : 'N/A';
+        //tr.appendChild(tdDataInicio);
 
         // Data Fim
-        const tdDataFim = document.createElement("td");
-        tdDataFim.textContent = projeto.data_fim ? 
-          new Date(projeto.data_fim).toLocaleDateString('pt-BR') : 'N/A';
-        tr.appendChild(tdDataFim);
+        //const tdDataFim = document.createElement("td");
+        //tdDataFim.textContent = projeto.data_fim ? 
+        //  new Date(projeto.data_fim).toLocaleDateString('pt-BR') : 'N/A';
+        //tr.appendChild(tdDataFim);
 
         // Ações
         const tdAcoes = document.createElement("td");
@@ -1424,10 +1435,10 @@
           txtNome.value = projeto.nome;
           txtDescricao.value = projeto.descricao || "";
           selStatus.value = projeto.status;
-          selUsuario.value = projeto.usuario_id || "";
+          //selUsuario.value = projeto.usuario_id || "";
           
-          txtDataInicio.value = formatDateFromBackend(projeto.data_inicio);
-          txtDataFim.value = formatDateFromBackend(projeto.data_fim);
+          //txtDataInicio.value = formatDateFromBackend(projeto.data_inicio);
+          //txtDataFim.value = formatDateFromBackend(projeto.data_fim);
           
           showMessage("Projeto selecionado para edição", "info");
         };
@@ -1518,7 +1529,7 @@
           ].join(' ');
 
           // Calcular dias restantes
-          let diasRestantes = null;
+          /*let diasRestantes = null;
           let diasClass = '';
           if (projeto.data_fim && projeto.status !== 'concluido') {
               const hoje = new Date();
@@ -1546,6 +1557,7 @@
               diasClass = 'dias-concluido';
               diasRestantes = 'Concluído';
           }
+              */
 
           col.innerHTML = `
             <div class="${cardClasses}">
@@ -1563,12 +1575,6 @@
                 <div class="projeto-card-metadata">
                   <span class="status-badge status-${projeto.status}">${formatarStatus(projeto.status)}</span>
                   ${diasRestantes ? `<span class="dias-restantes ${diasClass}">${diasRestantes}</span>` : ''}
-                </div>
-                
-                <div class="projeto-info mb-2">
-                  <div><strong>Responsável:</strong> ${responsavel ? responsavel.nome : 'Não atribuído'}</div>
-                  ${projeto.data_inicio ? `<div><strong>Início:</strong> ${new Date(projeto.data_inicio).toLocaleDateString('pt-BR')}</div>` : ''}
-                  ${projeto.data_fim ? `<div><strong>Término:</strong> ${new Date(projeto.data_fim).toLocaleDateString('pt-BR')}</div>` : ''}
                 </div>
                 
                 <div class="projeto-card-acoes mt-auto">
@@ -1637,7 +1643,7 @@
           // Calcular dias restantes
           let diasRestantes = null;
           let diasClass = '';
-          if (projeto.data_fim && projeto.status !== 'concluido') {
+          /*if (projeto.data_fim && projeto.status !== 'concluido') {
               const hoje = new Date();
               const dataFim = new Date(projeto.data_fim);
               const diffTime = dataFim - hoje;
@@ -1663,7 +1669,7 @@
               diasClass = 'dias-concluido';
               diasRestantes = 'Concluído';
           }
-
+          */
           card.innerHTML = `
             <div class="card-body">
               <div class="projeto-card-header">
@@ -1680,10 +1686,6 @@
                 ${diasRestantes ? `<span class="dias-restantes ${diasClass}">${diasRestantes}</span>` : ''}
               </div>
               
-              <div class="projeto-info">
-                <div><small><strong>Responsável:</strong> ${responsavel ? responsavel.nome : 'Não atribuído'}</small></div>
-                ${projeto.data_fim ? `<div><small><strong>Término:</strong> ${new Date(projeto.data_fim).toLocaleDateString('pt-BR')}</small></div>` : ''}
-              </div>
             </div>
           `;
 
@@ -1801,7 +1803,7 @@
           txtNome.value = projeto.nome;
           txtDescricao.value = projeto.descricao || "";
           selStatus.value = projeto.status;
-          selUsuario.value = projeto.usuario_id || "";
+          //selUsuario.value = projeto.usuario_id || "";
           
           txtDataInicio.value = formatDateFromBackend(projeto.data_inicio);
           txtDataFim.value = formatDateFromBackend(projeto.data_fim);
